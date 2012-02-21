@@ -68,7 +68,15 @@ DVD )
 	dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt
         ;;
 ISO )	
-	dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt
+	if [ -f $ISO_FILE ]
+	then
+		dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt
+	else
+		echo -ne "\n *************************************\n"
+		echo " ISO_FILE $ISO_FILE does not exists ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+	fi
 	;;
 * )
         echo -ne "\n Media source problem: make sure you filled DVD ISO BD or NONE in configuration file\n"
