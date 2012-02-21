@@ -8,7 +8,7 @@ if [ ! -f wazzuf-ripper.conf ]; then
 	echo -ne "\n No configuration file found ! Where is wazzuf-ripper.conf ? Exiting...\n"
         exit 1
 else	
-	source rip.conf
+	source wazzuf-ripper.conf
 fi
 
 # video codec filled
@@ -313,11 +313,21 @@ do
 	                echo " $AUDIO_FILE exists, next..." && sleep 1
         	     	echo -ne " *************************************\n"
 	        else
-			#nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -b $AUDIO_MP3_QUAL -h $WAV_FILE $AUDIO_FILE
-			#-V n   0 <= n <= 9
-			#Enable VBR (Variable BitRate) and specifies the value of VBR quality (default = 4).  0 = highest quality.
-			nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -V $AUDIO_MP3_VBR -h $WAV_FILE $AUDIO_FILE
-			
+			# lame mode choice
+			case $AUDIO_MP3_MODE in
+			        CBR | cbr )
+					nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -b $AUDIO_MP3_CBR -h $WAV_FILE $AUDIO_FILE
+					;;
+			        VBR | vbr )
+					nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -V $AUDIO_MP3_VBR -h $WAV_FILE $AUDIO_FILE
+					;;
+			        * )
+					echo -ne "\n *************************************\n"
+					echo " $AUDIO_MP3_MODE : lame mp3 encoding mode not recognized ! Exiting..."
+					echo -ne " *************************************\n"
+					exit 1
+					;;
+			esac
 			
 			# with ffmpeg (need libavcodec-extra-52) but -threads 4 doesn't work...)
 		#	nice -n ffmpeg -threads 4 -i $WAV_FILE $AUDIO_FILE
