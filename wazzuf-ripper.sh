@@ -3,12 +3,13 @@
 # DVD/BD rip script
 # booloki@gmail.com
 
-## check conf file existence
-if [ ! -f wazzuf-ripper.conf ]; then
-	echo -ne "\n No configuration file found ! Where is wazzuf-ripper.conf ? Exiting...\n"
+## check conf file
+CONF_FILE="wazzuf-ripper.conf"
+if [ ! -f $CONF_FILE ]; then
+	echo -ne "\n No configuration file found ! Where is $CONF_FILE ? Exiting...\n"
         exit 1
 else	
-	source wazzuf-ripper.conf
+	source $CONF_FILE
 fi
 
 # video codec filled
@@ -59,12 +60,17 @@ echo -ne "\n *************************************\n"
 echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO"
 echo -ne " *************************************\n"
 
-## read and save chapters list
-# DVD only
+# Read and save chapters list (DVD only)
+# output VIDEO_BITRATE choice (BD or DVD+*)
 case $SOURCE in
-NON* | BD )
+NON* )
+	$VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+        ;;
+BD )
+	$VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
 DVD )
+	$VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt
         ;;
 ISO )	
@@ -77,6 +83,7 @@ ISO )
 		echo -ne " *************************************\n"
 		exit 1
 	fi
+	$VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
         echo -ne "\n Media source problem: make sure you filled DVD ISO BD or NONE in configuration file\n"
@@ -95,28 +102,28 @@ do
 		echo " Work in progress: $TITLE_NAME $DATE E$i"
 	        echo -ne " *************************************\n"
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.E$i.vob"
-		DTS_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_LANG.dts"
-		WAV_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_LANG.wav"
-		MP3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_LANG.mp3"
-		OGG_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_LANG.ogg"
-		AC3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_LANG.ac3"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.E$i.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.E$i.h264"
-		SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_LANG"
+		SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
+		DTS_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
+		WAV_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.wav"
+		MP3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.mp3"
+		OGG_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.ogg"
+		AC3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.ac3"
 		;;
 	n* | N* )
 		echo -ne "\n *************************************\n"
 		echo " Work in progress: $TITLE_NAME $DATE"
 	        echo -ne " *************************************\n"
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
-		DTS_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_LANG.dts"
-		WAV_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_LANG.wav"
-		MP3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_LANG.mp3"
-		OGG_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_LANG.ogg"
-		AC3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_LANG.ac3"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
-		SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_LANG"
+		SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+		DTS_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.dts"
+		WAV_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.wav"
+		MP3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.mp3"
+		OGG_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.ogg"
+		AC3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.ac3"
 		;;
 	* )
                 echo -ne "\n *************************************\n"
@@ -140,7 +147,9 @@ do
 		                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
 		                echo -ne " *************************************\n"
 		        else
-				nice -n $NICENESS mencoder dvd://$DVD_TITLE_NUMBER -chapter $i-$i -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno
+				nice -n $NICENESS mencoder dvd://$DVD_TITLE_NUMBER -chapter $i-$i \
+				-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
+				-o /dev/null -nosound -ovc frameno
 			fi
 			;;
 		ISO )
@@ -151,7 +160,9 @@ do
 		                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
 		                echo -ne " *************************************\n"
 		        else
-				nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter $i-$i -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno
+				nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter $i-$i \
+					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
+					-o /dev/null -nosound -ovc frameno
 				# iso specific
 				#nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter 1-11 -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno
 			fi
@@ -174,16 +185,17 @@ do
 		BD )
 			if [ ! -f $SUBTITLE_FILE ]
 		        then
+				# PSG format (.sup) - subtitle extraction impossible with mplayer 1.0rc4-4.5.2
 				echo -ne "\n *************************************\n"
 		                echo " $SUBTITLE_FILE does not exists ! Exiting..."
+		                echo " For example, extrat PSG subtitles with tsMuxer - http://www.videohelp.com/tools/tsMuxeR "
 		                echo -ne " *************************************\n"
 				exit 1
-				# please use tsMuxer, for example, for BD subtitles -> PSG format (.sup) - subtitle extract not possible with mplayer 1.0rc4-4.5.2
 			else
+				# SUBTITLE_FILE is already OK
 				echo -ne "\n *************************************\n"
 		                echo " using $SUBTITLE_FILE subtitles. Next..." && sleep 1
 		                echo -ne " *************************************\n"
-				#SUBTITLE_FILE is already OK
 			fi
 			;;
 		esac
@@ -201,8 +213,7 @@ do
 		;;
 	esac
 
-
-	## Audio extract/encode
+	# Extract Full working file (.vob or .m2ts)
 	case $SOURCE in
 	NONE )
 		echo -ne "\n *************************************\n"
@@ -234,6 +245,7 @@ do
 		;;
 	esac
 
+	## Audio extract/encode
 	# extract audio from local working file : wav
 	case $CODEC_AUDIO in
         VORBIS | MP3 )
@@ -313,7 +325,7 @@ do
 		fi
 		;;
 	MP3 )
-		# audio mp3 encode (lame not multithreaded...)
+		# audio mp3 encode (but lame not multithreaded...)
 		AUDIO_FILE=$MP3_FILE
 		if [ -f $AUDIO_FILE ]
 	        then
@@ -353,8 +365,14 @@ do
 		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-x264.html
 		VIDEO_FILE=$H264_FILE
 		if [ ! -f $VIDEO_FILE ]; then
-			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE -vf pp=ci,crop=$VIDEO_CROP -ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=2:threads=$VIDEO_X264_THREADS:pass=1 -nosound -nosub
-			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE -vf pp=ci,crop=$VIDEO_CROP -ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=2:threads=$VIDEO_X264_THREADS:pass=2 -nosound -nosub
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=2:threads=$VIDEO_X264_THREADS:pass=1 \
+				-nosound -nosub
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=2:threads=$VIDEO_X264_THREADS:pass=2 \
+				-nosound -nosub
 		else
 			echo -ne "\n *************************************\n"
 	                echo " $VIDEO_FILE file exists. Next...." && sleep 1
@@ -372,8 +390,14 @@ do
 	                echo -ne " *************************************\n"
 	        else
 			# xvid: bitrate setting is ignored during first pass
-			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE -vf pp=ci,crop=$VIDEO_CROP -ovc xvid -xvidencopts pass=1:threads=$VIDEO_XVID_THREADS -nosound -nosub
-			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE -vf pp=ci,crop=$VIDEO_CROP -ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS -nosound -nosub
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc xvid -xvidencopts pass=1:threads=$VIDEO_XVID_THREADS \
+				-nosound -nosub
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS \
+				-nosound -nosub
 		fi
 		;;
 	esac
@@ -386,8 +410,12 @@ do
 	4/3 | 1.33 | 16/9 | 1.78 | 2.21 )
 		case $SUBTITLE_LANG in
 		fr | en )
-			nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv" --aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE --title "$TITLE_LONG" --language 0:$AUDIO_LANG $AUDIO_FILE --language 0:$SUBTITLE_LANG $SUBTITLE_FILE
-		        ;;
+			nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv" \
+				--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE \
+				--title "$TITLE_LONG" \
+				--language 0:$AUDIO_LANG $AUDIO_FILE \
+				--language 0:$SUBTITLE_LANG $SUBTITLE_FILE
+		       ;;
 		* )
 			case $SERIE in
 			y* | Y* )
@@ -403,11 +431,17 @@ do
 					EPISODE_NAME=`head -n $i $EPISODES_FILE | tail -n 1`
 					EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
 				fi
-				nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_SIGNATURE.mkv" --aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE --title "$TITLE_LONG - $EPISODE_NAME" --language 0:$AUDIO_LANG $AUDIO_FILE
+				nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_SIGNATURE.mkv" \
+					--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE \
+					--title "$TITLE_LONG - $EPISODE_NAME" \
+					--language 0:$AUDIO_LANG $AUDIO_FILE
 				;;
 			* )
 				# for standalone rip
-	        		nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv" --aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE --title "$TITLE_LONG" --language 0:$AUDIO_LANG $AUDIO_FILE
+	        		nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv" \
+					--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE \
+					--title "$TITLE_LONG" \
+					--language 0:$AUDIO_LANG $AUDIO_FILE
 				;;
 			esac
 		        ;;
