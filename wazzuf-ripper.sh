@@ -181,20 +181,6 @@ do
 					-o /dev/null -nosound -ovc frameno
 			fi
 			;;
-		NONE )
-			SUBTITLE_FILE=$SUB_FILE.idx
-			if [ -f $SUBTITLE_FILE ]
-		        then
-				echo -ne "\n *************************************\n"
-		                echo " $SUBTITLE_FILE OK. Next..." && sleep 1
-		                echo -ne " *************************************\n"
-		        else
-				echo -ne "\n *************************************\n"
-		                echo " $SUBTITLE_FILE subtitles does not exists and source media is NONE ! Exiting..."
-		                echo -ne " *************************************\n"
-				exit 1
-			fi
-			;;
 		BD )
 			if [ ! -f $SUBTITLE_FILE ]
 		        then
@@ -342,7 +328,7 @@ do
 	                echo " $AUDIO_FILE exists, next..." && sleep 1
         	     	echo -ne " *************************************\n"
 	        else
-			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL
+			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $OGG_FILE
 		fi
 		;;
 	MP3 )
