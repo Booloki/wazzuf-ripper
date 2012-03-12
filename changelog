@@ -4,17 +4,19 @@
 # Changelog file
 
 2011-03-12
-* add DTS output support (remove AUDIO_DTS, add mandatory AUDIO_SOURCE)
-* video bitrate choice bugfix
-* add force multichapters option for one video (MULTICHAP_FORCE MULTICHAP_FIRST MULTICHAP_LAST)
-* change mkvmerge composition: add audio/subtitle track name (AUDIO_NAME SUBTITLE_NAME)
-* set default subtitle track to none
-* some configuration file improvements
-* add this changelog file to git
+* Add ioniceness to audio extract
+* Remove useless NONE media support option
+* Add DTS output support (remove AUDIO_DTS, add mandatory AUDIO_SOURCE)
+* Video bitrate choice bugfix
+* Add force multichapters option for one video (MULTICHAP_FORCE MULTICHAP_FIRST MULTICHAP_LAST)
+* Change mkvmerge composition: add audio/subtitle track name (AUDIO_NAME SUBTITLE_NAME)
+* Set default subtitle track to none
+* Some configuration file improvements
+* Add this changelog file to git
 
 2011-03-05
 * Add original id to working audio/subtitles filename to prepare multi-audio and multi-subtitles rip
 * Separate video bitrate variables between DVD and BD
-* some minor bugfixes and comment changes
+* Some minor bugfixes and comment changes
 * Add CONF_FILE variable in script
 

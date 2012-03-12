@@ -25,7 +25,7 @@ xvi* | Xvi* | XVI* )
 	CODEC_VIDEO=$DEFAULT_CODEC_VIDEO
 	;;
 * )
-        echo -ne "\n Syntax : $0 [Video Codec (h264,xvid)] [Audio Codec (AC3,vorbis,mp3)]\n"
+        echo -ne "\n Syntax : $0 [Video Codec (h264,xvid)] [Audio Codec (DTS,AC3,vorbis,mp3)]\n"
         exit 1
         ;;
 esac
@@ -41,7 +41,7 @@ AC3 | AC351 | AC320 )
 ogg | vorbis | OGG | VORBIS )
         CODEC_AUDIO="VORBIS"
         ;;
-mp3 | MP3 )
+mp3 | MP3 | Mp3 )
         CODEC_AUDIO="MP3"
         ;;
 "" )
@@ -49,7 +49,7 @@ mp3 | MP3 )
 	CODEC_AUDIO=$DEFAULT_CODEC_AUDIO
         ;;
 * )
-        echo -ne "\n Syntax : $0 [Video Codec (h264,xvid)] [Audio Codec (AC3,vorbis,mp3)]\n"
+        echo -ne "\n Syntax : $0 [Video Codec (h264,xvid)] [Audio Codec (DTS,AC3,vorbis,mp3)]\n"
         exit 1
         ;;
 esac
@@ -66,9 +66,6 @@ echo -ne " *************************************\n"
 # Read and save chapters list (DVD only)
 # output VIDEO_BITRATE choice (BD or DVD+*)
 case $SOURCE in
-NON* )
-	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
-        ;;
 BD )
 	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
@@ -89,7 +86,7 @@ ISO )
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
-        echo -ne "\n Media source problem: make sure you filled DVD ISO BD or NONE in configuration file\n"
+        echo -ne "\n Media source problem: make sure you filled DVD ISO or BD in configuration file\n"
         exit 1
         ;;
 esac
@@ -233,15 +230,15 @@ do
 
 	# Extract Full working file (.vob or .m2ts)
 	case $SOURCE in
-	NONE )
-		echo -ne "\n *************************************\n"
-        	echo " Media source not used"  && sleep 1
-	        echo -ne " *************************************\n"
-		SOURCE_FILE=$VOB_FILE
-	        ;;
 	DVD )
-                # extract local working file from DVD
-               ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+		if [ ! -f $VOB_FILE ]; then
+                	# extract local working file from DVD
+	               ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+		else
+	                echo -ne "\n *************************************\n"
+	                echo " $VOB_FILE file exists. Next..."  && sleep 1
+        	        echo -ne " *************************************\n"
+		fi
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	ISO )
@@ -249,7 +246,7 @@ do
 			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
 		else
 	                echo -ne "\n *************************************\n"
-	                echo " Vob file exists. Next..."  && sleep 1
+	                echo " $VOB_FILE file exists. Next..."  && sleep 1
         	        echo -ne " *************************************\n"
 		fi
 		SOURCE_FILE=$VOB_FILE
@@ -287,14 +284,14 @@ do
 			echo " $DTS_FILE exists, next..." && sleep 1
 			echo -ne " *************************************\n"
 		else
-			nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
+			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 		fi
 		;;
         VORBIS | MP3 )
 		# extract wave
 		if [ ! -f $WAV_FILE ]; then
 			 # takes a long time....
-	                nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
+	                ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
 		else
 	                echo -ne "\n *************************************\n"
 	                echo " Wave file exists. Next..."  && sleep 1
