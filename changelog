@@ -4,6 +4,7 @@
 # Changelog file
 
 2011-03-12
+* Add licence.txt and readme.txt files
 * Add ioniceness to audio extraction
 * Remove useless NONE media support option
 * Add DTS output support (remove AUDIO_DTS, add mandatory AUDIO_SOURCE)
