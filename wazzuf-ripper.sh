@@ -32,6 +32,9 @@ esac
 
 # audio codec filled
 case $2 in
+DTS | DTS-HD )
+        CODEC_AUDIO=$2
+        ;;
 AC3 | AC351 | AC320 )
         CODEC_AUDIO=$2
         ;;
@@ -64,13 +67,13 @@ echo -ne " *************************************\n"
 # output VIDEO_BITRATE choice (BD or DVD+*)
 case $SOURCE in
 NON* )
-	$VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
         ;;
 BD )
-	$VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
+	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
 DVD )
-	$VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt
         ;;
 ISO )	
@@ -83,7 +86,7 @@ ISO )
 		echo -ne " *************************************\n"
 		exit 1
 	fi
-	$VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
         echo -ne "\n Media source problem: make sure you filled DVD ISO BD or NONE in configuration file\n"
@@ -96,6 +99,17 @@ if [[ $SERIE == "no" ]]; then EPISODE_LAST="1"; fi
 
 time for ((i=$EPISODE_FIRST; i <= EPISODE_LAST ; i++))
 do
+	# check multichapers
+	case $MULTICHAP_FORCE in
+		y* | Y* )
+			CHAPTERS="$MULTICHAP_FIRST-$MULTICHAP_LAST"
+			;;
+		* )
+			CHAPTERS="$i-$i"
+			;;
+	esac
+
+	# set variables if series or not 
 	case $SERIE in
 	y* | Y* )
 		echo -ne "\n *************************************\n"
@@ -133,7 +147,6 @@ do
 		;;
 	esac
 
-
 	## subtitle extract
 	# DVD only - .idx and .sub files
 	case $SUBTITLE_LANG in
@@ -147,7 +160,10 @@ do
 		                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
 		                echo -ne " *************************************\n"
 		        else
-				nice -n $NICENESS mencoder dvd://$DVD_TITLE_NUMBER -chapter $i-$i \
+				echo -ne "\n *************************************\n"
+		                echo " Extracting subtitle to $SUBTITLE_FILE "
+		                echo -ne " *************************************\n"
+				nice -n $NICENESS mencoder dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS \
 				-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
 				-o /dev/null -nosound -ovc frameno
 			fi
@@ -160,15 +176,15 @@ do
 		                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
 		                echo -ne " *************************************\n"
 		        else
-				nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter $i-$i \
+				echo -ne "\n *************************************\n"
+		                echo " Extracting subtitle to $SUBTITLE_FILE "
+		                echo -ne " *************************************\n"
+				nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS \
 					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
 					-o /dev/null -nosound -ovc frameno
-				# iso specific
-				#nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter 1-11 -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno
 			fi
 			;;
 		NONE )
-
 			SUBTITLE_FILE=$SUB_FILE.idx
 			if [ -f $SUBTITLE_FILE ]
 		        then
@@ -194,16 +210,18 @@ do
 			else
 				# SUBTITLE_FILE is already OK
 				echo -ne "\n *************************************\n"
-		                echo " using $SUBTITLE_FILE subtitles. Next..." && sleep 1
+		                echo " $SUBTITLE_FILE subtitles OK. Next..." && sleep 1
 		                echo -ne " *************************************\n"
 			fi
 			;;
 		esac
+		MERGE_SUBTITLES="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
 		;;
 	"" )
 		echo -ne "\n *************************************\n"
 		echo " No subtitle, next..." && sleep 1
 		echo -ne " *************************************\n"
+		MERGE_SUBTITLES=""
 		;;
 	* )
 		echo -ne "\n *************************************\n"
@@ -223,16 +241,12 @@ do
 	        ;;
 	DVD )
                 # extract local working file from DVD
-               ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $i-$i -dumpfile $VOB_FILE
-                # specific
-		#ionice -c 3 nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter 2-8 -dumpfile $VOB_FILE
+               ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	ISO )
 		if [ ! -f $VOB_FILE ]; then
-		        ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $i-$i -dumpfile $VOB_FILE
-	                # specific
-		        #ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter 1-11 -dumpfile $VOB_FILE
+			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
 		else
 	                echo -ne "\n *************************************\n"
 	                echo " Vob file exists. Next..."  && sleep 1
@@ -246,10 +260,40 @@ do
 	esac
 
 	## Audio extract/encode
-	# extract audio from local working file : wav
+
+	# Audio source format
+        case $AUDIO_SOURCE in
+	DTS )
+		AUDIO_SOURCE_FILE=$DTS_FILE
+		;;
+        AC3 )
+		AUDIO_SOURCE_FILE=$AC3_FILE
+		;;
+	* )
+		echo -ne "\n *************************************\n"
+		echo " $AUDIO_SOURCE : audio source format not recognized ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
+	esac
+
+	# extract audio from local working file
 	case $CODEC_AUDIO in
+	DTS | DTS-HD | AC3 | AC351 )
+		# extract AC3/DTS
+		if [ -f $AUDIO_SOURCE_FILE ]
+		then
+			echo -ne "\n *************************************\n"
+			echo " $DTS_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
+		fi
+		;;
         VORBIS | MP3 )
+		# extract wave
 		if [ ! -f $WAV_FILE ]; then
+			 # takes a long time....
 	                nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
 		else
 	                echo -ne "\n *************************************\n"
@@ -257,60 +301,40 @@ do
         	        echo -ne " *************************************\n"
 		fi
                 ;;
+	* )
+		echo -ne "\n *************************************\n"
+		echo " $CODEC_AUDIO : audio codec not recognized ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
         esac
 
         case $CODEC_AUDIO in
-        AC3 | AC351 | AC320 )
-		# extract audio from local working file : ac3
+	DTS | DTS-HD )
+		AUDIO_FILE=$DTS_FILE
+       		if [ -f $AUDIO_FILE ]
+       		then
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE should already exist but not here ! exiting..."
+			echo -ne " *************************************\n"
+			exit 1	
+		fi
+		;;
+        AC3 | AC351)
 		AUDIO_FILE=$AC3_FILE
-		case $SOURCE in
-		BD )
-			case $AUDIO_DTS in
-				y* | Y* )
-		        		if [ -f $DTS_FILE ]
-		        		then
-                				echo -ne "\n *************************************\n"
-		                		echo " $DTS_FILE exists, next..." && sleep 1
-       	        				echo -ne " *************************************\n"
-		        		else
-						# M2TS to DTS
-		                		nice -n 1 mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $DTS_FILE
-		        		fi
-	                		if [ -f $AUDIO_FILE ]
-                       			then
-             	  				echo -ne "\n *************************************\n"
-              	          		        echo " $AUDIO_FILE exists, next..." && sleep 1
-       	     	  				echo -ne " *************************************\n"
-                       			else
-	                		        # DTS to AC3
-	                		        # to much time ! cause not multithreaded ?
-	                		        # dcadec -o $DTS_FILE | aften - $AUDIO_FILE -b $AUDIO_AC3_QUAL
-                        			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $DTS_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
-	                		fi
-					;;
-				n* | N* )
-	                		if [ -f $AUDIO_FILE ]
-                       			then
-             	  				echo -ne "\n *************************************\n"
-                        		        echo " $AUDIO_FILE exists, next..." && sleep 1
-       	     	  				echo -ne " *************************************\n"
-                       			else
-		                		nice -n 1 mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_FILE
-		        		fi
-					;;
-					esac
-			;;
-		* )
-	                if [ -f $AUDIO_FILE ]
-                       	then
-             	  		echo -ne "\n *************************************\n"
-                                echo " $AUDIO_FILE exists, next..." && sleep 1
-       	     	  		echo -ne " *************************************\n"
-                       	else
-				nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_FILE
-		        fi
-			;;
-		esac
+		if [ -f $AUDIO_FILE ]
+		then
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			# DTS to AC3
+			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $DTS_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
+		fi
 		;;
 	VORBIS )
 		# audio ogg vorbis encode
@@ -348,12 +372,6 @@ do
 					exit 1
 					;;
 			esac
-			
-			# with ffmpeg (need libavcodec-extra-52) but -threads 4 doesn't work...)
-		#	nice -n ffmpeg -threads 4 -i $WAV_FILE $AUDIO_FILE
-	
-			# with mencoder (doesn't work even with -vc null -vo null OR -novideo)
-		#	nice -n $NICENESS mencoder $WAV_FILE -oac mp3lame -o $AUDIO_FILE -novideo -vc null
 		fi
 		;;
 	esac
@@ -408,16 +426,7 @@ do
 	# aspect-ratio check
 	case $VIDEO_RATIO in
 	4/3 | 1.33 | 16/9 | 1.78 | 2.21 )
-		case $SUBTITLE_LANG in
-		fr | en )
-			nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv" \
-				--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE \
-				--title "$TITLE_LONG" \
-				--language 0:$AUDIO_LANG $AUDIO_FILE \
-				--language 0:$SUBTITLE_LANG $SUBTITLE_FILE
-		       ;;
-		* )
-			case $SERIE in
+		case $SERIE in
 			y* | Y* )
 				# for TV series
 	        		if [ ! -f $EPISODES_FILE ]
@@ -431,21 +440,27 @@ do
 					EPISODE_NAME=`head -n $i $EPISODES_FILE | tail -n 1`
 					EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
 				fi
-				nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_SIGNATURE.mkv" \
-					--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE \
-					--title "$TITLE_LONG - $EPISODE_NAME" \
-					--language 0:$AUDIO_LANG $AUDIO_FILE
+				MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+				#.$CODEC_VIDEO.$CODEC_AUDIO
+				MERGE_TITLE="$TITLE_LONG - $EPISODE_NAME"
 				;;
-			* )
-				# for standalone rip
-	        		nice -n $NICENESS mkvmerge -o "$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv" \
-					--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE \
-					--title "$TITLE_LONG" \
-					--language 0:$AUDIO_LANG $AUDIO_FILE
+			* )	
+				MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+				MERGE_TITLE=$TITLE_LONG
 				;;
-			esac
-		        ;;
 		esac
+
+		MERGE_VIDEO="--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE"
+		MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:$AUDIO_NAME $AUDIO_FILE"
+
+		# global merge command
+		echo -ne "\n *************************************\n"
+		echo " Final file merge:"
+		nice -n $NICENESS mkvmerge \
+			$MERGE_OUTPUT --title "$MERGE_TITLE" \
+			$MERGE_VIDEO \
+			$MERGE_AUDIO \
+			$MERGE_SUBTITLES
 		;;
 	* )
 		echo -ne "\n *************************************\n"
