@@ -3,7 +3,11 @@
 # booloki@gmail.com
 # Changelog file
 
-2011-03-12
+2012-03-12
+* Add SUBTITLE_NODEFAULT_FORCE option to avoid unnecessary default subtitle display
+* Configuration file reorganization
+
+2012-03-12
 * Add licence.txt and readme.txt files
 * Add ioniceness to audio extraction
 * Remove useless NONE media support option
@@ -15,7 +19,7 @@
 * Some configuration file improvements
 * Add this changelog file to git
 
-2011-03-05
+2012-03-05
 * Add original id to working audio/subtitles filename to prepare multi-audio and multi-subtitles rip
 * Separate video bitrate variables between DVD and BD
 * Some minor bugfixes and comment changes

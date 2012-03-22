@@ -198,7 +198,15 @@ do
 			fi
 			;;
 		esac
-		MERGE_SUBTITLES="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+		# Force no default subtitle (or not)
+		case $SUBTITLE_NODEFAULT_FORCE in
+		Y* | y* )
+			MERGE_SUBTITLES="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+			;;
+		* )
+			MERGE_SUBTITLES="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+			;;
+		esac
 		;;
 	"" )
 		echo -ne "\n *************************************\n"
@@ -439,6 +447,7 @@ do
 		# global merge command
 		echo -ne "\n *************************************\n"
 		echo " Final file merge:"
+		echo -ne " *************************************\n"
 		nice -n $NICENESS mkvmerge \
 			$MERGE_OUTPUT --title "$MERGE_TITLE" \
 			$MERGE_VIDEO \
