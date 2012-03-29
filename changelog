@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-03-29
+* New wazzuf-functions-check file
 * Add multiple audio track rip feature
 * Code structure change for v2
 * New v1 release branch

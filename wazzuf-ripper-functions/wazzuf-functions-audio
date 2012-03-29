@@ -87,6 +87,7 @@ audio_rip () {
 			echo -ne " *************************************\n"
 		else
 			# DTS to AC3
+			check_ffmpeg
 			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $DTS_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
 		fi
 		;;
@@ -100,6 +101,7 @@ audio_rip () {
         	     	echo -ne " *************************************\n"
 	        else
 			# multithread option ?
+			check_oggenc
 			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $OGG_FILE
 		fi
 		;;
@@ -112,6 +114,7 @@ audio_rip () {
 	                echo " $AUDIO_FILE exists, next..." && sleep 1
         	     	echo -ne " *************************************\n"
 	        else
+			check_lame
 			# lame mode choice
 			case $AUDIO_MP3_MODE in
 			        CBR | cbr )

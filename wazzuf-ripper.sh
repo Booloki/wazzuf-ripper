@@ -8,22 +8,12 @@ FUNCTIONS_PATH="wazzuf-ripper-functions"
 FUNCTIONS_AUDIO_FILE="$FUNCTIONS_PATH/wazzuf-functions-audio"
 FUNCTIONS_VIDEO_FILE="$FUNCTIONS_PATH/wazzuf-functions-video"
 FUNCTIONS_SUBTITLES_FILE="$FUNCTIONS_PATH/wazzuf-functions-subtitle"
+FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
+WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE"
 
 # check wazzuf files
-for WFILE in $CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE
-do
-	if [ ! -f $WFILE ]; then
-		echo -ne "\n $WFILE file not found ! Exiting...\n"
-	        exit 1
-	else	
-		source $WFILE
-	fi
-done
-
-wazzuf_usage () {
-	echo -ne "\n Usage : $0 [Video Codec (h264,xvid)] [Audio Codec (DTS,AC3,vorbis,mp3)]\n"
-	exit 1
-}
+source $FUNCTIONS_CHECK
+checkandsource_wazzuf_files
 
 # video codec choice check
 case $1 in
@@ -91,7 +81,7 @@ mkdir -p "$TAG_TITLE_NAME"
 cd $TAG_TITLE_NAME
 
 echo -ne "\n *************************************\n"
-echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO"
+echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
 echo -ne " *************************************\n"
 
 # Read and save chapters list (DVD only)
@@ -102,11 +92,13 @@ BD )
         ;;
 DVD )
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+	check_ogmtools
 	dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt
         ;;
 ISO )	
 	if [ -f $ISO_FILE ]
 	then
+		check_ogmtools
 		dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt
 	else
 		echo -ne "\n *************************************\n"
@@ -121,6 +113,9 @@ ISO )
         exit 1
         ;;
 esac
+
+check_nice
+check_ionice
 
 # serie check for loop
 if [[ $SERIE == "no" ]]; then EPISODE_LAST="1"; fi
@@ -167,6 +162,7 @@ do
 
 
 	# Extract Full working file (.vob or .m2ts)
+	check_mplayer
 	case $SOURCE in
 	DVD )
 		if [ ! -f $VOB_FILE ]; then
@@ -304,6 +300,7 @@ do
 		echo -ne "\n *************************************\n"
 		echo " Final file merge:"
 		echo -ne " *************************************\n"
+		check_mkvmerge
 		nice -n $NICENESS mkvmerge \
 			$MERGE_OUTPUT --title "$MERGE_TITLE" \
 			$MERGE_VIDEO \
