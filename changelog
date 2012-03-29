@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-03-29
+* New v1 release branch
+
 2012-03-12
 * Add SUBTITLE_NODEFAULT_FORCE option to avoid unnecessary default subtitle display
 * Configuration file reorganization
