@@ -1,0 +1,91 @@
+## check functions
+checkandsource_wazzuf_files () {
+	for WFILE in $WAZZUF_FILES
+	do
+		if [ ! -f $WFILE ]; then
+	                echo -ne "\n *************************************\n"
+			echo -ne "\n $WFILE file not found ! Exiting...\n"
+        	        echo -ne " *************************************\n"
+		        exit 1
+		else	
+			source $WFILE
+		fi
+	done
+}
+
+check_nice () {
+	if [ ! -x "/usr/bin/nice" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install nice (coreutils) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_ionice () {
+	if [ ! -x "/usr/bin/ionice" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install ionice (util-linux) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_ogmtools () {
+	if [ ! -x "/usr/bin/dvdxchap" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install dvdxchap (ogmtools) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_mplayer () {
+	if [ ! -x "/usr/bin/mplayer" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install mplayer ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_ffmpeg () {
+	if [ ! -x "/usr/bin/ffmpeg" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install ffmpeg ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_oggenc () {
+	if [ ! -x "/usr/bin/oggenc" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install oggenc (vorbis-tools) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi	
+}
+
+check_lame () {
+	if [ ! -x "/usr/bin/lame" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install lame ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_mkvmerge () {
+	if [ ! -x "/usr/bin/mkvmerge" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install mkvmerge (mkvtoolnix) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+wazzuf_usage () {
+	echo -ne "\n Usage : $0 [Video Codec (h264,xvid)] [Audio 1 Codec (DTS,AC3,vorbis,mp3)] [Audio 2 Codec (DTS,AC3,vorbis,mp3)]\n"
+	exit 1
+}
