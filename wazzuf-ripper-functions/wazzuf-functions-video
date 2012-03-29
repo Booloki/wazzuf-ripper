@@ -1,0 +1,45 @@
+## video encode function
+video_rip () {
+	case $CODEC_VIDEO in
+	H264 )
+		# video h264 (2 pass) encode
+		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-x264.html
+		VIDEO_FILE=$H264_FILE
+		if [ ! -f $VIDEO_FILE ]; then
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=2:threads=$VIDEO_X264_THREADS:pass=1 \
+				-nosound -nosub
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=2:threads=$VIDEO_X264_THREADS:pass=2 \
+				-nosound -nosub
+		else
+			echo -ne "\n *************************************\n"
+	                echo " $VIDEO_FILE file exists. Next...." && sleep 1
+	                echo -ne " *************************************\n"
+		fi
+		;;
+	XVID )	
+		# video xvid encode
+	        # doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
+		VIDEO_FILE=$XVID_FILE
+	        if [ -f $VIDEO_FILE ]
+	        then
+			echo -ne "\n *************************************\n"
+	                echo " $VIDEO_FILE file exists. Next..." && sleep 1
+	                echo -ne " *************************************\n"
+	        else
+			# xvid: bitrate setting is ignored during first pass
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc xvid -xvidencopts pass=1:threads=$VIDEO_XVID_THREADS \
+				-nosound -nosub
+			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				-vf pp=ci,crop=$VIDEO_CROP \
+				-ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS \
+				-nosound -nosub
+		fi
+		;;
+	esac
+}

@@ -1,0 +1,133 @@
+## Audio extract/encode function
+
+# audio_rip
+# need 	AUDIO_AID
+#	AUDIO_SOURCE
+#	AUDIO_LANG
+#	AUDIO_NAME
+#	CODEC_AUDIO
+#	DTS_FILE
+#	WAV_FILE
+#	MP3_FILE
+#	OGG_FILE
+#	AC3_FILE
+#
+# return AUDIO_FILE
+audio_rip () {
+
+	# Audio source format
+        case $AUDIO_SOURCE in
+	DTS )
+		AUDIO_SOURCE_FILE=$DTS_FILE
+		;;
+        AC3 )
+		AUDIO_SOURCE_FILE=$AC3_FILE
+		;;
+	* )
+		echo -ne "\n *************************************\n"
+		echo " $AUDIO_SOURCE : audio source format not recognized ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
+	esac
+
+	# extract audio from local working file
+	case $CODEC_AUDIO in
+	DTS | DTS-HD | AC3 | AC351 )
+		# extract AC3/DTS
+		if [ -f $AUDIO_SOURCE_FILE ]
+		then
+			echo -ne "\n *************************************\n"
+			echo " $DTS_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
+		fi
+		;;
+        VORBIS | MP3 )
+		# extract wave
+		if [ ! -f $WAV_FILE ]; then
+			 # takes a long time....
+	                ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
+		else
+	                echo -ne "\n *************************************\n"
+	                echo " Wave file exists. Next..."  && sleep 1
+        	        echo -ne " *************************************\n"
+		fi
+                ;;
+	* )
+		echo -ne "\n *************************************\n"
+		echo " $CODEC_AUDIO : audio codec not recognized ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
+        esac
+
+        case $CODEC_AUDIO in
+	DTS | DTS-HD )
+		AUDIO_FILE=$DTS_FILE
+       		if [ -f $AUDIO_FILE ]
+       		then
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE should already exist but not here ! exiting..."
+			echo -ne " *************************************\n"
+			exit 1	
+		fi
+		;;
+        AC3 | AC351)
+		AUDIO_FILE=$AC3_FILE
+		if [ -f $AUDIO_FILE ]
+		then
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			# DTS to AC3
+			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $DTS_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
+		fi
+		;;
+	VORBIS )
+		# audio ogg vorbis encode
+		AUDIO_FILE=$OGG_FILE
+		if [ -f $AUDIO_FILE ]
+	        then
+	             	echo -ne "\n *************************************\n"
+	                echo " $AUDIO_FILE exists, next..." && sleep 1
+        	     	echo -ne " *************************************\n"
+	        else
+			# multithread option ?
+			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $OGG_FILE
+		fi
+		;;
+	MP3 )
+		# audio mp3 encode (but lame not multithreaded...)
+		AUDIO_FILE=$MP3_FILE
+		if [ -f $AUDIO_FILE ]
+	        then
+	             	echo -ne "\n *************************************\n"
+	                echo " $AUDIO_FILE exists, next..." && sleep 1
+        	     	echo -ne " *************************************\n"
+	        else
+			# lame mode choice
+			case $AUDIO_MP3_MODE in
+			        CBR | cbr )
+					nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -b $AUDIO_MP3_CBR -h $WAV_FILE $AUDIO_FILE
+					;;
+			        VBR | vbr )
+					nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -V $AUDIO_MP3_VBR -h $WAV_FILE $AUDIO_FILE
+					;;
+			        * )
+					echo -ne "\n *************************************\n"
+					echo " $AUDIO_MP3_MODE : lame mp3 encoding mode not recognized ! Exiting..."
+					echo -ne " *************************************\n"
+					exit 1
+					;;
+			esac
+		fi
+		;;
+	esac
+}
