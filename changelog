@@ -4,11 +4,13 @@
 # Changelog file
 
 -2012-04-08
+* Add second subtitles track rip feature
 * remove SUBTITLE_LANG check - mkvmerge do it well
 
 2012-03-29
+* VIDEO_RATIO is now VIDEO_RATIO_FORCE optional option
 * New wazzuf-functions-check file
-* Add multiple audio track rip feature
+* Add second audio track rip feature
 * Code structure change for v2
 * New v1 release branch
 

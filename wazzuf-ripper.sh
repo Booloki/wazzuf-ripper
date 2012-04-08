@@ -132,7 +132,7 @@ do
 			;;
 	esac
 
-	# set video and subtitles variables if series or not 
+	# set full working file and video filenames if series or not 
 	case $SERIE in
 	y* | Y* )
 		echo -ne "\n *************************************\n"
@@ -141,7 +141,6 @@ do
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.E$i.vob"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.E$i.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.E$i.h264"
-		SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
 		;;
 	n* | N* )
 		echo -ne "\n *************************************\n"
@@ -150,7 +149,6 @@ do
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
-		SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
 		;;
 	* )
                 echo -ne "\n *************************************\n"
@@ -161,7 +159,7 @@ do
 	esac
 
 
-	# Extract Full working file (.vob or .m2ts)
+	# Extract full working file (.vob or .m2ts)
 	check_mplayer
 	case $SOURCE in
 	DVD )
@@ -191,11 +189,71 @@ do
 	esac
 
 
-	## subtitle extract
-	subtitle_rip
+	## subtitle(s) check/extract
+
+	if [[ $SUBTITLE_1_LANG == "" ]]; then
+		echo -ne "\n *************************************\n"
+		echo " No subtitle track choice, next..." && sleep 1
+		echo -ne " *************************************\n"
+	else
+		# audio track 1
+		SUBTITLE_LANG=$SUBTITLE_1_LANG
+		SUBTITLE_NAME=$SUBTITLE_1_NAME
+		SUBTITLE_SID=$SUBTITLE_1_SID
+		SUBTITLE_FILE=$SUBTITLE_1_FILE
+	
+		# set subtitles filenames if series or not 
+		case $SERIE in
+		y* | Y* )
+			SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
+			;;
+		n* | N* )
+			SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+			;;
+		esac
+	
+		subtitle_rip
+	
+		# Force no default subtitle (or not)
+		case $SUBTITLE_NODEFAULT_FORCE in
+		Y* | y* )
+			MERGE_SUBTITLES_1="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+			;;
+		* )
+			MERGE_SUBTITLES_1="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+			;;
+		esac
+		
+		# subtitles track 2
+		if [[ $SUBTITLE_2_LANG == "" ]]; then
+			echo -ne "\n *************************************\n"
+			echo " No second subtitle track choice. Next..."  && sleep 1
+	        	echo -ne " *************************************\n"
+		else
+			SUBTITLE_LANG=$SUBTITLE_2_LANG
+			SUBTITLE_NAME=$SUBTITLE_2_NAME
+			SUBTITLE_SID=$SUBTITLE_2_SID
+			SUBTITLE_FILE=$SUBTITLE_2_FILE
+		
+			# set subtitles filenames if series or not 
+			case $SERIE in
+			y* | Y* )
+				SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
+				;;
+			n* | N* )
+				SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+				;;
+			esac
+
+			subtitle_rip
+			MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+		fi
+
+		MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
+	fi
 
 
-	## Audio extract/encode
+	## Audio track(s) extract/encode
 
 	# audio track 1
 	AUDIO_AID=$AUDIO_1_AID
@@ -204,7 +262,7 @@ do
 	AUDIO_NAME=$AUDIO_1_NAME
 	CODEC_AUDIO=$CODEC_AUDIO_1
 
-	# set audio variables if series or not 
+	# set audio filenames if series or not 
 	case $SERIE in
 	y* | Y* )
 		DTS_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
@@ -237,6 +295,7 @@ do
 		AUDIO_NAME=$AUDIO_2_NAME
 		CODEC_AUDIO=$CODEC_AUDIO_2
 
+		# set audio filenames if series or not 
 		case $SERIE in
 		y* | Y* )
 			DTS_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
@@ -256,64 +315,71 @@ do
 
 		audio_rip
 		MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME $AUDIO_FILE"
+		
 	fi
 	
-	MERGE_AUDIO="$MERGE_AUDIO_1 $MERGE_AUDIO_2"
+	MERGE_AUDIO_FULL="$MERGE_AUDIO_1 $MERGE_AUDIO_2"
 
 
 	## video encode
+
 	video_rip
-	MERGE_VIDEO="--aspect-ratio 0:$VIDEO_RATIO $VIDEO_FILE"
+
+	if [[ $VIDEO_RATIO_FORCE == "" ]]; then
+		MERGE_VIDEO="$VIDEO_FILE"
+	else
+		# aspect-ratio check
+		case $VIDEO_RATIO_FORCE in
+		4/3 | 1.33 | 16/9 | 1.78 | 2.21 | 2.35 )
+			MERGE_VIDEO="--aspect-ratio 0:$VIDEO_RATIO_FORCE $VIDEO_FILE"
+			;;
+		* )
+			echo -ne "\n *************************************\n"
+			echo " $VIDEO_RATIO_FORCE : video aspect ratio not recognized ! Exiting..."
+			echo -ne " *************************************\n"
+			exit 1
+			;;
+		esac
+	fi
 
 
 	## merge
 
-	# aspect-ratio check
-	case $VIDEO_RATIO in
-	4/3 | 1.33 | 16/9 | 1.78 | 2.21 )
-		case $SERIE in
-			y* | Y* )
-				# for TV series
-	        		if [ ! -f $EPISODES_FILE ]
-			        then
-					echo -ne "\n *************************************\n"
-			                echo " Warning ! $EPISODES_FILE does not exists !" && sleep 2
-	                		echo -ne " *************************************\n"
-					EPISODE_NAME="E$i"
-					EPISODE_TAG="E$i"
-				else
-					EPISODE_NAME=`head -n $i $EPISODES_FILE | tail -n 1`
-					EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
-				fi
-				MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
-				#.$CODEC_VIDEO.$CODEC_AUDIO
-				MERGE_TITLE="$TITLE_LONG - $EPISODE_NAME"
-				;;
-			* )	
-				MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
-				MERGE_TITLE=$TITLE_LONG
-				;;
-		esac
-
-
-		# global merge command
-		echo -ne "\n *************************************\n"
-		echo " Final file merge:"
-		echo -ne " *************************************\n"
-		check_mkvmerge
-		nice -n $NICENESS mkvmerge \
-			$MERGE_OUTPUT --title "$MERGE_TITLE" \
-			$MERGE_VIDEO \
-			$MERGE_AUDIO \
-			$MERGE_SUBTITLES
-		;;
-	* )
-		echo -ne "\n *************************************\n"
-		echo " $VIDEO_RATIO : video aspect ratio not recognized ! Exiting..."
-		echo -ne " *************************************\n"
-		exit 1
-		;;
+	case $SERIE in
+		y* | Y* )
+			# for TV series
+	        	if [ ! -f $EPISODES_FILE ]
+		        then
+				echo -ne "\n *************************************\n"
+		                echo " Warning ! $EPISODES_FILE does not exists !" && sleep 2
+	                	echo -ne " *************************************\n"
+				EPISODE_NAME="E$i"
+				EPISODE_TAG="E$i"
+			else
+				EPISODE_NAME=`head -n $i $EPISODES_FILE | tail -n 1`
+				EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
+			fi
+			MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+			MERGE_TITLE="$TITLE_LONG - $EPISODE_NAME"
+			;;
+		* )	
+			MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+			MERGE_TITLE=$TITLE_LONG
+			;;
 	esac
+
+
+	# global merge command
+	echo -ne "\n *************************************\n"
+	echo " Final file merge:"
+	echo -ne " *************************************\n"
+	check_mkvmerge
+	nice -n $NICENESS mkvmerge \
+		$MERGE_OUTPUT --title "$MERGE_TITLE" \
+		$MERGE_VIDEO \
+		$MERGE_AUDIO_FULL \
+		$MERGE_SUBTITLES_FULL
+
 done
 
 cd ..
