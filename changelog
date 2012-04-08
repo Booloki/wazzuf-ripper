@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+-2012-04-08
+* remove SUBTITLE_LANG check - mkvmerge do it well
+
 2012-03-29
 * New wazzuf-functions-check file
 * Add multiple audio track rip feature
