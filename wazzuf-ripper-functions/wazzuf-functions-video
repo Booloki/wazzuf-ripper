@@ -1,5 +1,24 @@
 ## video encode function
+
+# video_rip
+# need 	SOURCE_FILE
+#	VIDEO_CROP
+#	VIDEO_BITRATE
+#	VIDEO_NOSKIP_FORCE
+#	VIDEO_X264_FRAMEREF_PASS1
+#	VIDEO_X264_FRAMEREF_PASS2
+#	VIDEO_X264_SUBQ_PASS1
+#	VIDEO_X264_SUBQ_PASS2
+#	VIDEO_X264_THREADS
+#	VIDEO_XVID_THREADS
+#	H264_FILE
+#	XVID_FILE
+#
+# return VIDEO_FILE
 video_rip () {
+	# frames skipping or not
+	if [[ $VIDEO_NOSKIP_FORCE == "yes" ]]; then VIDEO_SKIP="-noskip"; else VIDEO_SKIP=""; fi
+
 	case $CODEC_VIDEO in
 	H264 )
 		# video h264 (2 pass) encode
@@ -7,16 +26,18 @@ video_rip () {
 		VIDEO_FILE=$H264_FILE
 		if [ ! -f $VIDEO_FILE ]; then
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
 				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=2:threads=$VIDEO_X264_THREADS:pass=1 \
 				-nosound -nosub
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
 				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=2:threads=$VIDEO_X264_THREADS:pass=2 \
 				-nosound -nosub
 		else
 			echo -ne "\n *************************************\n"
-	                echo " $VIDEO_FILE file exists. Next...." && sleep 1
+	                echo " $VIDEO_FILE file exists. Next..." && sleep 1
 	                echo -ne " *************************************\n"
 		fi
 		;;
@@ -32,10 +53,12 @@ video_rip () {
 	        else
 			# xvid: bitrate setting is ignored during first pass
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
 				-ovc xvid -xvidencopts pass=1:threads=$VIDEO_XVID_THREADS \
 				-nosound -nosub
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
+				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
 				-ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS \
 				-nosound -nosub

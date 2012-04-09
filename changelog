@@ -3,9 +3,12 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-04-09
+* Add VIDEO_NOSKIP_FORCE option to force mencoder frames skipping
+
 2012-04-08
 * Add second subtitles track rip feature
-* VIDEO_RATIO is now VIDEO_RATIO_FORCE optional option
+* VIDEO_RATIO is now VIDEO_RATIO_FORCE option
 * remove SUBTITLE_LANG check - mkvmerge do it well
 
 2012-03-29
