@@ -55,12 +55,12 @@ video_rip () {
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
-				-ovc xvid -xvidencopts pass=1:threads=$VIDEO_XVID_THREADS \
+				-ovc xvid -xvidencopts pass=1:threads=$VIDEO_XVID_THREADS:autoaspect \
 				-nosound -nosub
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
-				-ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS \
+				-ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS:autoaspect \
 				-nosound -nosub
 		fi
 		;;
