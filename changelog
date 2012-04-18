@@ -3,6 +3,12 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-04-18
+* Add manual choice to bypass iso media source if not needed
+
+2012-04-17
+* Add autoaspect to mencoder xvid option to autodetect movie aspect
+
 2012-04-09
 * Add VIDEO_NOSKIP_FORCE option to force mencoder frames skipping
 

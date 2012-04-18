@@ -102,9 +102,21 @@ ISO )
 		dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt
 	else
 		echo -ne "\n *************************************\n"
-		echo " ISO_FILE $ISO_FILE does not exists ! Exiting..."
+		echo -ne "-> ISO_FILE $ISO_FILE does not exists !\n"
+		echo -ne " Do you you want to bypass media source (y/N)?\n"
+		echo -ne " Note: Working files (.vob...) had to be already extracted.\n"
 		echo -ne " *************************************\n"
-		exit 1
+		read ANSWER
+		case $ANSWER in
+			n* | N* | "" )
+				echo "Quit."
+				exit 1
+				;;
+			y* | Y* | o* )
+				echo " Bypassing media source."
+				echo -ne " *************************************\n"
+				;;
+	        esac
 	fi
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
