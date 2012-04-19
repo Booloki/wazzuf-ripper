@@ -40,6 +40,15 @@ check_ogmtools () {
 	fi
 }
 
+check_lsdvd () {
+	if [ ! -x "/usr/bin/lsdvd" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install lsdvd ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
 check_mplayer () {
 	if [ ! -x "/usr/bin/mplayer" ]; then
 		echo -ne "\n *************************************\n"
