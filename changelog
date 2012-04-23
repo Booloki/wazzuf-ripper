@@ -3,7 +3,11 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-04-23
+# Set mencoder log level to 1 (Errors and Warning only) 
+
 2012-04-19
+* Wazzuf Ripper v2.0
 * Add wazzuf-pre-ripper.sh script helping to fill configuration file
 
 2012-04-18
