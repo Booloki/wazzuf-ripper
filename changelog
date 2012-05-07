@@ -3,8 +3,11 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-05-07
+* bugfix: LCPM audio format re-taken into account
+
 2012-04-23
-# Set mencoder log level to 1 (Errors and Warning only) 
+* Set mencoder log level to 1 (Errors and Warning only) 
 
 2012-04-19
 * Wazzuf Ripper v2.0

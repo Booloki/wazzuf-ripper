@@ -28,8 +28,11 @@ audio_rip () {
 	DTS )
 		AUDIO_SOURCE_FILE=$DTS_FILE
 		;;
-        AC3 )
+	AC3 )
 		AUDIO_SOURCE_FILE=$AC3_FILE
+		;;
+	LPCM )
+		# nothing to do
 		;;
 	* )
 		echo -ne "\n *************************************\n"
