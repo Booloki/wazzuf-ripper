@@ -3,8 +3,11 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-05-14
+* Add basic error catching
+
 2012-05-07
-* bugfix: LCPM audio format re-taken into account
+* Bugfix: LCPM audio format re-taken into account
 
 2012-04-23
 * Set mencoder log level to 1 (Errors and Warning only) 

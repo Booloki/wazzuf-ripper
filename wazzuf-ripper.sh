@@ -11,6 +11,9 @@ FUNCTIONS_SUBTITLES_FILE="$FUNCTIONS_PATH/wazzuf-functions-subtitle"
 FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
 WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE"
 
+# basic error catching
+trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
+
 # check wazzuf files
 source $FUNCTIONS_CHECK
 checkandsource_wazzuf_files
@@ -173,6 +176,7 @@ do
 
 	# Extract full working file (.vob or .m2ts)
 	check_mplayer
+	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
 	DVD )
 		if [ ! -f $VOB_FILE ]; then
@@ -202,7 +206,7 @@ do
 
 
 	## subtitle(s) check/extract
-
+	trap "echo -e '\nManual killed script (Ctrl-C) during checking/extracting subtitles' && exit 1" 2
 	if [[ $SUBTITLE_1_LANG == "" ]]; then
 		echo -ne "\n *************************************\n"
 		echo " No subtitle track choice, next..." && sleep 1
@@ -334,6 +338,7 @@ do
 
 
 	## video encode
+	trap "echo -e '\nManual killed script (Ctrl-C) during Video encoding' && exit 1" 2
 
 	video_rip
 
@@ -356,6 +361,7 @@ do
 
 
 	## merge
+	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merging' && exit 1" 2
 
 	case $SERIE in
 		y* | Y* )
