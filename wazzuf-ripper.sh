@@ -59,24 +59,28 @@ mp3 | MP3 | Mp3 )
 esac
 
 # audio 2 codec choice check
-case $3 in
-DTS | DTS-HD )
-        CODEC_AUDIO_2=$2
-        ;;
-AC3 | AC351 | AC320 )
-        CODEC_AUDIO_2=$2
-        ;;
-ogg | vorbis | OGG | VORBIS )
-        CODEC_AUDIO_2="VORBIS"
-        ;;
-mp3 | MP3 | Mp3 )
-        CODEC_AUDIO_2="MP3"
-        ;;
-* )
-        # use default CODEC_AUDIO
-	CODEC_AUDIO_2=$DEFAULT_CODEC_AUDIO
-        ;;
-esac
+if [[ ! $AUDIO_2_LANG == "" ]]; then
+	case $3 in
+	DTS | DTS-HD )
+	        CODEC_AUDIO_2=$2
+	        ;;
+	AC3 | AC351 | AC320 )
+	        CODEC_AUDIO_2=$2
+	        ;;
+	ogg | vorbis | OGG | VORBIS )
+	        CODEC_AUDIO_2="VORBIS"
+	        ;;
+	mp3 | MP3 | Mp3 )
+	        CODEC_AUDIO_2="MP3"
+	        ;;
+	* )
+	        # use default CODEC_AUDIO
+		CODEC_AUDIO_2=$DEFAULT_CODEC_AUDIO
+	        ;;
+	esac
+else
+	CODEC_AUDIO_2=""
+fi
 
 
 # entering working directory
@@ -87,40 +91,22 @@ echo -ne "\n *************************************\n"
 echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
 echo -ne " *************************************\n"
 
-# Read and save chapters list (DVD only)
+# Read and save chapters list (DVD only) if source is OK
 # output VIDEO_BITRATE choice (BD or DVD+*)
 case $SOURCE in
 BD )
 	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
 DVD )
-	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+	check_dvd DVD
 	check_ogmtools
-	dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt
+	if [ ! -f title$DVD_TITLE_NUMBER-chapters.txt ]; then dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt; fi
+	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
         ;;
 ISO )	
-	if [ -f $ISO_FILE ]
-	then
-		check_ogmtools
-		dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt
-	else
-		echo -ne "\n *************************************\n"
-		echo -ne "-> ISO_FILE $ISO_FILE does not exists !\n"
-		echo -ne " Do you you want to bypass media source (y/N)?\n"
-		echo -ne " Note: Working files (.vob...) had to be already extracted.\n"
-		echo -ne " *************************************\n"
-		read ANSWER
-		case $ANSWER in
-			n* | N* | "" )
-				echo "Quit."
-				exit 1
-				;;
-			y* | Y* | o* )
-				echo " Bypassing media source."
-				echo -ne " *************************************\n"
-				;;
-	        esac
-	fi
+	check_dvd ISO
+	check_ogmtools
+	if [ ! -f title$DVD_TITLE_NUMBER-chapters.txt ]; then dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt; fi
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
@@ -137,7 +123,7 @@ if [[ $SERIE == "no" ]]; then EPISODE_LAST="1"; fi
 
 time for ((i=$EPISODE_FIRST; i <= EPISODE_LAST ; i++))
 do
-	# check multichapers
+	# check multichapters
 	case $MULTICHAP_FORCE in
 		y* | Y* )
 			CHAPTERS="$MULTICHAP_FIRST-$MULTICHAP_LAST"
@@ -243,7 +229,7 @@ do
 		# subtitles track 2
 		if [[ $SUBTITLE_2_LANG == "" ]]; then
 			echo -ne "\n *************************************\n"
-			echo " No second subtitle track choice. Next..."  && sleep 1
+			echo " No second subtitle track choice. Next..." && sleep 1
 	        	echo -ne " *************************************\n"
 		else
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
@@ -270,6 +256,7 @@ do
 
 
 	## Audio track(s) extract/encode
+	trap "echo -e '\nManual killed script (Ctrl-C) during Audio track(s) extracting/encoding' && exit 1" 2
 
 	# audio track 1
 	AUDIO_AID=$AUDIO_1_AID

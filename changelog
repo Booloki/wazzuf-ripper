@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-05-15
+* Add physical DVD presence check
+
 2012-05-14
 * Pre-rip script improvements
 * Add basic error catching
