@@ -347,6 +347,27 @@ do
 	fi
 
 
+	## image attachment
+	if [[ $COVER == "" ]]; then
+		echo -ne "\n *************************************\n"
+		echo " No image attachment. Next..." && sleep 1
+	        echo -ne " *************************************\n"
+		MERGE_COVER=""
+	else
+		if [ ! -f $COVER ]; then
+			echo -ne "\n *************************************\n"
+			echo " Warning ! $COVER does not exists !" && sleep 2
+	        	echo -ne " *************************************\n"
+			MERGE_COVER=""		
+		else
+			echo -ne "\n *************************************\n"
+			echo " $COVER image choice OK. Next... " && sleep 1
+        	echo -ne " *************************************\n"
+			MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/jpeg --attach-file $COVER"
+		fi
+	fi
+
+
 	## merge
 	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merging' && exit 1" 2
 
@@ -383,7 +404,8 @@ do
 		$MERGE_OUTPUT --title "$MERGE_TITLE" \
 		$MERGE_VIDEO \
 		$MERGE_AUDIO_FULL \
-		$MERGE_SUBTITLES_FULL
+		$MERGE_SUBTITLES_FULL \
+		$MERGE_COVER
 
 done
 
