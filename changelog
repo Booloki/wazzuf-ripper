@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-06-14
+* Add DVD video track DUMP option (no encoding)
+
 2012-06-05
 * Add optional mkv image attachment
 

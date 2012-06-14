@@ -37,20 +37,20 @@ video_rip () {
 				-nosound -nosub
 		else
 			echo -ne "\n *************************************\n"
-	                echo " $VIDEO_FILE file exists. Next..." && sleep 1
-	                echo -ne " *************************************\n"
+			echo " $VIDEO_FILE file exists. Next..." && sleep 1
+			echo -ne " *************************************\n"
 		fi
 		;;
 	XVID )	
 		# video xvid encode
-	        # doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
+		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
 		VIDEO_FILE=$XVID_FILE
-	        if [ -f $VIDEO_FILE ]
-	        then
+		if [ -f $VIDEO_FILE ]
+		then
 			echo -ne "\n *************************************\n"
-	                echo " $VIDEO_FILE file exists. Next..." && sleep 1
-	                echo -ne " *************************************\n"
-	        else
+			echo " $VIDEO_FILE file exists. Next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
 			# xvid: bitrate setting is ignored during first pass
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
@@ -62,6 +62,21 @@ video_rip () {
 				-vf pp=ci,crop=$VIDEO_CROP \
 				-ovc xvid -xvidencopts pass=2:bitrate=$VIDEO_BITRATE:threads=$VIDEO_XVID_THREADS:autoaspect \
 				-nosound -nosub
+		fi
+		;;
+	DUMP )
+		# only dump video without transcoding
+		# manpage http://www.transcoding.org/transcode?Tcdemux
+		VIDEO_FILE=$DUMP_FILE
+        if [ -f $VIDEO_FILE ]
+        then
+			echo -ne "\n *************************************\n"
+			echo " $VIDEO_FILE file exists. Next..." && sleep 1
+			echo -ne " *************************************\n"
+        else
+			check_tcdemux
+			echo " Dumping $VIDEO_FILE from $SOURCE_FILE ..."
+			ionice -c $IONICENESS nice -n $NICENESS tcdemux -i $SOURCE_FILE -x mpeg2 > $VIDEO_FILE
 		fi
 		;;
 	esac

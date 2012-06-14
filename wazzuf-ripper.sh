@@ -26,6 +26,9 @@ h264 | x264 | H264 | X264 )
 xvi* | Xvi* | XVI* )
         CODEC_VIDEO="XVID"
         ;;
+dump | DUMP )
+        CODEC_VIDEO="DUMP"
+        ;;
 "" )
 	# use default CODEC_VIDEO
 	CODEC_VIDEO=$DEFAULT_CODEC_VIDEO
@@ -98,6 +101,7 @@ BD )
 	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
 DVD )
+	# check_dvd TOCOMMENT if DVD NAME contains spaces...
 	check_dvd DVD
 	check_ogmtools
 	if [ ! -f title$DVD_TITLE_NUMBER-chapters.txt ]; then dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt; fi
@@ -119,7 +123,7 @@ check_nice
 check_ionice
 
 # serie check for loop
-if [[ $SERIE == "no" ]]; then EPISODE_LAST="1"; fi
+if [[ $SERIE == "no" ]]; then EPISODE_LAST="1"; EPISODE_FIRST="1"; fi
 
 time for ((i=$EPISODE_FIRST; i <= EPISODE_LAST ; i++))
 do
@@ -142,6 +146,7 @@ do
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.E$i.vob"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.E$i.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.E$i.h264"
+		DUMP_FILE="$TAG_TITLE_NAME.$DATE.E$i.mpv"
 		;;
 	n* | N* )
 		echo -ne "\n *************************************\n"
@@ -150,6 +155,7 @@ do
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
+		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
 		;;
 	* )
                 echo -ne "\n *************************************\n"
