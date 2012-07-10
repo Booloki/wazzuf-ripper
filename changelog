@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-07-10
+* Bugfix: chapters informations re-taken into account
+
 2012-06-14
 * Add DVD video track DUMP option (no encoding)
 

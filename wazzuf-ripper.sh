@@ -94,7 +94,7 @@ echo -ne "\n *************************************\n"
 echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
 echo -ne " *************************************\n"
 
-# Read and save chapters list (DVD only) if source is OK
+# Check if source is OK (DVD only)
 # output VIDEO_BITRATE choice (BD or DVD+*)
 case $SOURCE in
 BD )
@@ -104,13 +104,11 @@ DVD )
 	# check_dvd TOCOMMENT if DVD NAME contains spaces...
 	check_dvd DVD
 	check_ogmtools
-	if [ ! -f title$DVD_TITLE_NUMBER-chapters.txt ]; then dvdxchap -t $DVD_TITLE_NUMBER /dev/dvd > title$DVD_TITLE_NUMBER-chapters.txt; fi
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
         ;;
 ISO )	
 	check_dvd ISO
 	check_ogmtools
-	if [ ! -f title$DVD_TITLE_NUMBER-chapters.txt ]; then dvdxchap -t $DVD_TITLE_NUMBER $ISO_FILE > title$DVD_TITLE_NUMBER-chapters.txt; fi
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
@@ -144,6 +142,7 @@ do
 		echo " Work in progress: $TITLE_NAME $DATE E$i"
 	        echo -ne " *************************************\n"
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.E$i.vob"
+		CHAPTERS_FILE="$TAG_TITLE_NAME.$DATE.E$i-chapters.txt"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.E$i.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.E$i.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.$DATE.E$i.mpv"
@@ -153,6 +152,7 @@ do
 		echo " Work in progress: $TITLE_NAME $DATE"
 	        echo -ne " *************************************\n"
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
+		CHAPTERS_FILE="$TAG_TITLE_NAME.$DATE-chapters.txt"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
@@ -167,10 +167,13 @@ do
 
 
 	# Extract full working file (.vob or .m2ts)
+	# Save chapters informations (DVD only)
 	check_mplayer
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
 	DVD )
+		if [ ! -f $CHAPTERS_FILE ]; then dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE; fi
+
 		if [ ! -f $VOB_FILE ]; then
                 	# extract local working file from DVD
 	               ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
@@ -182,6 +185,8 @@ do
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	ISO )
+		if [ ! -f $CHAPTERS_FILE ]; then dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $ISO_FILE > $CHAPTERS_FILE; fi
+
 		if [ ! -f $VOB_FILE ]; then
 			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
 		else
@@ -352,6 +357,16 @@ do
 		esac
 	fi
 
+	## chapters informations
+	case $SOURCE in
+	DVD | ISO )
+		MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
+		;;
+	* )
+		MERGE_CHAPTERS=""
+		;;
+	esac
+
 
 	## image attachment
 	if [[ $COVER == "" ]]; then
@@ -391,11 +406,11 @@ do
 				EPISODE_NAME=`head -n $i $EPISODES_FILE | tail -n 1`
 				EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
 			fi
-			MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+			MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 			MERGE_TITLE="$TITLE_LONG - $EPISODE_NAME"
 			;;
 		* )	
-			MERGE_OUTPUT="-o $TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+			MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 			MERGE_TITLE=$TITLE_LONG
 			;;
 	esac
@@ -407,10 +422,11 @@ do
 	echo -ne " *************************************\n"
 	check_mkvmerge
 	nice -n $NICENESS mkvmerge \
-		$MERGE_OUTPUT --title "$MERGE_TITLE" \
+		-o $MERGE_OUTPUT --title "$MERGE_TITLE" \
 		$MERGE_VIDEO \
 		$MERGE_AUDIO_FULL \
 		$MERGE_SUBTITLES_FULL \
+		$MERGE_CHAPTERS \
 		$MERGE_COVER
 
 done
