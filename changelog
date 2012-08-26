@@ -3,6 +3,10 @@
 # booloki@gmail.com
 # Changelog file
 
+
+2012-08-26
+* Bugfix: apply SUBTITLE_NODEFAULT_FORCE option to second subtitle track
+
 2012-07-10
 * Bugfix: chapters informations re-taken into account
 

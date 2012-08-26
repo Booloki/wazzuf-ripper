@@ -259,7 +259,16 @@ do
 			esac
 
 			subtitle_rip
-			MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+
+			# Force no default subtitle (or not)
+			case $SUBTITLE_NODEFAULT_FORCE in
+			Y* | y* )
+				MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+				;;
+			* )
+				MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+				;;
+			esac
 		fi
 
 		MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
