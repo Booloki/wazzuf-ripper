@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-08-27
+* Typo fixes
 * External subtitle support improvements (SUBTITLE_X_FILE to SUBTITLE_X_FILE_FORCE)
 * Add check_avconv check_7z check_tcdemux
 * Add DVD structure display (pre-rip script)

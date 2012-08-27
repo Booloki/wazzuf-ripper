@@ -158,6 +158,6 @@ check_mkvmerge () {
 }
 
 wazzuf_usage () {
-	echo -ne "\n Usage : $0 [Video Codec (h264,xvid)] [Audio 1 Codec (DTS,AC3,vorbis,mp3)] [Audio 2 Codec (DTS,AC3,vorbis,mp3)]\n"
+	echo -ne "\n Usage : $0 [Video Codec (h264,xvid,DUMP)] [Audio 1 Codec (DTS,AC3,vorbis,mp3)] [Audio 2 Codec (DTS,AC3,vorbis,mp3)]\n"
 	exit 1
 }

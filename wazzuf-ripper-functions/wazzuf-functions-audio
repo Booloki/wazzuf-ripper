@@ -89,7 +89,7 @@ audio_rip () {
 			exit 1	
 		fi
 		;;
-        AC3 | AC351)
+        AC3 | AC351 )
 		AUDIO_FILE=$AC3_FILE
 		if [ -f $AUDIO_FILE ]
 		then
