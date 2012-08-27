@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-08-27
+* Add check_avconv check_7z check_tcdemux
 * Add DVD structure display (pre-rip script)
 * Add cover image MIME type recognition (jpg and png only)
 * Add source files directory option for m2ts/ts, iso, external subtitles, cover image, episodes list...

@@ -22,8 +22,8 @@ check_dvd () {
 		DEVICE_NAME="DVD"
 		;;
 	ISO )
-		DEVICE_TEST="-f $ISO_FILE"
-		DEVICE_NAME="ISO_FILE $ISO_FILE"
+		DEVICE_TEST="-f $SOURCE_DIRECTORY/$ISO_FILE"
+		DEVICE_NAME="$SOURCE_DIRECTORY/$ISO_FILE iso file"
 		;;
 	* )
 		echo "Unexpected error: No device to check !"
@@ -85,10 +85,37 @@ check_lsdvd () {
 	fi
 }
 
+check_avconv () {
+	if [ ! -x "/usr/bin/avconv" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install avconv (libav-tools) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_7z () {
+	if [ ! -x "/usr/bin/7z" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install 7z (p7zip) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
 check_mplayer () {
 	if [ ! -x "/usr/bin/mplayer" ]; then
 		echo -ne "\n *************************************\n"
 		echo -ne "\n Please install mplayer ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_tcdemux () {
+	if [ ! -x "/usr/bin/tcdemux" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install tcdemux (transcode) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi

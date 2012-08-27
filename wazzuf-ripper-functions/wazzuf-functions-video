@@ -66,6 +66,7 @@ video_rip () {
 		;;
 	DUMP )
 		# only dump video without transcoding
+		check_tcdemux
 		# manpage http://www.transcoding.org/transcode?Tcdemux
 		VIDEO_FILE=$DUMP_FILE
         if [ -f $VIDEO_FILE ]

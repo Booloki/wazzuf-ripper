@@ -14,6 +14,7 @@ checkandsource_wazzuf_files
 
 check_mplayer
 check_ffmpeg
+check_avconv
 
 ISO_FILE_PATH=$SOURCE_DIRECTORY/$ISO_FILE
 M2TS_FILE_PATH=$SOURCE_DIRECTORY/$ISO_FILE
@@ -110,6 +111,7 @@ DVD )
 	grep "^Disc Title" DVD-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
 	echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
+	echo `grep "Title: $DVD_TITLE_NUMBER" DVD-lsdvd.info | cut -d "," -f 2`
 	cropdetect "dvd://$DVD_TITLE_NUMBER"
 	lsdvd -t $DVD_TITLE_NUMBER -acsv /dev/dvd 2>/dev/null | grep -E "Subtitle|Audio|VTS" > DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 	grep VTS DVD-lsdvd-T$DVD_TITLE_NUMBER.info
@@ -143,6 +145,7 @@ ISO )
 	avconv -i "$ISO_FILE_PATH" 2> ISO-avconv.info
 	echo "-> see ISO-avconv.info"
 
+	check_7z
 	echo -ne "*************************************\n"
 	echo " DVD structure informations"
 	7z l "$ISO_FILE_PATH" > ISO-DVDstruct.info
