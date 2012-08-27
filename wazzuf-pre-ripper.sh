@@ -144,6 +144,11 @@ ISO )
 	echo "-> see ISO-avconv.info"
 
 	echo -ne "*************************************\n"
+	echo " DVD structure informations"
+	7z l "$ISO_FILE_PATH" > ISO-DVDstruct.info
+	echo "-> see ISO-DVDstruct.info"
+
+	echo -ne "*************************************\n"
 	echo ISO_FILE_PATH=\"$ISO_FILE_PATH\"
 	grep "^Disc Title" ISO-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" ISO-lsdvd.info | sed s/'Longest track: '//`
