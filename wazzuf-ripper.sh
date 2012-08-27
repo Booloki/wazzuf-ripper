@@ -86,7 +86,7 @@ else
 fi
 
 
-# entering working directory
+# enter working directory
 mkdir -p "$TAG_TITLE_NAME"
 cd $TAG_TITLE_NAME
 
@@ -209,7 +209,7 @@ do
 		echo " No subtitle track choice, next..." && sleep 1
 		echo -ne " *************************************\n"
 	else
-		# audio track 1
+		# subtitle track 1
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
 		SUBTITLE_SID=$SUBTITLE_1_SID
@@ -237,7 +237,7 @@ do
 			;;
 		esac
 		
-		# subtitles track 2
+		# subtitle track 2
 		if [[ $SUBTITLE_2_LANG == "" ]]; then
 			echo -ne "\n *************************************\n"
 			echo " No second subtitle track choice. Next..." && sleep 1
@@ -304,7 +304,13 @@ do
 	esac
 
 	audio_rip
-	MERGE_AUDIO_1="--language 0:$AUDIO_1_LANG --track-name 0:$AUDIO_1_NAME $AUDIO_FILE"
+
+	# merge with or without audio sync
+	if [[ $AUDIO_1_SYNC == "" ]]; then
+		MERGE_AUDIO_1="--language 0:$AUDIO_1_LANG --track-name 0:$AUDIO_1_NAME $AUDIO_FILE"
+	else	
+		MERGE_AUDIO_1="--language 0:$AUDIO_1_LANG --track-name 0:$AUDIO_1_NAME -y 0:$AUDIO_1_SYNC $AUDIO_FILE"
+	fi
 
 	# audio track 2
 	if [[ $AUDIO_2_LANG == "" ]]; then
@@ -337,8 +343,12 @@ do
 		esac
 
 		audio_rip
-		MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME $AUDIO_FILE"
-		
+
+		if [[ $AUDIO_2_SYNC == "" ]]; then
+			MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME $AUDIO_FILE"
+		else	
+			MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME -y 0:$AUDIO_2_SYNC $AUDIO_FILE"
+		fi					
 	fi
 	
 	MERGE_AUDIO_FULL="$MERGE_AUDIO_1 $MERGE_AUDIO_2"

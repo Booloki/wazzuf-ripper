@@ -3,6 +3,8 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-08-27
+* Add audio sync option
 
 2012-08-26
 * Bugfix: apply SUBTITLE_NODEFAULT_FORCE option to second subtitle track
