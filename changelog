@@ -4,10 +4,9 @@
 # Changelog file
 
 2012-08-27
+* Add cover image MIME type recognition (jpg and png only)
 * Add source files directory option for m2ts/ts, iso, external subtitles, cover image, episodes list...
 => lots of absolute to relative option changes in configuration file !
-
-2012-08-27
 * Add audio sync option
 
 2012-08-26

@@ -400,10 +400,24 @@ do
 	        	echo -ne " *************************************\n"
 			MERGE_COVER=""		
 		else
-			echo -ne "\n *************************************\n"
-			echo " $COVER image choice OK. Next... " && sleep 1
-        	echo -ne " *************************************\n"
-			MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/jpeg --attach-file $SOURCE_DIRECTORY/$COVER"
+			# MIME types detection
+			COVER_FORMAT_TEST=`file $SOURCE_DIRECTORY/$COVER | cut -d ' ' -f 2`
+			if [[ $COVER_FORMAT_TEST == "JPEG" ]];
+			then
+				COVER_FORMAT=jpg
+				MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/jpeg --attach-file $SOURCE_DIRECTORY/$COVER"
+			else
+				if [[ $COVER_FORMAT_TEST == "PNG" ]];
+				then
+					COVER_FORMAT=png
+					MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/png --attach-file $SOURCE_DIRECTORY/$COVER"
+				else
+					echo -ne "\n *************************************\n"
+					echo " $COVER file format unrecognized so no image attachment. Next... " && sleep 2
+			        	echo -ne " *************************************\n"
+					MERGE_COVER=""		
+				fi
+			fi
 		fi
 	fi
 
