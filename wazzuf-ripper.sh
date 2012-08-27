@@ -212,8 +212,15 @@ do
 		# subtitle track 1
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
-		SUBTITLE_SID=$SUBTITLE_1_SID
-		SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE
+
+		# subtitle file (force external or not)
+		if [[ $SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE == "" ]];
+		then
+			SUBTITLE_FILE=$SUB_FILE.idx
+			SUBTITLE_SID=$SUBTITLE_1_SID
+		else
+			SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE
+		fi
 	
 		# set subtitles filenames if series or not 
 		case $SERIE in
@@ -245,9 +252,16 @@ do
 		else
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
 			SUBTITLE_NAME=$SUBTITLE_2_NAME
-			SUBTITLE_SID=$SUBTITLE_2_SID
-			SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE
 		
+			# subtitle file (force external or not)
+			if [[ $SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE == "" ]];
+			then
+				SUBTITLE_FILE=$SUB_FILE.idx
+				SUBTITLE_SID=$SUBTITLE_2_SID
+			else
+				SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE
+			fi
+
 			# set subtitles filenames if series or not 
 			case $SERIE in
 			y* | Y* )

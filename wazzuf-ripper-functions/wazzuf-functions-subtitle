@@ -4,7 +4,6 @@
 subtitle_rip () {
         case $SOURCE in
         DVD )
-		SUBTITLE_FILE=$SUB_FILE.idx
 		if [ -f $SUBTITLE_FILE ]
 	        then
 			echo -ne "\n *************************************\n"
@@ -20,7 +19,6 @@ subtitle_rip () {
 		fi
 		;;
 	ISO )
-		SUBTITLE_FILE=$SUB_FILE.idx
 		if [ -f $SUBTITLE_FILE ]
 	        then
 			echo -ne "\n *************************************\n"
@@ -41,7 +39,6 @@ subtitle_rip () {
 			# PSG format (.sup) - subtitle extraction impossible with mplayer 1.0rc4-4.5.2
 			echo -ne "\n *************************************\n"
 	                echo " $SUBTITLE_FILE does not exists ! Exiting..."
-	                echo " For example, extrat PSG subtitles with tsMuxer - http://www.videohelp.com/tools/tsMuxeR "
 	                echo -ne " *************************************\n"
 			exit 1
 		else
