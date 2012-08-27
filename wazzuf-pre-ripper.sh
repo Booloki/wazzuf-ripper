@@ -15,16 +15,19 @@ checkandsource_wazzuf_files
 check_mplayer
 check_ffmpeg
 
+ISO_FILE_PATH=$SOURCE_DIRECTORY/$ISO_FILE
+M2TS_FILE_PATH=$SOURCE_DIRECTORY/$ISO_FILE
+
 ## pre-rip functions
 
 # Run cropdetect to establish the correct crop rectangle
 CROP_FRAMES=100
 cropdetect(){
 	echo -n "Running Crop Detection... "
-	if [[ "$ISO_FILE" =~ \ |\' ]]
+	if [[ "$ISO_FILE_PATH" =~ \ |\' ]]
 	then
 		echo -ne "\n *************************************\n"
-		echo " Warning: Path/filename to iso file $ISO_FILE must not contain spaces for croptetection.."
+		echo " Warning: Path/filename to iso file $ISO_FILE_PATH must not contain spaces for croptetection.."
 		echo -ne " *************************************\n"
 	else
 		mplayer ${1} -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
@@ -57,31 +60,34 @@ lsdvd-decode(){
 	done  < ${1}
 }
 
+## enter source directory
+cd $SOURCE_DIRECTORY
+
 ## pre-rip source choice
 
 case $SOURCE in
 BD )
-	if [ ! -f "$M2TS_FILE" ]
+	if [ ! -f "$M2TS_FILE_PATH" ]
 	then
 		echo -ne "\n *************************************\n"
-		echo " M2TS_FILE $M2TS_FILE does not exists ! Exiting..."
+		echo " M2TS_FILE_PATH $M2TS_FILE_PATH does not exists ! Exiting..."
 		echo -ne " *************************************\n"
 		exit 1
 	fi
 
 	echo -ne " *************************************\n"
 	echo " MPlayer informations"
-	mplayer -v -vo null -ao null -frames 0 -identify "$M2TS_FILE" 2>/dev/null > M2TS-mplayer.info
+	mplayer -v -vo null -ao null -frames 0 -identify "$M2TS_FILE_PATH" 2>/dev/null > M2TS-mplayer.info
 	echo "-> see M2TS-mplayer.info"
 
 	echo -ne " *************************************\n"
 	echo " avconv informations"
-	avconv -i "$M2TS_FILE" 2> M2TS-avconv.info
+	avconv -i "$M2TS_FILE_PATH" 2> M2TS-avconv.info
 	echo "-> see M2TS-avconv.info"
 
 	echo -ne " *************************************\n"
-	echo M2TS_FILE=\"$M2TS_FILE\"
-	cropdetect $M2TS_FILE
+	echo M2TS_FILE_PATH=\"$M2TS_FILE_PATH\"
+	cropdetect $M2TS_FILE_PATH
 
 	echo -ne "*************************************\n"
 	echo "All tracks:"
@@ -113,10 +119,10 @@ DVD )
 	lsdvd-decode DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 	;;
 ISO )
-	if [ ! -f "$ISO_FILE" ]
+	if [ ! -f "$ISO_FILE_PATH" ]
 	then
 		echo -ne "\n *************************************\n"
-		echo " ISO_FILE $ISO_FILE does not exists ! Exiting..."
+		echo " ISO_FILE_PATH $ISO_FILE_PATH does not exists ! Exiting..."
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -124,25 +130,26 @@ ISO )
 	check_lsdvd
 	echo -ne "*************************************\n"
 	echo " lsdvd"
-	lsdvd -acsv "$ISO_FILE" 2>/dev/null > ISO-lsdvd.info
+	lsdvd -acsv "$ISO_FILE_PATH" 2>/dev/null > ISO-lsdvd.info
 	echo "-> see ISO-lsdvd.info"
 	
 	echo -ne "*************************************\n"
 	echo " MPlayer informations"
-	mplayer -v -vo null -ao null -frames 0 -identify "$ISO_FILE" 2>/dev/null > ISO-mplayer.info
+	mplayer -v -vo null -ao null -frames 0 -identify "$ISO_FILE_PATH" 2>/dev/null > ISO-mplayer.info
 	echo "-> see ISO-lsdvd.info"
 
 	echo -ne "*************************************\n"
 	echo " avconv informations"
-	avconv -i "$ISO_FILE" 2> ISO-avconv.info
+	avconv -i "$ISO_FILE_PATH" 2> ISO-avconv.info
 	echo "-> see ISO-avconv.info"
 
 	echo -ne "*************************************\n"
-	echo ISO_FILE=\"$ISO_FILE\"
+	echo ISO_FILE_PATH=\"$ISO_FILE_PATH\"
 	grep "^Disc Title" ISO-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" ISO-lsdvd.info | sed s/'Longest track: '//`
 	echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
-	cropdetect "-dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER"
+	echo `grep "Title: $DVD_TITLE_NUMBER" ISO-lsdvd.info | cut -d "," -f 2`
+	cropdetect "-dvd-device $ISO_FILE_PATH dvd://$DVD_TITLE_NUMBER"
 
 	echo -ne "*************************************\n"
 	echo "Audio/Subtitles tracks:"

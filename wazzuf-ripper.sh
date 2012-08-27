@@ -185,10 +185,10 @@ do
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	ISO )
-		if [ ! -f $CHAPTERS_FILE ]; then dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $ISO_FILE > $CHAPTERS_FILE; fi
+		if [ ! -f $CHAPTERS_FILE ]; then dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $SOURCE_DIRECTORY/$ISO_FILE > $CHAPTERS_FILE; fi
 
 		if [ ! -f $VOB_FILE ]; then
-			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $SOURCE_DIRECTORY/$ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
 		else
 	                echo -ne "\n *************************************\n"
 	                echo " $VOB_FILE file exists. Next..."  && sleep 1
@@ -197,7 +197,7 @@ do
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	BD )
-		SOURCE_FILE=$M2TS_FILE
+		SOURCE_FILE=$SOURCE_DIRECTORY/$M2TS_FILE
 		;;
 	esac
 
@@ -213,7 +213,7 @@ do
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
 		SUBTITLE_SID=$SUBTITLE_1_SID
-		SUBTITLE_FILE=$SUBTITLE_1_FILE
+		SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE
 	
 		# set subtitles filenames if series or not 
 		case $SERIE in
@@ -246,7 +246,7 @@ do
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
 			SUBTITLE_NAME=$SUBTITLE_2_NAME
 			SUBTITLE_SID=$SUBTITLE_2_SID
-			SUBTITLE_FILE=$SUBTITLE_2_FILE
+			SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE
 		
 			# set subtitles filenames if series or not 
 			case $SERIE in
@@ -388,22 +388,22 @@ do
 
 
 	## image attachment
-	if [[ $COVER == "" ]]; then
+	if [[ $SOURCE_DIRECTORY/$COVER == "" ]]; then
 		echo -ne "\n *************************************\n"
 		echo " No image attachment. Next..." && sleep 1
 	        echo -ne " *************************************\n"
 		MERGE_COVER=""
 	else
-		if [ ! -f $COVER ]; then
+		if [ ! -f $SOURCE_DIRECTORY/$COVER ]; then
 			echo -ne "\n *************************************\n"
-			echo " Warning ! $COVER does not exists !" && sleep 2
+			echo " Warning ! $SOURCE_DIRECTORY/$COVER file does not exists !" && sleep 2
 	        	echo -ne " *************************************\n"
 			MERGE_COVER=""		
 		else
 			echo -ne "\n *************************************\n"
 			echo " $COVER image choice OK. Next... " && sleep 1
         	echo -ne " *************************************\n"
-			MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/jpeg --attach-file $COVER"
+			MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/jpeg --attach-file $SOURCE_DIRECTORY/$COVER"
 		fi
 	fi
 
@@ -414,15 +414,15 @@ do
 	case $SERIE in
 		y* | Y* )
 			# for TV series
-	        	if [ ! -f $EPISODES_FILE ]
+	        	if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
 		        then
 				echo -ne "\n *************************************\n"
-		                echo " Warning ! $EPISODES_FILE does not exists !" && sleep 2
+		                echo " Warning ! $SOURCE_DIRECTORY/$EPISODES_FILE does not exists !" && sleep 2
 	                	echo -ne " *************************************\n"
 				EPISODE_NAME="E$i"
 				EPISODE_TAG="E$i"
 			else
-				EPISODE_NAME=`head -n $i $EPISODES_FILE | tail -n 1`
+				EPISODE_NAME=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
 				EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
 			fi
 			MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
