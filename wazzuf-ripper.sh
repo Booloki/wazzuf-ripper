@@ -8,8 +8,9 @@ FUNCTIONS_PATH="wazzuf-ripper-functions"
 FUNCTIONS_AUDIO_FILE="$FUNCTIONS_PATH/wazzuf-functions-audio"
 FUNCTIONS_VIDEO_FILE="$FUNCTIONS_PATH/wazzuf-functions-video"
 FUNCTIONS_SUBTITLES_FILE="$FUNCTIONS_PATH/wazzuf-functions-subtitle"
+FUNCTIONS_COVERART_FILES="$FUNCTIONS_PATH/wazzuf-functions-coverart"
 FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
-WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE"
+WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE $FUNCTIONS_COVERART_FILES"
 
 # basic error catching
 trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
@@ -214,8 +215,7 @@ do
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
 
 		# subtitle file (force external or not)
-		if [[ $SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE == "" ]];
-		then
+		if [[ $SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE == "" ]]; then
 			SUBTITLE_FILE=$SUB_FILE.idx
 			SUBTITLE_SID=$SUBTITLE_1_SID
 		else
@@ -254,8 +254,7 @@ do
 			SUBTITLE_NAME=$SUBTITLE_2_NAME
 		
 			# subtitle file (force external or not)
-			if [[ $SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE == "" ]];
-			then
+			if [[ $SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE == "" ]]; then
 				SUBTITLE_FILE=$SUB_FILE.idx
 				SUBTITLE_SID=$SUBTITLE_2_SID
 			else
@@ -401,7 +400,8 @@ do
 	esac
 
 
-	## image attachment
+	## Cover art
+	# Matroska Cover Art Guidelines http://www.matroska.org/technical/cover_art/index.html
 	if [[ $SOURCE_DIRECTORY/$COVER == "" ]]; then
 		echo -ne "\n *************************************\n"
 		echo " No image attachment. Next..." && sleep 1
@@ -415,19 +415,23 @@ do
 			MERGE_COVER=""		
 		else
 			# MIME types detection
+			# "The pictures should only use the JPEG and PNG picture formats", Matroska Cover Art Guidelines
+			# List of officially recognized image MIME types at the IANA homepage http://www.iana.org/assignments/media-types/image/index.html
 			COVER_FORMAT_TEST=`file $SOURCE_DIRECTORY/$COVER | cut -d ' ' -f 2`
-			if [[ $COVER_FORMAT_TEST == "JPEG" ]];
-			then
-				COVER_FORMAT=jpg
-				MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/jpeg --attach-file $SOURCE_DIRECTORY/$COVER"
+			if [[ $COVER_FORMAT_TEST == "JPEG" ]]; then
+				COVER_FORMAT=jpeg
+				COVER_HEIGHT=`convert $SOURCE_DIRECTORY/$COVER -print "%h" /dev/null`
+				COVER_WIDTH=`convert $SOURCE_DIRECTORY/$COVER -print "%w" /dev/null`
+				cover_art_convert
 			else
-				if [[ $COVER_FORMAT_TEST == "PNG" ]];
-				then
+				if [[ $COVER_FORMAT_TEST == "PNG" ]]; then
 					COVER_FORMAT=png
-					MERGE_COVER="--attachment-description "cover" --attachment-mime-type image/png --attach-file $SOURCE_DIRECTORY/$COVER"
+					COVER_HEIGHT=`file $SOURCE_DIRECTORY/$COVER | cut -d "," -f 2 | cut -d " " -f 4`
+					COVER_WIDTH=`file $SOURCE_DIRECTORY/$COVER | cut -d "," -f 2 | cut -d " " -f 2`
+					cover_art_convert
 				else
 					echo -ne "\n *************************************\n"
-					echo " $COVER file format unrecognized so no image attachment. Next... " && sleep 2
+					echo " $COVER file format unrecognized, so no image attachment. Next... " && sleep 2
 			        	echo -ne " *************************************\n"
 					MERGE_COVER=""		
 				fi

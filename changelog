@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-08-28
+* Add cover art management: resizing + thunmbnail
+
 2012-08-27
 * Typo fixes
 * External subtitle support improvements (SUBTITLE_X_FILE to SUBTITLE_X_FILE_FORCE)
