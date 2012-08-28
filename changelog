@@ -4,7 +4,8 @@
 # Changelog file
 
 2012-08-28
-* Add cover art management: resizing + thunmbnail
+* Add check_imagemagick function
+* Add cover art management: resizing + thumbnail
 
 2012-08-27
 * Typo fixes

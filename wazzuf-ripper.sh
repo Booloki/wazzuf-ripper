@@ -414,6 +414,7 @@ do
 	        	echo -ne " *************************************\n"
 			MERGE_COVER=""		
 		else
+			check_imagemagick
 			# MIME types detection
 			# "The pictures should only use the JPEG and PNG picture formats", Matroska Cover Art Guidelines
 			# List of officially recognized image MIME types at the IANA homepage http://www.iana.org/assignments/media-types/image/index.html

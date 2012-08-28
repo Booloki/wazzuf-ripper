@@ -9,6 +9,7 @@ checkandsource_wazzuf_files () {
         	        echo -ne " *************************************\n"
 		        exit 1
 		else	
+			echo "Sourcing $WFILE..."
 			source $WFILE
 		fi
 	done
@@ -143,6 +144,15 @@ check_lame () {
 	if [ ! -x "/usr/bin/lame" ]; then
 		echo -ne "\n *************************************\n"
 		echo -ne "\n Please install lame ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_imagemagick () {
+	if [ ! -x "/usr/bin/convert" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install convert (imagemagick) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
