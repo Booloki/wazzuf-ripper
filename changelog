@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-08-28
+* Add check_vobcopy and check_mkisofs
 * Tagging bugfixes
 * Add external srt subtitle Unicode check
 * Add copy DVD to iso feature

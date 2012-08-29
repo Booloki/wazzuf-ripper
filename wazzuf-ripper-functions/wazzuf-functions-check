@@ -104,6 +104,24 @@ check_7z () {
 	fi
 }
 
+check_vobcopy () {
+	if [ ! -x "/usr/bin/vobcopy" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install vobcopy ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_mkisofs () {
+	if [ ! -x "/usr/bin/mkisofs" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne "\n Please install mkisofs (genisoimage) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
 check_mplayer () {
 	if [ ! -x "/usr/bin/mplayer" ]; then
 		echo -ne "\n *************************************\n"
