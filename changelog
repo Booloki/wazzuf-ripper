@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-08-28
+* Add external srt subtitle Unicode check
 * Add copy DVD to iso feature
 * Some minor bugfixes / check
 * Add tags to mp3 (ID3v2) and ogg files

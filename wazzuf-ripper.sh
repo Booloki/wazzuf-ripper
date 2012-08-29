@@ -260,13 +260,16 @@ do
 		# subtitle track 1
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
+		SUBTITLE_FILE_FORCE_PATH=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE
 
 		# subtitle file (force external or not)
-		if [[ $SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE == "" ]]; then
+		if [[ $SUBTITLE_FILE_FORCE_PATH == "" ]]; then
 			SUBTITLE_FILE=$SUB_FILE.idx
 			SUBTITLE_SID=$SUBTITLE_1_SID
 		else
-			SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE
+			# check srt files encoding
+			if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+			SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
 		fi
 	
 		# set subtitles filenames
@@ -299,13 +302,16 @@ do
 		else
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
 			SUBTITLE_NAME=$SUBTITLE_2_NAME
+			SUBTITLE_FILE_FORCE_PATH=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE
 		
 			# subtitle file (force external or not)
-			if [[ $SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE == "" ]]; then
+			if [[ $SUBTITLE_FILE_FORCE_PATH == "" ]]; then
 				SUBTITLE_FILE=$SUB_FILE.idx
 				SUBTITLE_SID=$SUBTITLE_2_SID
 			else
-				SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE
+			# check srt files encoding
+			if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+			SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
 			fi
 
 			# set subtitles filenames

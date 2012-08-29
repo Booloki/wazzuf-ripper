@@ -51,3 +51,16 @@ subtitle_rip () {
 		;;
 	esac
 }
+
+# check srt files encoding
+# Warning only
+subtitle_srt_check () {
+	SUBTITLE_TYPE="`file $SUBTITLE_FILE_FORCE_PATH`"
+	if [[ `echo $SUBTITLE_TYPE | grep Unicode` == "" ]]; then
+		echo -ne "\n *************************************\n"
+		echo " Warning. Provided subtitle is not Unicode."
+		echo " $SUBTITLE_TYPE" && sleep 2
+		echo -ne " *************************************\n"
+	fi
+}
+
