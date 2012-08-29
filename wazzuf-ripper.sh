@@ -91,6 +91,30 @@ fi
 mkdir -p "$TAG_TITLE_NAME"
 cd $TAG_TITLE_NAME
 
+
+case $VIDEO_TYPE in
+MOVIE )
+	TITLE_LONG=$TITLE_NAME
+        ;;
+SHOW )
+	TITLE_LONG="$TITLE_NAME - Season $SEASON_NUMBER"
+	EPISODE_FIRST="1"
+	EPISODE_LAST="1"
+        ;;
+MUSIC )
+	TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
+	EPISODE_FIRST="1"
+	EPISODE_LAST="1"
+        ;;
+* )
+	echo -ne "\n *************************************\n"
+	echo " VIDEO_TYPE not set to MOVIE, SHOW or MUSIC ! Exiting..."
+	echo -ne " *************************************\n"
+	exit 1
+        ;;
+esac
+
+
 echo -ne "\n *************************************\n"
 echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
 echo -ne " *************************************\n"
@@ -121,9 +145,6 @@ esac
 check_nice
 check_ionice
 
-# serie check for loop
-if [[ $SERIE == "no" ]]; then EPISODE_LAST="1"; EPISODE_FIRST="1"; fi
-
 time for ((i=$EPISODE_FIRST; i <= EPISODE_LAST ; i++))
 do
 	# check multichapters
@@ -136,33 +157,45 @@ do
 			;;
 	esac
 
-	# set full working file and video filenames if series or not 
-	case $SERIE in
-	y* | Y* )
-		echo -ne "\n *************************************\n"
-		echo " Work in progress: $TITLE_NAME $DATE E$i"
-	        echo -ne " *************************************\n"
-		VOB_FILE="$TAG_TITLE_NAME.$DATE.E$i.vob"
-		CHAPTERS_FILE="$TAG_TITLE_NAME.$DATE.E$i-chapters.txt"
-		XVID_FILE="$TAG_TITLE_NAME.$DATE.E$i.xvid"
-		H264_FILE="$TAG_TITLE_NAME.$DATE.E$i.h264"
-		DUMP_FILE="$TAG_TITLE_NAME.$DATE.E$i.mpv"
-		;;
-	n* | N* )
-		echo -ne "\n *************************************\n"
-		echo " Work in progress: $TITLE_NAME $DATE"
-	        echo -ne " *************************************\n"
+	# tagging / set full working file and video filenames
+	case $VIDEO_TYPE in
+	MOVIE | MUSIC )
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
 		CHAPTERS_FILE="$TAG_TITLE_NAME.$DATE-chapters.txt"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
+		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+		MERGE_TITLE=$TITLE_NAME
+		echo -ne "\n *************************************\n"
+		echo " Work in progress: $TITLE_NAME ($DATE)"
+	        echo -ne " *************************************\n"
 		;;
-	* )
-                echo -ne "\n *************************************\n"
-		echo " SERIE not set to "yes" or "no" ! Exiting..."
-                echo -ne " *************************************\n"
-		exit 1
+	SHOW )
+		VOB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.vob"
+		CHAPTERS_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i-chapters.txt"
+		XVID_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.xvid"
+		H264_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.h264"
+		DUMP_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.mpv"
+
+        if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
+		then
+			echo -ne "\n *************************************\n"
+			echo " Warning ! $SOURCE_DIRECTORY/$EPISODES_FILE does not exists !" && sleep 2
+			echo -ne " *************************************\n"
+			EPISODE_NAME=$i
+			EPISODE_TAG="E$i"
+		else
+			EPISODE_NAME_FULL=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
+			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2 | sed s/\ //`
+			EPISODE_TAG="E`echo $EPISODE_NAME_FULL | sed s/\ -\ /./g | sed s/\ /./g`"
+		fi
+		MERGE_OUTPUT="$TAG_TITLE_NAME.S$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+
+		MERGE_TITLE="$TITLE_LONG - Episode $EPISODE_NAME_FULL"
+		echo -ne "\n *************************************\n"
+		echo " Work in progress: Episode $EPISODE_NAME_FULL"
+	        echo -ne " *************************************\n"
 		;;
 	esac
 
@@ -222,13 +255,13 @@ do
 			SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE
 		fi
 	
-		# set subtitles filenames if series or not 
-		case $SERIE in
-		y* | Y* )
-			SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
-			;;
-		n* | N* )
+		# set subtitles filenames
+		case $VIDEO_TYPE in
+		MOVIE | MUSIC )
 			SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+			;;
+		SHOW )
+			SUB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
 			;;
 		esac
 	
@@ -261,13 +294,13 @@ do
 				SUBTITLE_FILE=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE
 			fi
 
-			# set subtitles filenames if series or not 
-			case $SERIE in
-			y* | Y* )
-				SUB_FILE="$TAG_TITLE_NAME.$DATE.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
-				;;
-			n* | N* )
+			# set subtitles filenames
+			case $VIDEO_TYPE in
+			MOVIE | MUSIC )
 				SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+				;;
+			SHOW )
+				SUB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
 				;;
 			esac
 
@@ -299,20 +332,20 @@ do
 	CODEC_AUDIO=$CODEC_AUDIO_1
 
 	# set audio filenames if series or not 
-	case $SERIE in
-	y* | Y* )
-		DTS_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
-		WAV_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.wav"
-		MP3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.mp3"
-		OGG_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.ogg"
-		AC3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.ac3"
-		;;
-	n* | N* )
+	case $VIDEO_TYPE in
+	MOVIE | MUSIC )
 		DTS_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.dts"
 		WAV_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.wav"
 		MP3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.mp3"
 		OGG_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.ogg"
 		AC3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.ac3"
+		;;
+	SHOW )
+		DTS_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
+		WAV_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.wav"
+		MP3_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.mp3"
+		OGG_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.ogg"
+		AC3_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.ac3"
 		;;
 	esac
 
@@ -338,20 +371,20 @@ do
 		CODEC_AUDIO=$CODEC_AUDIO_2
 
 		# set audio filenames if series or not 
-		case $SERIE in
-		y* | Y* )
-			DTS_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
-			WAV_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.wav"
-			MP3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.mp3"
-			OGG_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.ogg"
-			AC3_FILE="$TAG_TITLE_NAME.$DATE.E$i.$AUDIO_AID-$AUDIO_LANG.ac3"
-			;;
-		n* | N* )
+		case $VIDEO_TYPE in
+		MOVIE | MUSIC )
 			DTS_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.dts"
 			WAV_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.wav"
 			MP3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.mp3"
 			OGG_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.ogg"
 			AC3_FILE="$TAG_TITLE_NAME.$DATE.$AUDIO_AID-$AUDIO_LANG.ac3"
+			;;
+		SHOW )
+			DTS_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.dts"
+			WAV_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.wav"
+			MP3_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.mp3"
+			OGG_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.ogg"
+			AC3_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$AUDIO_AID-$AUDIO_LANG.ac3"
 			;;
 		esac
 
@@ -442,31 +475,7 @@ do
 
 
 	## merge
-	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merging' && exit 1" 2
-
-	case $SERIE in
-		y* | Y* )
-			# for TV series
-	        	if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
-		        then
-				echo -ne "\n *************************************\n"
-		                echo " Warning ! $SOURCE_DIRECTORY/$EPISODES_FILE does not exists !" && sleep 2
-	                	echo -ne " *************************************\n"
-				EPISODE_NAME="E$i"
-				EPISODE_TAG="E$i"
-			else
-				EPISODE_NAME=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
-				EPISODE_TAG="E`echo $EPISODE_NAME | sed s/\ -\ /./g | sed s/\ /./g`"
-			fi
-			MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
-			MERGE_TITLE="$TITLE_LONG - $EPISODE_NAME"
-			;;
-		* )	
-			MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
-			MERGE_TITLE=$TITLE_LONG
-			;;
-	esac
-
+	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merge' && exit 1" 2
 
 	# global merge command
 	echo -ne "\n *************************************\n"
