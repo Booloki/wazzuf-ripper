@@ -119,6 +119,21 @@ DVD )
 	echo -ne "*************************************\n"
 	echo "Audio/Subtitles tracks (Title $DVD_TITLE_NUMBER):"
 	lsdvd-decode DVD-lsdvd-T$DVD_TITLE_NUMBER.info
+
+	# copy DVD to iso file ?
+	DVD_MOUNT_PATH=`mount | grep udf | cut -d ' ' -f 3`
+	DVD_MOUNT_NAME=`echo $DVD_MOUNT_PATH | cut -d '/' -f 3`
+	echo -ne "*************************************\n"
+	echo -ne " Wanna copy $DVD_MOUNT_PATH to $SOURCE_DIRECTORY/$ISO_FILE file ? (N/y)\n"
+	read answer
+	case $answer in
+	y* | Y* )
+		vobcopy -m -i $DVD_MOUNT_PATH -o $SOURCE_DIRECTORY
+		cd $SOURCE_DIRECTORY
+		mkisofs -allow-limited-size -dvd-video -o $ISO_FILE $DVD_MOUNT_NAME
+		rm -rf $DVD_MOUNT_NAME
+		;;
+	esac
 	;;
 ISO )
 	if [ ! -f "$ISO_FILE_PATH" ]

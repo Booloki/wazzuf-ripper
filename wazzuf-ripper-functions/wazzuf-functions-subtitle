@@ -1,4 +1,5 @@
 ## subtitle check/extract function
+
 # DVD only - .idx and .sub files
 # BD - sup files
 subtitle_rip () {
