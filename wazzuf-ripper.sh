@@ -160,7 +160,7 @@ do
 
 	# tagging / set full working file and video filenames
 	case $VIDEO_TYPE in
-	MOVIE | MUSIC )
+	MOVIE )
 		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
 		CHAPTERS_FILE="$TAG_TITLE_NAME.$DATE-chapters.txt"
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
@@ -170,7 +170,19 @@ do
 		MERGE_TITLE=$TITLE_NAME
 		echo -ne "\n *************************************\n"
 		echo " Work in progress: $TITLE_NAME ($DATE)"
-	        echo -ne " *************************************\n"
+		echo -ne " *************************************\n"
+		;;
+	MUSIC )
+		VOB_FILE="$TAG_TITLE_NAME.$DATE.vob"
+		CHAPTERS_FILE="$TAG_TITLE_NAME.$DATE-chapters.txt"
+		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
+		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
+		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
+		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+		MERGE_TITLE=$TITLE_NAME
+		echo -ne "\n *************************************\n"
+		echo " Work in progress: $ARTIST_NAME - $TITLE_NAME ($DATE)"
+		echo -ne " *************************************\n"
 		;;
 	SHOW )
 		VOB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.vob"
@@ -179,11 +191,12 @@ do
 		H264_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.mpv"
 
-        if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
+		if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
 		then
 			echo -ne "\n *************************************\n"
 			echo " Warning ! $SOURCE_DIRECTORY/$EPISODES_FILE does not exists !" && sleep 2
 			echo -ne " *************************************\n"
+			EPISODE_NAME_FULL=$i
 			EPISODE_NAME=$i
 			EPISODE_TAG="E$i"
 		else
@@ -196,7 +209,7 @@ do
 		MERGE_TITLE="$TITLE_LONG - Episode $EPISODE_NAME_FULL"
 		echo -ne "\n *************************************\n"
 		echo " Work in progress: Episode $EPISODE_NAME_FULL"
-	        echo -ne " *************************************\n"
+		echo -ne " *************************************\n"
 		;;
 	esac
 
@@ -438,13 +451,13 @@ do
 	# Matroska Cover Art Guidelines http://www.matroska.org/technical/cover_art/index.html
 	if [[ $SOURCE_DIRECTORY/$COVER == "" ]]; then
 		echo -ne "\n *************************************\n"
-		echo " No image attachment. Next..." && sleep 1
+		echo " No image attachment. Skipping..." && sleep 1
 	        echo -ne " *************************************\n"
 		MERGE_COVER=""
 	else
 		if [ ! -f $SOURCE_DIRECTORY/$COVER ]; then
 			echo -ne "\n *************************************\n"
-			echo " Warning ! $SOURCE_DIRECTORY/$COVER file does not exists !" && sleep 2
+			echo " Warning ! $SOURCE_DIRECTORY/$COVER file does not exists! Skipping..." && sleep 2
 	        	echo -ne " *************************************\n"
 			MERGE_COVER=""		
 		else
@@ -495,20 +508,27 @@ do
 
 	case $VIDEO_TYPE in
 	MOVIE )
+		TEMPLATE_FILE="../$TEMPLATES_PATH/tags-50-movie-template.xml"
 		TAG_FILE="$TAG_TITLE_NAME.$DATE.xml"
 		if [ ! -f $TAG_FILE ]; then
-			echo -ne "\n *************************************\n"
-			echo " Generate xml tags file with probed informations... "
-			cp -v ../$TEMPLATES_PATH/tags-50-movie-template.xml $TAG_FILE
+			if [ ! -f $TEMPLATE_FILE ]; then
+				echo -ne "\n *************************************\n"
+				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
+				echo -ne " *************************************\n"
+			else
+				echo -ne "\n *************************************\n"
+				echo " Generate xml tags file with probed informations... "
+				cp -v $TEMPLATE_FILE $TAG_FILE
 
-			xml_tagging_base
+				xml_tagging_base
 
-			XMLTAG_TITLE=$TITLE_NAME
-			sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
+				XMLTAG_TITLE=$TITLE_NAME
+				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
 
-			XMLTAG_DIRECTOR=$DIRECTOR_NAME
-			sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
-			echo -ne " *************************************\n"
+				XMLTAG_DIRECTOR=$DIRECTOR_NAME
+				sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
+				echo -ne " *************************************\n"
+			fi
 		else
 			echo -ne "\n *************************************\n"
 			echo " xml tags file exists. Next..."  && sleep 1
@@ -516,20 +536,27 @@ do
 		fi		
 		;;
 	MUSIC )
+		TEMPLATE_FILE="../$TEMPLATES_PATH/tags-50-music-template.xml"
 		TAG_FILE="$TAG_TITLE_NAME.$DATE.xml"
 		if [ ! -f $TAG_FILE ]; then
-			echo -ne "\n *************************************\n"
-			echo " Generate xml tags file with probed informations... "
-			cp -v ../$TEMPLATES_PATH/tags-50-music-template.xml $TAG_FILE
+			if [ ! -f $TEMPLATE_FILE ]; then
+				echo -ne "\n *************************************\n"
+				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
+				echo -ne " *************************************\n"
+			else
+				echo -ne "\n *************************************\n"
+				echo " Generate xml tags file with probed informations... "
+				cp -v $TEMPLATE_FILE $TAG_FILE
 
-			xml_tagging_base
+				xml_tagging_base
 
-			XMLTAG_TITLE=$TITLE_NAME
-			sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
+				XMLTAG_TITLE=$TITLE_NAME
+				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
 
-			XMLTAG_ARTIST=$ARTIST_NAME
-			sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
-			echo -ne " *************************************\n"
+				XMLTAG_ARTIST=$ARTIST_NAME
+				sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
+				echo -ne " *************************************\n"
+			fi
 		else
 			echo -ne "\n *************************************\n"
 			echo " xml tags file exists. Next..."  && sleep 1
@@ -537,33 +564,40 @@ do
 		fi		
 		;;
 	SHOW )
+		TEMPLATE_FILE="../$TEMPLATES_PATH/tags-50-show-template.xml"
 		TAG_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.xml"
 		if [ ! -f $TAG_FILE ]; then
-			echo -ne "\n *************************************\n"
-			echo " Generate xml tags file with probed informations... "
-			cp -v ../$TEMPLATES_PATH/tags-50-show-template.xml $TAG_FILE
+			if [ ! -f $TEMPLATE_FILE ]; then
+				echo -ne "\n *************************************\n"
+				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
+				echo -ne " *************************************\n"
+			else
+				echo -ne "\n *************************************\n"
+				echo " Generate xml tags file with probed informations... "
+				cp -v $TEMPLATE_FILE $TAG_FILE
 
-			xml_tagging_base
+				xml_tagging_base
 
-			XMLTAG_SHOW=$TITLE_NAME
-			sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
+				XMLTAG_SHOW=$TITLE_NAME
+				sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
 
-			# Season
-			XMLTAG_SEASON=$SEASON_NUMBER
-			sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
+				# Season
+				XMLTAG_SEASON=$SEASON_NUMBER
+				sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
 
-			# episode number
-			XMLTAG_EPISODE_NUMBER=$i
-			sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
+				# episode number
+				XMLTAG_EPISODE_NUMBER=$i
+				sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
 
-			# total episode number (in the season)
-			XMLTAG_EPISODE_TOTAL=$EPISODES_TOTAL_NUMBER
-			sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
+				# total episode number (in the season)
+				XMLTAG_EPISODE_TOTAL=$EPISODES_TOTAL_NUMBER
+				sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
 
-			# episode title
-			XMLTAG_EPISODE_TITLE=$EPISODE_NAME
-			sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
-			echo -ne " *************************************\n"
+				# episode title
+				XMLTAG_EPISODE_TITLE=$EPISODE_NAME
+				sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
+				echo -ne " *************************************\n"
+			fi
 		else
 			echo -ne "\n *************************************\n"
 			echo " xml tags file exists. Next..."  && sleep 1
@@ -576,7 +610,7 @@ do
 		MERGE_XMLTAGS="--global-tags $TAG_FILE"
 	else
 		echo -ne "\n *************************************\n"
-		echo " xml tags generation problem. Skipping..."  && sleep 1
+		echo " xml tags generation problem. Skipping..."  && sleep 2
 		echo -ne " *************************************\n"
 		MERGE_XMLTAGS=""
 	fi
