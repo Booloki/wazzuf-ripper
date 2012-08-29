@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE Tags SYSTEM "matroskatags.dtd">
+<Tags>
+  <!-- movie -->
+  <Tag>
+    <Targets>
+      <TargetTypeValue>50</TargetTypeValue>
+    </Targets>
+    <Simple>
+      <Name>TITLE</Name>
+      <String>XMLTAG_TITLE</String>
+    </Simple>
+    <Simple>
+      <Name>DIRECTOR</Name>
+      <String>XMLTAG_DIRECTOR</String>
+    </Simple>
+    <Simple>
+      <Name>DATE_RELEASE</Name>
+      <String>XMLTAG_DATE_RELEASE</String>
+    </Simple>
+    <Simple>
+      <Name>DATE_ENCODED</Name>
+      <String>XMLTAG_DATE_ENCODED</String>
+    </Simple>
+    <Simple>
+      <Name>ENCODED_BY</Name>
+      <String>XMLTAG_ENCODED_BY</String>
+    </Simple>
+    <Simple>
+      <Name>COMMENT</Name>
+      <String>XMLTAG_COMMENT</String>
+    </Simple>
+  </Tag>
+</Tags>

@@ -4,6 +4,7 @@
 # booloki@gmail.com
 
 CONF_FILE="wazzuf-ripper.conf"
+TEMPLATES_PATH="wazzuf-ripper-templates"
 FUNCTIONS_PATH="wazzuf-ripper-functions"
 FUNCTIONS_AUDIO_FILE="$FUNCTIONS_PATH/wazzuf-functions-audio"
 FUNCTIONS_VIDEO_FILE="$FUNCTIONS_PATH/wazzuf-functions-video"
@@ -474,6 +475,113 @@ do
 	fi
 
 
+	## xml tags
+	# http://matroska.org/technical/specs/tagging/index.html
+
+	XMLTAG_DATE_ENCODED=`date +%Y`
+	XMLTAG_ENCODED_BY="$TAG_SIGNATURE"
+	XMLTAG_COMMENT=$COMMENT
+	XMLTAG_DATE_RELEASE=$DATE
+	xml_tagging_base () {
+		# release date
+		sed -i s%XMLTAG_DATE_RELEASE%"$XMLTAG_DATE_RELEASE"% $TAG_FILE
+		# encoded date
+		sed -i s%XMLTAG_DATE_ENCODED%"$XMLTAG_DATE_ENCODED"% $TAG_FILE	
+		# signature
+		sed -i s%XMLTAG_ENCODED_BY%"$XMLTAG_ENCODED_BY"% $TAG_FILE	
+		# comment
+		sed -i s%XMLTAG_COMMENT%"$XMLTAG_COMMENT"% $TAG_FILE
+	}
+
+	case $VIDEO_TYPE in
+	MOVIE )
+		TAG_FILE="$TAG_TITLE_NAME.$DATE.xml"
+		if [ ! -f $TAG_FILE ]; then
+			echo -ne "\n *************************************\n"
+			echo " Generate xml tags file with probed informations... "
+			cp -v ../$TEMPLATES_PATH/tags-50-movie-template.xml $TAG_FILE
+
+			xml_tagging_base
+
+			XMLTAG_TITLE=$TITLE_NAME
+			sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
+
+			XMLTAG_DIRECTOR=$DIRECTOR_NAME
+			sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
+			echo -ne " *************************************\n"
+		else
+			echo -ne "\n *************************************\n"
+			echo " xml tags file exists. Next..."  && sleep 1
+			echo -ne " *************************************\n"		
+		fi		
+		;;
+	MUSIC )
+		TAG_FILE="$TAG_TITLE_NAME.$DATE.xml"
+		if [ ! -f $TAG_FILE ]; then
+			echo -ne "\n *************************************\n"
+			echo " Generate xml tags file with probed informations... "
+			cp -v ../$TEMPLATES_PATH/tags-50-music-template.xml $TAG_FILE
+
+			xml_tagging_base
+
+			XMLTAG_TITLE=$TITLE_NAME
+			sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
+
+			XMLTAG_ARTIST=$ARTIST_NAME
+			sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
+			echo -ne " *************************************\n"
+		else
+			echo -ne "\n *************************************\n"
+			echo " xml tags file exists. Next..."  && sleep 1
+			echo -ne " *************************************\n"		
+		fi		
+		;;
+	SHOW )
+		TAG_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.xml"
+		if [ ! -f $TAG_FILE ]; then
+			echo -ne "\n *************************************\n"
+			echo " Generate xml tags file with probed informations... "
+			cp -v ../$TEMPLATES_PATH/tags-50-show-template.xml $TAG_FILE
+
+			xml_tagging_base
+
+			XMLTAG_SHOW=$TITLE_NAME
+			sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
+
+			# Season
+			XMLTAG_SEASON=$SEASON_NUMBER
+			sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
+
+			# episode number
+			XMLTAG_EPISODE_NUMBER=$i
+			sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
+
+			# total episode number (in the season)
+			XMLTAG_EPISODE_TOTAL=$EPISODES_TOTAL_NUMBER
+			sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
+
+			# episode title
+			XMLTAG_EPISODE_TITLE=$EPISODE_NAME
+			sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
+			echo -ne " *************************************\n"
+		else
+			echo -ne "\n *************************************\n"
+			echo " xml tags file exists. Next..."  && sleep 1
+			echo -ne " *************************************\n"		
+		fi
+		;;
+	esac
+
+	if [ -f $TAG_FILE ]; then
+		MERGE_XMLTAGS="--global-tags $TAG_FILE"
+	else
+		echo -ne "\n *************************************\n"
+		echo " xml tags generation problem. Skipping..."  && sleep 1
+		echo -ne " *************************************\n"
+		MERGE_XMLTAGS=""
+	fi
+
+
 	## merge
 	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merge' && exit 1" 2
 
@@ -488,7 +596,8 @@ do
 		$MERGE_AUDIO_FULL \
 		$MERGE_SUBTITLES_FULL \
 		$MERGE_CHAPTERS \
-		$MERGE_COVER
+		$MERGE_COVER \
+		$MERGE_XMLTAGS
 
 done
 
