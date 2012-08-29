@@ -96,11 +96,12 @@ cd $TAG_TITLE_NAME
 case $VIDEO_TYPE in
 MOVIE )
 	TITLE_LONG=$TITLE_NAME
-        ;;
-SHOW )
-	TITLE_LONG="$TITLE_NAME - Season $SEASON_NUMBER"
 	EPISODE_FIRST="1"
 	EPISODE_LAST="1"
+        ;;
+SHOW )
+#	TITLE_LONG="$TITLE_NAME - Season $SEASON_NUMBER"
+	TITLE_LONG="$TITLE_NAME - Saison $SEASON_NUMBER"
         ;;
 MUSIC )
 	TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
@@ -198,11 +199,13 @@ do
 			echo -ne " *************************************\n"
 			EPISODE_NAME_FULL=$i
 			EPISODE_NAME=$i
-			EPISODE_TAG="E$i"
+			EPISODE_NUMBER=$i
+			EPISODE_TAG=E$EPISODE_NUMBER
 		else
 			EPISODE_NAME_FULL=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
-			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2 | sed s/\ //`
-			EPISODE_TAG="E`echo $EPISODE_NAME_FULL | sed s/\ -\ /./g | sed s/\ /./g`"
+			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2-10 | sed s/\ //`
+			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`
+			EPISODE_TAG=E$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
 		fi
 		MERGE_OUTPUT="$TAG_TITLE_NAME.S$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 
@@ -309,9 +312,9 @@ do
 				SUBTITLE_FILE=$SUB_FILE.idx
 				SUBTITLE_SID=$SUBTITLE_2_SID
 			else
-			# check srt files encoding
-			if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
-			SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
+				# check srt files encoding
+				if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+				SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
 			fi
 
 			# set subtitles filenames
@@ -592,7 +595,7 @@ do
 				sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
 
 				# episode number
-				XMLTAG_EPISODE_NUMBER=$i
+				XMLTAG_EPISODE_NUMBER=$EPISODE_NUMBER
 				sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
 
 				# total episode number (in the season)
