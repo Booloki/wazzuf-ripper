@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-08-28
+* Add tags to mp3 (ID3v2) and ogg files
 * New video type management: MOVIE SHOW MUSIC instead of SERIE
 * Add xml tags to mkv depending on video type (3 templates)
 

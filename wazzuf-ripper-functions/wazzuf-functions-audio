@@ -19,10 +19,13 @@
 #	MP3_FILE
 #	OGG_FILE
 #	AC3_FILE
-#
+#	TITLE_NAME
+#	AUDIO_NAME
+#	MERGE_TITLE
+#	DATE
+#	COMMENT
 # return AUDIO_FILE
 audio_rip () {
-
 	# Audio source format
         case $AUDIO_SOURCE in
 	DTS )
@@ -58,7 +61,6 @@ audio_rip () {
         VORBIS | MP3 )
 		# extract wave
 		if [ ! -f $WAV_FILE ]; then
-			 # takes a long time....
 	                ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
 		else
 	                echo -ne "\n *************************************\n"
@@ -103,7 +105,7 @@ audio_rip () {
 		fi
 		;;
 	VORBIS )
-		# audio ogg vorbis encode
+		# audio ogg vorbis encode (but oggenc not multithreaded...)
 		AUDIO_FILE=$OGG_FILE
 		if [ -f $AUDIO_FILE ]
 	        then
@@ -111,9 +113,8 @@ audio_rip () {
 	                echo " $AUDIO_FILE exists, next..." && sleep 1
         	     	echo -ne " *************************************\n"
 	        else
-			# multithread option ?
 			check_oggenc
-			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $OGG_FILE
+			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $OGG_FILE -a "$TITLE_NAME" -t "$AUDIO_NAME" -l "$MERGE_TITLE" -G "Soundtrack" -d $DATE
 		fi
 		;;
 	MP3 )
@@ -129,10 +130,10 @@ audio_rip () {
 			# lame mode choice
 			case $AUDIO_MP3_MODE in
 			        CBR | cbr )
-					nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -b $AUDIO_MP3_CBR -h $WAV_FILE $AUDIO_FILE
+					AUDIO_MP3_MODE_OPTION="-b $AUDIO_MP3_CBR"
 					;;
 			        VBR | vbr )
-					nice -n $NICENESS lame --scale $AUDIO_MP3_VOL -V $AUDIO_MP3_VBR -h $WAV_FILE $AUDIO_FILE
+					AUDIO_MP3_MODE_OPTION="-V $AUDIO_MP3_VBR"
 					;;
 			        * )
 					echo -ne "\n *************************************\n"
@@ -141,6 +142,7 @@ audio_rip () {
 					exit 1
 					;;
 			esac
+			nice -n $NICENESS lame --scale $AUDIO_MP3_VOL $AUDIO_MP3_MODE_OPTION --ta "$TITLE_NAME" --tt "$AUDIO_NAME" --tl "$MERGE_TITLE" --tg 24 --ty $DATE --tc "$COMMENT" -h $WAV_FILE $AUDIO_FILE
 		fi
 		;;
 	esac
