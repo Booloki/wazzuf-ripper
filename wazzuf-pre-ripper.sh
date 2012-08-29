@@ -128,6 +128,8 @@ DVD )
 	read answer
 	case $answer in
 	y* | Y* )
+		check_vobcopy
+		check_mkisofs
 		vobcopy -m -i $DVD_MOUNT_PATH -o $SOURCE_DIRECTORY
 		cd $SOURCE_DIRECTORY
 		mkisofs -allow-limited-size -dvd-video -o $ISO_FILE $DVD_MOUNT_NAME
