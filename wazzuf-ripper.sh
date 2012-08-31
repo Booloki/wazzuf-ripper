@@ -167,6 +167,7 @@ do
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
+		CODEC_AUDIO=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
 		echo -ne "\n *************************************\n"
@@ -266,26 +267,24 @@ do
 		SUBTITLE_FILE_FORCE_PATH=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE
 
 		# subtitle file (force external or not)
-		if [[ $SUBTITLE_FILE_FORCE_PATH == "" ]]; then
-			SUBTITLE_FILE=$SUB_FILE.idx
+		if [[ $SUBTITLE_1_FILE_FORCE == "" ]]; then
 			SUBTITLE_SID=$SUBTITLE_1_SID
+			# set subtitles filenames
+			case $VIDEO_TYPE in
+			MOVIE | MUSIC )
+				SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+				;;
+			SHOW )
+				SUB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
+				;;
+			esac
+			SUBTITLE_FILE=$SUB_FILE.idx		
+			subtitle_rip
 		else
 			# check srt files encoding
 			if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
 			SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
 		fi
-	
-		# set subtitles filenames
-		case $VIDEO_TYPE in
-		MOVIE | MUSIC )
-			SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
-			;;
-		SHOW )
-			SUB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
-			;;
-		esac
-	
-		subtitle_rip
 	
 		# Force no default subtitle (or not)
 		case $SUBTITLE_NODEFAULT_FORCE in
@@ -308,26 +307,24 @@ do
 			SUBTITLE_FILE_FORCE_PATH=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE
 		
 			# subtitle file (force external or not)
-			if [[ $SUBTITLE_FILE_FORCE_PATH == "" ]]; then
-				SUBTITLE_FILE=$SUB_FILE.idx
+			if [[ $SUBTITLE_2_FILE_FORCE == "" ]]; then
 				SUBTITLE_SID=$SUBTITLE_2_SID
+				# set subtitles filenames
+				case $VIDEO_TYPE in
+				MOVIE | MUSIC )
+					SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
+					;;
+				SHOW )
+					SUB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
+					;;
+				esac
+				SUBTITLE_FILE=$SUB_FILE.idx	
+				subtitle_rip
 			else
 				# check srt files encoding
 				if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
 				SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
 			fi
-
-			# set subtitles filenames
-			case $VIDEO_TYPE in
-			MOVIE | MUSIC )
-				SUB_FILE="$TAG_TITLE_NAME.$DATE.$SUBTITLE_SID-$SUBTITLE_LANG"
-				;;
-			SHOW )
-				SUB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.$SUBTITLE_SID-$SUBTITLE_LANG"
-				;;
-			esac
-
-			subtitle_rip
 
 			# Force no default subtitle (or not)
 			case $SUBTITLE_NODEFAULT_FORCE in
@@ -502,8 +499,8 @@ do
 
 	XMLTAG_DATE_ENCODED=`date +%Y`
 	XMLTAG_ENCODED_BY="$TAG_SIGNATURE"
-	XMLTAG_COMMENT=$COMMENT
-	XMLTAG_DATE_RELEASE=$DATE
+	XMLTAG_COMMENT="$COMMENT"
+	XMLTAG_DATE_RELEASE="$DATE"
 	xml_tagging_base () {
 		# release date
 		sed -i s%XMLTAG_DATE_RELEASE%"$XMLTAG_DATE_RELEASE"% $TAG_FILE
@@ -531,10 +528,10 @@ do
 
 				xml_tagging_base
 
-				XMLTAG_TITLE=$TITLE_NAME
+				XMLTAG_TITLE="$TITLE_NAME"
 				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
 
-				XMLTAG_DIRECTOR=$DIRECTOR_NAME
+				XMLTAG_DIRECTOR="$DIRECTOR_NAME"
 				sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
 				echo -ne " *************************************\n"
 			fi
@@ -559,10 +556,10 @@ do
 
 				xml_tagging_base
 
-				XMLTAG_TITLE=$TITLE_NAME
+				XMLTAG_TITLE="$TITLE_NAME"
 				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
 
-				XMLTAG_ARTIST=$ARTIST_NAME
+				XMLTAG_ARTIST="$ARTIST_NAME"
 				sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
 				echo -ne " *************************************\n"
 			fi
@@ -587,23 +584,23 @@ do
 
 				xml_tagging_base
 
-				XMLTAG_SHOW=$TITLE_NAME
+				XMLTAG_SHOW="$TITLE_NAME"
 				sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
 
 				# Season
-				XMLTAG_SEASON=$SEASON_NUMBER
+				XMLTAG_SEASON="$SEASON_NUMBER"
 				sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
 
 				# episode number
-				XMLTAG_EPISODE_NUMBER=$EPISODE_NUMBER
+				XMLTAG_EPISODE_NUMBER="$EPISODE_NUMBER"
 				sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
 
 				# total episode number (in the season)
-				XMLTAG_EPISODE_TOTAL=$EPISODES_TOTAL_NUMBER
+				XMLTAG_EPISODE_TOTAL="$EPISODES_TOTAL_NUMBER"
 				sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
 
 				# episode title
-				XMLTAG_EPISODE_TITLE=$EPISODE_NAME
+				XMLTAG_EPISODE_TITLE="$EPISODE_NAME"
 				sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
 				echo -ne " *************************************\n"
 			fi

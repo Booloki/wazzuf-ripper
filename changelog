@@ -3,7 +3,10 @@
 # booloki@gmail.com
 # Changelog file
 
-2012-08-28
+2012-08-31
+* bugfix: right subtitles path provided, and others small bugfixes
+
+2012-08-29
 * Add check_vobcopy and check_mkisofs
 * Tagging bugfixes
 * Add external srt subtitle Unicode check

@@ -29,7 +29,7 @@ subtitle_rip () {
 			echo -ne "\n *************************************\n"
 	                echo " Extracting subtitle to $SUBTITLE_FILE "
 	                echo -ne " *************************************\n"
-			nice -n $NICENESS mencoder -dvd-device $ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS \
+			nice -n $NICENESS mencoder -dvd-device $SOURCE_DIRECTORY/$ISO_FILE dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS \
 				-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
 				-o /dev/null -nosound -ovc frameno
 		fi
