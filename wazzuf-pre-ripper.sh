@@ -62,6 +62,7 @@ lsdvd-decode(){
 }
 
 ## enter source directory
+mkdir -p $SOURCE_DIRECTORY
 cd $SOURCE_DIRECTORY
 
 ## pre-rip source choice
@@ -96,7 +97,6 @@ BD )
 	;;
 DVD )
 	check_lsdvd
-
 	echo -ne "*************************************\n"
 	echo " lsdvd"
  	lsdvd -acsv /dev/dvd 2>/dev/null > DVD-lsdvd.info
@@ -134,6 +134,7 @@ DVD )
 		cd $SOURCE_DIRECTORY
 		mkisofs -allow-limited-size -dvd-video -o $ISO_FILE $DVD_MOUNT_NAME
 		rm -rf $DVD_MOUNT_NAME
+		echo -ne "\n You can now use ISO instead of DVD in configuration file."
 		;;
 	esac
 	;;
