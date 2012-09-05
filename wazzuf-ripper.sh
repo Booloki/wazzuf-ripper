@@ -42,9 +42,9 @@ esac
 
 # audio 1 codec choice check
 case $2 in
-DTS | DTS-HD )
-        CODEC_AUDIO_1=$2
-        ;;
+DUMP )
+	CODEC_AUDIO_1=$AUDIO_1_SOURCE
+	;;
 AC3 | AC351 | AC320 )
         CODEC_AUDIO_1=$2
         ;;
@@ -66,20 +66,20 @@ esac
 # audio 2 codec choice check
 if [[ ! $AUDIO_2_LANG == "" ]]; then
 	case $3 in
-	DTS | DTS-HD )
-	        CODEC_AUDIO_2=$2
-	        ;;
+	DUMP )
+		CODEC_AUDIO_2=$AUDIO_2_SOURCE
+		;;
 	AC3 | AC351 | AC320 )
-	        CODEC_AUDIO_2=$2
-	        ;;
+		CODEC_AUDIO_2="AC3"
+		;;
 	ogg | vorbis | OGG | VORBIS )
-	        CODEC_AUDIO_2="VORBIS"
-	        ;;
+		CODEC_AUDIO_2="VORBIS"
+		;;
 	mp3 | MP3 | Mp3 )
-	        CODEC_AUDIO_2="MP3"
-	        ;;
+		CODEC_AUDIO_2="MP3"
+		;;
 	* )
-	        # use default CODEC_AUDIO
+		# use default CODEC_AUDIO
 		CODEC_AUDIO_2=$DEFAULT_CODEC_AUDIO
 	        ;;
 	esac
@@ -177,8 +177,8 @@ do
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
-		CODEC_AUDIO=$CODEC_AUDIO_1
-		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
+		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
 		echo -ne "\n *************************************\n"
 		echo " Work in progress: $TITLE_NAME ($DATE)"
@@ -190,7 +190,8 @@ do
 		XVID_FILE="$TAG_TITLE_NAME.$DATE.xvid"
 		H264_FILE="$TAG_TITLE_NAME.$DATE.h264"
 		DUMP_FILE="$TAG_TITLE_NAME.$DATE.mpv"
-		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$CODEC_AUDIO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
+		MERGE_OUTPUT="$TAG_TITLE_NAME.$DATE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
 		echo -ne "\n *************************************\n"
 		echo " Work in progress: $ARTIST_NAME - $TITLE_NAME ($DATE)"
