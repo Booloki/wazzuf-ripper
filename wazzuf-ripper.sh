@@ -149,13 +149,23 @@ check_ionice
 
 time for ((i=$EPISODE_FIRST; i <= EPISODE_LAST ; i++))
 do
-	# check multichapters
+
+	# check multichapters and set chapters merge informations
 	case $MULTICHAP_FORCE in
 		y* | Y* )
 			CHAPTERS="$MULTICHAP_FIRST-$MULTICHAP_LAST"
+			case $SOURCE in
+			DVD | ISO )
+				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
+				;;
+			* )
+				MERGE_CHAPTERS=""
+				;;
+			esac
 			;;
 		* )
 			CHAPTERS="$i-$i"
+			MERGE_CHAPTERS=""
 			;;
 	esac
 
@@ -441,16 +451,6 @@ do
 			;;
 		esac
 	fi
-
-	## chapters informations
-	case $SOURCE in
-	DVD | ISO )
-		MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
-		;;
-	* )
-		MERGE_CHAPTERS=""
-		;;
-	esac
 
 
 	## Cover art
