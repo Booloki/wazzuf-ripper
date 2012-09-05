@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-09-05
+* bugfix + improvements: cover art management
 * Change LPCM to PCM
 * Add DVD audio track DUMP option (no encoding) and removing DTS option
 * bugfix: avoid DVD chapters informations merge when only one chapter
