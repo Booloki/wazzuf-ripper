@@ -482,130 +482,34 @@ do
 
 	## xml tags
 	# http://matroska.org/technical/specs/tagging/index.html
-	# 3 templates:  tags-50-movie-template.xml  tags-50-music-template.xml  tags-50-show-template.xml
-	# in TEMPLATES_PATH
-
 	TAG_FILE="$BASE_WORKING_FILE.xml"
-	# if empty tag: ugly but not really important
-	XMLTAG_DATE_ENCODED=`date +%Y`
-	XMLTAG_ENCODED_BY="$TAG_SIGNATURE"
-	XMLTAG_COMMENT="$COMMENT"
-	XMLTAG_DATE_RELEASE="$DATE"
+	if [ ! -f $TAG_FILE ]; then
+		# 3 templates:  tags-50-movie-template.xml  tags-50-music-template.xml  tags-50-show-template.xml
+		# in TEMPLATES_PATH
+		TEMPLATE_FILE_MOVIE="../$TEMPLATES_PATH/tags-50-movie-template.xml"
+		TEMPLATE_FILE_MUSIC="../$TEMPLATES_PATH/tags-50-music-template.xml"
+		TEMPLATE_FILE_SHOW="../$TEMPLATES_PATH/tags-50-show-template.xml"
 
-	# Common to 3 templates: XMLTAG_TITLE XMLTAG_DATE_RELEASE XMLTAG_DATE_ENCODED XMLTAG_ENCODED_BY XMLTAG_COMMENT
-	xml_tagging_base () {
-		# release date
-		sed -i s%XMLTAG_DATE_RELEASE%"$XMLTAG_DATE_RELEASE"% $TAG_FILE
-		# encoded date
-		sed -i s%XMLTAG_DATE_ENCODED%"$XMLTAG_DATE_ENCODED"% $TAG_FILE	
-		# signature
-		sed -i s%XMLTAG_ENCODED_BY%"$XMLTAG_ENCODED_BY"% $TAG_FILE	
-		# comment
-		sed -i s%XMLTAG_COMMENT%"$XMLTAG_COMMENT"% $TAG_FILE
-	}
+		# if empty tag: ugly but not really important
+		XMLTAG_DATE_ENCODED=`date +%Y`
+		XMLTAG_ENCODED_BY="$TAG_SIGNATURE"
+		XMLTAG_COMMENT="$COMMENT"
+		XMLTAG_DATE_RELEASE="$DATE"
+		# DATE_TAGGED useless
 
-	case $VIDEO_TYPE in
-	MOVIE )
-		TEMPLATE_FILE="../$TEMPLATES_PATH/tags-50-movie-template.xml"
-		if [ ! -f $TAG_FILE ]; then
-			if [ ! -f $TEMPLATE_FILE ]; then
-				echo -ne "\n *************************************\n"
-				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
-				echo -ne " *************************************\n"
-			else
-				echo -ne "\n *************************************\n"
-				echo " Generate xml tags file with probed informations... "
-				cp -v $TEMPLATE_FILE $TAG_FILE
+		xml_tagging
+	else
+		echo -ne "\n *************************************\n"
+		echo " xml tags file exists. Next..."  && sleep 1
+		echo -ne " *************************************\n"		
+	fi
 
-				xml_tagging_base
-
-				XMLTAG_TITLE="$TITLE_NAME"
-				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
-
-				XMLTAG_DIRECTOR="$DIRECTOR_NAME"
-				sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
-				echo -ne " *************************************\n"
-			fi
-		else
-			echo -ne "\n *************************************\n"
-			echo " xml tags file exists. Next..."  && sleep 1
-			echo -ne " *************************************\n"		
-		fi		
-		;;
-	MUSIC )
-		TEMPLATE_FILE="../$TEMPLATES_PATH/tags-50-music-template.xml"
-		if [ ! -f $TAG_FILE ]; then
-			if [ ! -f $TEMPLATE_FILE ]; then
-				echo -ne "\n *************************************\n"
-				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
-				echo -ne " *************************************\n"
-			else
-				echo -ne "\n *************************************\n"
-				echo " Generate xml tags file with probed informations... "
-				cp -v $TEMPLATE_FILE $TAG_FILE
-
-				xml_tagging_base
-
-				XMLTAG_TITLE="$TITLE_NAME"
-				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
-
-				XMLTAG_ARTIST="$ARTIST_NAME"
-				sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
-				echo -ne " *************************************\n"
-			fi
-		else
-			echo -ne "\n *************************************\n"
-			echo " xml tags file exists. Next..."  && sleep 1
-			echo -ne " *************************************\n"		
-		fi		
-		;;
-	SHOW )
-		TEMPLATE_FILE="../$TEMPLATES_PATH/tags-50-show-template.xml"
-		if [ ! -f $TAG_FILE ]; then
-			if [ ! -f $TEMPLATE_FILE ]; then
-				echo -ne "\n *************************************\n"
-				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
-				echo -ne " *************************************\n"
-			else
-				echo -ne "\n *************************************\n"
-				echo " Generate xml tags file with probed informations... "
-				cp -v $TEMPLATE_FILE $TAG_FILE
-
-				xml_tagging_base
-
-				XMLTAG_SHOW="$TITLE_NAME"
-				sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
-
-				# Season
-				XMLTAG_SEASON="$SEASON_NUMBER"
-				sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
-
-				# episode number
-				XMLTAG_EPISODE_NUMBER="$EPISODE_NUMBER"
-				sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
-
-				# total episode number (in the season)
-				XMLTAG_EPISODE_TOTAL="$EPISODES_TOTAL_NUMBER"
-				sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
-
-				# episode title
-				XMLTAG_EPISODE_TITLE="$EPISODE_NAME"
-				sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
-				echo -ne " *************************************\n"
-			fi
-		else
-			echo -ne "\n *************************************\n"
-			echo " xml tags file exists. Next..."  && sleep 1
-			echo -ne " *************************************\n"		
-		fi
-		;;
-	esac
-
+	# second check, if generation problem, and to fill MERGE_XMLTAGS
 	if [ -f $TAG_FILE ]; then
 		MERGE_XMLTAGS="--global-tags $TAG_FILE"
 	else
 		echo -ne "\n *************************************\n"
-		echo " xml tags generation problem. Skipping..."  && sleep 2
+		echo " xml tags file generation problem. Skipping..."  && sleep 2
 		echo -ne " *************************************\n"
 		MERGE_XMLTAGS=""
 	fi
