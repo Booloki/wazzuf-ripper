@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-09-06
+* New BASE_WORKING_FILE variable
 * SHOW: Season & Episode denominations + types variables
 * Chapters file improvements (DVD/ISO)
 
