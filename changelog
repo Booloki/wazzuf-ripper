@@ -4,6 +4,9 @@
 # Changelog file
 
 2012-09-06
+* Configuration file reorganization
+* Add DVD_EPISODES_ORG and DVD_TITLE_LIST options
+* Change EPISODE_FIRST/LAST to DVD_CHAPTER_FIRST/LAST options
 * New wazzuf-functions-xmltag file
 * New BASE_WORKING_FILE variable
 * SHOW: Season & Episode denominations + types variables

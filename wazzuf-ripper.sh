@@ -97,17 +97,20 @@ cd $TAG_TITLE_NAME
 case $VIDEO_TYPE in
 MOVIE )
 	TITLE_LONG=$TITLE_NAME
-	EPISODE_FIRST="1"
-	EPISODE_LAST="1"
+	DVD_CHAPTER_FIRST="1"
+	DVD_CHAPTER_LAST="1"
+	DVD_TITLE_LIST=$DVD_TITLE_NUMBER
         ;;
 SHOW )
 	SEASON_DENOMINATION="Season"
 	TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
+	if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then	DVD_TITLE_LIST=$DVD_TITLE_NUMBER; fi
         ;;
 MUSIC )
 	TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
-	EPISODE_FIRST="1"
-	EPISODE_LAST="1"
+	DVD_CHAPTER_FIRST="1"
+	DVD_CHAPTER_LAST="1"
+	DVD_TITLE_LIST=$DVD_TITLE_NUMBER
         ;;
 * )
 	echo -ne "\n *************************************\n"
@@ -148,23 +151,27 @@ esac
 check_nice
 check_ionice
 
-time for ((i=$EPISODE_FIRST; i <= EPISODE_LAST ; i++))
+time for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 do
-
+time for ((i=$DVD_CHAPTER_FIRST; i <= DVD_CHAPTER_LAST ; i++))
+do
 	# check multichapters and set chapters merge informations
 	case $MULTICHAP_FORCE in
 		y* | Y* )
 			CHAPTERS="$MULTICHAP_FIRST-$MULTICHAP_LAST"
 			case $SOURCE in
 			DVD | ISO )
+				DVD_CHAPTER_NUMBER=$CHAPTERS
 				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
 				;;
 			* )
+				DVD_CHAPTER_NUMBER=$i
 				MERGE_CHAPTERS=""
 				;;
 			esac
 			;;
 		* )
+			DVD_CHAPTER_NUMBER=$i
 			CHAPTERS="$i-$i"
 			MERGE_CHAPTERS=""
 			;;
@@ -203,7 +210,7 @@ do
 	SHOW )
 		SEASON_TYPE="S"
 		EPISODE_TYPE="E"
-		BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.$EPISODE_TYPE$i"
+		BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.T$DVD_TITLE_NUMBER.C$DVD_CHAPTER_NUMBER"
 		VOB_FILE="$BASE_WORKING_FILE.vob"
 		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
@@ -218,9 +225,13 @@ do
 			EPISODE_NAME_FULL=$i
 			EPISODE_NAME=$i
 			EPISODE_NUMBER=$i
-			EPISODE_TAG=E$EPISODE_NUMBER
+			EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER
 		else
-			EPISODE_NAME_FULL=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
+			if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+				EPISODE_NAME_FULL=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
+			else
+				EPISODE_NAME_FULL=`head -n $DVD_TITLE_NUMBER $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
+			fi
 			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2-10 | sed s/\ //`
 			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`
 			EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
@@ -237,7 +248,7 @@ do
 
 
 	# Extract full working file (.vob or .m2ts)
-	# Save chapters informations (DVD only)
+	# Save chapters informations (DVD/ISO only)
 	check_mplayer
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
