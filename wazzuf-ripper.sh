@@ -235,7 +235,18 @@ do
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
 	DVD )
-		if [ ! -f $CHAPTERS_FILE ]; then dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE; fi
+		case $MULTICHAP_FORCE in
+			y* | Y* )
+	                	echo -ne "\n *************************************\n"
+		                if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE; fi
+	        	        echo -ne " *************************************\n"
+				;;
+			* )
+	                	echo -ne "\n *************************************\n"
+		                echo " No chapters file to create. Next..."
+	        	        echo -ne " *************************************\n"
+				;;
+		esac
 
 		if [ ! -f $VOB_FILE ]; then
                 	# extract local working file from DVD
@@ -248,7 +259,18 @@ do
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	ISO )
-		if [ ! -f $CHAPTERS_FILE ]; then dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $SOURCE_DIRECTORY/$ISO_FILE > $CHAPTERS_FILE; fi
+		case $MULTICHAP_FORCE in
+			y* | Y* )
+	                	echo -ne "\n *************************************\n"
+		                if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $SOURCE_DIRECTORY/$ISO_FILE > $CHAPTERS_FILE; fi
+	        	        echo -ne " *************************************\n"
+				;;
+			* )
+	                	echo -ne "\n *************************************\n"
+		                echo " No chapters file to create. Next..."
+	        	        echo -ne " *************************************\n"
+				;;
+		esac
 
 		if [ ! -f $VOB_FILE ]; then
 			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $SOURCE_DIRECTORY/$ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
