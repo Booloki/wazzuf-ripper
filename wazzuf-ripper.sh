@@ -100,8 +100,8 @@ MOVIE )
 	EPISODE_LAST="1"
         ;;
 SHOW )
-#	TITLE_LONG="$TITLE_NAME - Season $SEASON_NUMBER"
-	TITLE_LONG="$TITLE_NAME - Saison $SEASON_NUMBER"
+	SEASON_DENOMINATION="Season"
+	TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
         ;;
 MUSIC )
 	TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
@@ -121,14 +121,14 @@ echo -ne "\n *************************************\n"
 echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
 echo -ne " *************************************\n"
 
-# Check if source is OK (DVD only)
-# output VIDEO_BITRATE choice (BD or DVD+*)
+# Check if source is OK (DVD/ISO only)
+# Output VIDEO_BITRATE choice
 case $SOURCE in
 BD )
 	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
 DVD )
-	# check_dvd TOCOMMENT if DVD NAME contains spaces...
+	# TOCOMMENT if DVD NAME contains spaces...
 	check_dvd DVD
 	check_ogmtools
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
@@ -198,11 +198,13 @@ do
 		echo -ne " *************************************\n"
 		;;
 	SHOW )
-		VOB_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.vob"
-		CHAPTERS_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i-chapters.txt"
-		XVID_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.xvid"
-		H264_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.h264"
-		DUMP_FILE="$TAG_TITLE_NAME.S$SEASON_NUMBER.E$i.mpv"
+		SEASON_TYPE="S"
+		EPISODE_TYPE="E"
+		VOB_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.E$i.vob"
+		CHAPTERS_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.E$i-chapters.txt"
+		XVID_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.E$i.xvid"
+		H264_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.E$i.h264"
+		DUMP_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.E$i.mpv"
 
 		if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
 		then
@@ -217,13 +219,14 @@ do
 			EPISODE_NAME_FULL=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
 			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2-10 | sed s/\ //`
 			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`
-			EPISODE_TAG=E$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
+			EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
 		fi
-		MERGE_OUTPUT="$TAG_TITLE_NAME.S$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
+		MERGE_OUTPUT="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 
-		MERGE_TITLE="$TITLE_LONG - Episode $EPISODE_NAME_FULL"
+		EPISODE_DENOMINATION="Episode"
+		MERGE_TITLE="$TITLE_LONG - $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
 		echo -ne "\n *************************************\n"
-		echo " Work in progress: Episode $EPISODE_NAME_FULL"
+		echo " Work in progress: $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
 		echo -ne " *************************************\n"
 		;;
 	esac

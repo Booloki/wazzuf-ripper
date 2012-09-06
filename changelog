@@ -3,6 +3,10 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-09-06
+* SHOW: Season & Episode denominations + types variables
+* Chapters file improvements (DVD/ISO)
+
 2012-09-05
 * bugfix + improvements: cover art management
 * Change LPCM to PCM
