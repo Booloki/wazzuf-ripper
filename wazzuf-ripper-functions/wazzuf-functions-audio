@@ -52,11 +52,11 @@ audio_rip () {
 		if [ -f $AUDIO_SOURCE_FILE ]
 		then
 			echo -ne "\n *************************************\n"
-			echo " $DTS_FILE exists, next..." && sleep 1
+			echo " $AUDIO_SOURCE_FILE exists, next..." && sleep 1
 			echo -ne " *************************************\n"
 		else
 			echo -ne "\n *************************************\n"
-			echo " Dumping $DTS_FILE...\n"
+			echo " Dumping $AUDIO_SOURCE_FILE...\n"
 			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 		fi
 		;;
@@ -66,7 +66,7 @@ audio_rip () {
 	                ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
 		else
 	                echo -ne "\n *************************************\n"
-	                echo " Wave file exists. Next..."  && sleep 1
+	                echo " $WAV_FILE exists. Next..."  && sleep 1
         	        echo -ne " *************************************\n"
 		fi
                 ;;
