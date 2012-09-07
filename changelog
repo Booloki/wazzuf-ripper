@@ -3,6 +3,10 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-09-07
+* DVD/ISO pre-rip script improvements
+* New wazzuf-functions-pre file
+
 2012-09-06
 * Configuration file reorganization
 * Add DVD_EPISODES_ORG and DVD_TITLE_LIST options
