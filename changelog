@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-09-09
+* bugfix: Chapters file merge
+
 2012-09-07
 * DVD/ISO pre-rip script improvements
 * New wazzuf-functions-pre file

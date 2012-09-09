@@ -155,25 +155,22 @@ time for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 do
 time for ((i=$DVD_CHAPTER_FIRST; i <= DVD_CHAPTER_LAST ; i++))
 do
-	# check multichapters and set chapters merge informations
+	# check multichapters
 	case $MULTICHAP_FORCE in
 		y* | Y* )
 			CHAPTERS="$MULTICHAP_FIRST-$MULTICHAP_LAST"
 			case $SOURCE in
 			DVD | ISO )
 				DVD_CHAPTER_NUMBER=$CHAPTERS
-				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
 				;;
 			* )
 				DVD_CHAPTER_NUMBER=$i
-				MERGE_CHAPTERS=""
 				;;
 			esac
 			;;
 		* )
 			DVD_CHAPTER_NUMBER=$i
 			CHAPTERS="$i-$i"
-			MERGE_CHAPTERS=""
 			;;
 	esac
 
@@ -248,21 +245,23 @@ do
 
 
 	# Extract full working file (.vob or .m2ts)
-	# Save chapters informations (DVD/ISO only)
+	# Save chapters informations (DVD/ISO only) and set chapters merge informations
 	check_mplayer
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
 	DVD )
 		case $MULTICHAP_FORCE in
 			y* | Y* )
-	                	echo -ne "\n *************************************\n"
-		                if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE; fi
-	        	        echo -ne " *************************************\n"
+				echo -ne "\n *************************************\n"
+				if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE; else echo " $CHAPTERS_FILE file exists. Next..."; fi
+				echo -ne " *************************************\n"
+				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
 				;;
 			* )
-	                	echo -ne "\n *************************************\n"
-		                echo " No chapters file to create. Next..."
-	        	        echo -ne " *************************************\n"
+				echo -ne "\n *************************************\n"
+				echo " No chapters file to create. Next..."
+				echo -ne " *************************************\n"
+				MERGE_CHAPTERS=""
 				;;
 		esac
 
@@ -279,14 +278,16 @@ do
 	ISO )
 		case $MULTICHAP_FORCE in
 			y* | Y* )
-	                	echo -ne "\n *************************************\n"
-		                if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $SOURCE_DIRECTORY/$ISO_FILE > $CHAPTERS_FILE; fi
-	        	        echo -ne " *************************************\n"
+				echo -ne "\n *************************************\n"
+				if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $SOURCE_DIRECTORY/$ISO_FILE > $CHAPTERS_FILE; else echo " $CHAPTERS_FILE file exists. Next..."; fi
+				echo -ne " *************************************\n"
+				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
 				;;
 			* )
-	                	echo -ne "\n *************************************\n"
-		                echo " No chapters file to create. Next..."
-	        	        echo -ne " *************************************\n"
+				echo -ne "\n *************************************\n"
+				echo " No chapters file to create. Next..."
+				 echo -ne " *************************************\n"
+				MERGE_CHAPTERS=""
 				;;
 		esac
 
@@ -301,6 +302,7 @@ do
 	        ;;
 	BD )
 		SOURCE_FILE=$SOURCE_DIRECTORY/$M2TS_FILE
+		MERGE_CHAPTERS=""
 		;;
 	esac
 
