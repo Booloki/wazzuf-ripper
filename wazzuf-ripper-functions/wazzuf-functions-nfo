@@ -3,7 +3,6 @@
 # generate .nfo file
 generate_nfo () {
 	echo "$MERGE_OUTPUT" > $MERGE_OUTPUT.nfo
-	cat /media/dev/rip/BOO.nfo >> $MERGE_OUTPUT.nfo
 	echo "" >> $MERGE_OUTPUT.nfo
 	case $VIDEO_TYPE in
 	MOVIE )

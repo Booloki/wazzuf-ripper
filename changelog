@@ -3,6 +3,12 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-09-10
+* New IMDB_ID variable
+* Add external tools installer (wazzuf-external-tools-install.sh)
+* Add IMdb informations retrieve / poster image download (wazzuf-functions-imdb)
+* Add .nfo maker (wazzuf-functions-nfo)
+
 2012-09-09
 * bugfix: Chapters file merge
 
