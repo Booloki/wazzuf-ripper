@@ -60,25 +60,27 @@ audio_rip () {
 			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 		fi
 		;;
-        VORBIS | MP3 | PCM )
+	VORBIS | MP3 | PCM )
 		# extract audio track to wave file
 		if [ ! -f $WAV_FILE ]; then
-	                ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
+			echo -ne "\n *************************************\n"
+			echo " Dumping $WAV_FILE...\n"
+			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
 		else
-	                echo -ne "\n *************************************\n"
-	                echo " $WAV_FILE exists. Next..."  && sleep 1
-        	        echo -ne " *************************************\n"
+			echo -ne "\n *************************************\n"
+			echo " $WAV_FILE exists. Next..."  && sleep 1
+			echo -ne " *************************************\n"
 		fi
-                ;;
+		;;
 	* )
 		echo -ne "\n *************************************\n"
 		echo " $CODEC_AUDIO : audio codec not recognized ! Exiting..."
 		echo -ne " *************************************\n"
 		exit 1
 		;;
-        esac
+	esac
 
-        case $CODEC_AUDIO in
+	case $CODEC_AUDIO in
 	PCM )
 		AUDIO_FILE=$WAV_FILE
        		if [ -f $WAV_FILE ]
@@ -117,6 +119,8 @@ audio_rip () {
 		else
 			check_ffmpeg
 			# DTS to AC3
+			echo -ne "\n *************************************\n"
+			echo " Convert $AUDIO_SOURCE_FILE to $AUDIO_FILE...\n"
 			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
 		fi
 		;;
@@ -130,6 +134,8 @@ audio_rip () {
         	     	echo -ne " *************************************\n"
 	        else
 			check_oggenc
+			echo -ne "\n *************************************\n"
+			echo " Convert $WAV_FILE to $AUDIO_FILE...\n"
 			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $AUDIO_FILE -a "$TITLE_NAME" -t "$AUDIO_NAME" -l "$MERGE_TITLE" -G "Soundtrack" -d $DATE
 		fi
 		;;

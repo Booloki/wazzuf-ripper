@@ -4,9 +4,9 @@ checkandsource_wazzuf_files () {
 	for WFILE in $WAZZUF_FILES
 	do
 		if [ ! -f $WFILE ]; then
-	                echo -ne "\n *************************************\n"
-			echo -ne "\n $WFILE file not found ! Exiting...\n"
-        	        echo -ne " *************************************\n"
+			echo -ne "\n *************************************\n"
+			echo -ne " $WFILE file not found ! Exiting...\n"
+			echo -ne " *************************************\n"
 		        exit 1
 		else	
 			echo "Sourcing $WFILE..."
@@ -53,7 +53,7 @@ check_dvd () {
 check_nice () {
 	if [ ! -x "/usr/bin/nice" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install nice (coreutils) ! Exiting... \n"
+		echo -ne " Please install nice (coreutils) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -62,7 +62,7 @@ check_nice () {
 check_ionice () {
 	if [ ! -x "/usr/bin/ionice" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install ionice (util-linux) ! Exiting... \n"
+		echo -ne " Please install ionice (util-linux) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -71,7 +71,7 @@ check_ionice () {
 check_ogmtools () {
 	if [ ! -x "/usr/bin/dvdxchap" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install dvdxchap (ogmtools) ! Exiting... \n"
+		echo -ne " Please install dvdxchap (ogmtools) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -80,7 +80,7 @@ check_ogmtools () {
 check_lsdvd () {
 	if [ ! -x "/usr/bin/lsdvd" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install lsdvd ! Exiting... \n"
+		echo -ne " Please install lsdvd ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -89,7 +89,7 @@ check_lsdvd () {
 check_avconv () {
 	if [ ! -x "/usr/bin/avconv" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install avconv (libav-tools) ! Exiting... \n"
+		echo -ne " Please install avconv (libav-tools) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -98,7 +98,7 @@ check_avconv () {
 check_7z () {
 	if [ ! -x "/usr/bin/7z" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install 7z (p7zip) ! Exiting... \n"
+		echo -ne " Please install 7z (p7zip-full) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -107,7 +107,7 @@ check_7z () {
 check_vobcopy () {
 	if [ ! -x "/usr/bin/vobcopy" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install vobcopy ! Exiting... \n"
+		echo -ne " Please install vobcopy ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -116,7 +116,7 @@ check_vobcopy () {
 check_mkisofs () {
 	if [ ! -x "/usr/bin/mkisofs" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install mkisofs (genisoimage) ! Exiting... \n"
+		echo -ne " Please install mkisofs (genisoimage) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -125,7 +125,16 @@ check_mkisofs () {
 check_mplayer () {
 	if [ ! -x "/usr/bin/mplayer" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install mplayer ! Exiting... \n"
+		echo -ne " Please install mplayer ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_mencoder () {
+	if [ ! -x "/usr/bin/mencoder" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne " Please install mencoder ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -134,7 +143,7 @@ check_mplayer () {
 check_tcdemux () {
 	if [ ! -x "/usr/bin/tcdemux" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install tcdemux (transcode) ! Exiting... \n"
+		echo -ne " Please install tcdemux (transcode) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -143,7 +152,7 @@ check_tcdemux () {
 check_ffmpeg () {
 	if [ ! -x "/usr/bin/ffmpeg" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install ffmpeg ! Exiting... \n"
+		echo -ne " Please install ffmpeg ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -152,7 +161,7 @@ check_ffmpeg () {
 check_oggenc () {
 	if [ ! -x "/usr/bin/oggenc" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install oggenc (vorbis-tools) ! Exiting... \n"
+		echo -ne " Please install oggenc (vorbis-tools) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi	
@@ -161,7 +170,7 @@ check_oggenc () {
 check_lame () {
 	if [ ! -x "/usr/bin/lame" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install lame ! Exiting... \n"
+		echo -ne " Please install lame ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -170,7 +179,7 @@ check_lame () {
 check_imagemagick () {
 	if [ ! -x "/usr/bin/convert" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install convert (imagemagick) ! Exiting... \n"
+		echo -ne " Please install convert (imagemagick) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi
@@ -179,7 +188,7 @@ check_imagemagick () {
 check_mkvmerge () {
 	if [ ! -x "/usr/bin/mkvmerge" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne "\n Please install mkvmerge (mkvtoolnix) ! Exiting... \n"
+		echo -ne " Please install mkvmerge (mkvtoolnix) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi

@@ -3,19 +3,8 @@
 # DVD/BD rip script
 # booloki@gmail.com
 
-CONF_FILE="wazzuf-ripper.conf"
-TEMPLATES_PATH="wazzuf-ripper-templates"
-EXTERNAL_TOOLS_PATH="wazzuf-external-tools"
-FUNCTIONS_PATH="wazzuf-ripper-functions"
-FUNCTIONS_AUDIO_FILE="$FUNCTIONS_PATH/wazzuf-functions-audio"
-FUNCTIONS_VIDEO_FILE="$FUNCTIONS_PATH/wazzuf-functions-video"
-FUNCTIONS_SUBTITLES_FILE="$FUNCTIONS_PATH/wazzuf-functions-subtitle"
-FUNCTIONS_COVERART_FILE="$FUNCTIONS_PATH/wazzuf-functions-coverart"
-FUNCTIONS_XMLTAG_FILE="$FUNCTIONS_PATH/wazzuf-functions-xmltag"
-FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
-FUNCTIONS_NFO="$FUNCTIONS_PATH/wazzuf-functions-nfo"
-FUNCTIONS_IMDB="$FUNCTIONS_PATH/wazzuf-functions-imdb"
-WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE $FUNCTIONS_COVERART_FILE $FUNCTIONS_XMLTAG_FILE $FUNCTIONS_NFO $FUNCTIONS_IMDB"
+PATH_FILE="wazzuf-path.conf"
+source $PATH_FILE
 
 # basic error catching
 trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
@@ -93,8 +82,8 @@ fi
 
 
 # enter working directory
-mkdir -p "$TAG_TITLE_NAME"
-cd $TAG_TITLE_NAME
+mkdir -p "$WORKING_PATH_BASE/$TAG_TITLE_NAME"
+cd $WORKING_PATH_BASE/$TAG_TITLE_NAME
 
 
 case $VIDEO_TYPE in
@@ -105,7 +94,6 @@ MOVIE )
 	DVD_TITLE_LIST=$DVD_TITLE_NUMBER
         ;;
 SHOW )
-	SEASON_DENOMINATION="Season"
 	TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
 	if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then	DVD_TITLE_LIST=$DVD_TITLE_NUMBER; fi
         ;;
@@ -251,7 +239,7 @@ do
 	if [[ $IMDB_ID == "" ]]; then
 		echo -ne " No IMdb ID provided. Skipping..."
 	else
-		echo -ne " Retrieving IMdb inormations...\n"
+		echo -ne " Retrieving IMdb informations...\n"
 		get_imdb_informations
 	fi
 	echo -ne " *************************************\n"
@@ -513,9 +501,9 @@ do
 	if [ ! -f $TAG_FILE ]; then
 		# 3 templates:  tags-50-movie-template.xml  tags-50-music-template.xml  tags-50-show-template.xml
 		# in TEMPLATES_PATH
-		TEMPLATE_FILE_MOVIE="../$TEMPLATES_PATH/tags-50-movie-template.xml"
-		TEMPLATE_FILE_MUSIC="../$TEMPLATES_PATH/tags-50-music-template.xml"
-		TEMPLATE_FILE_SHOW="../$TEMPLATES_PATH/tags-50-show-template.xml"
+		TEMPLATE_FILE_MOVIE="$WAZZUF_PATH/$TEMPLATES_PATH/tags-50-movie-template.xml"
+		TEMPLATE_FILE_MUSIC="$WAZZUF_PATH/$TEMPLATES_PATH/tags-50-music-template.xml"
+		TEMPLATE_FILE_SHOW="$WAZZUF_PATH/$TEMPLATES_PATH/tags-50-show-template.xml"
 
 		# if empty tag: ugly but not really important
 		XMLTAG_DATE_ENCODED=`date +%Y`

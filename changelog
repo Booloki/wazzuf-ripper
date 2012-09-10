@@ -4,6 +4,8 @@
 # Changelog file
 
 2012-09-10
+* Lots of little improvements
+* New wazzuf-path.conf file
 * New IMDB_ID variable
 * Add external tools installer (wazzuf-external-tools-install.sh)
 * Add IMdb informations retrieve / poster image download (wazzuf-functions-imdb)

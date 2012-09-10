@@ -11,6 +11,7 @@ subtitle_rip () {
 	                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
 	                echo -ne " *************************************\n"
 	        else
+			check_mencoder
 			echo -ne "\n *************************************\n"
 	                echo " Extracting subtitle to $SUBTITLE_FILE "
 	                echo -ne " *************************************\n"
@@ -26,6 +27,7 @@ subtitle_rip () {
 	                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
 	                echo -ne " *************************************\n"
 	        else
+			check_mencoder
 			echo -ne "\n *************************************\n"
 	                echo " Extracting subtitle to $SUBTITLE_FILE "
 	                echo -ne " *************************************\n"
@@ -63,4 +65,3 @@ subtitle_srt_check () {
 		echo -ne " *************************************\n"
 	fi
 }
-

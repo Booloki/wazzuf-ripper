@@ -3,13 +3,8 @@
 # DVD/BD pre-rip script helping to fill configuration file
 # booloki@gmail.com
 
-CONF_FILE="wazzuf-ripper.conf"
-EXTERNAL_TOOLS_PATH="wazzuf-external-tools"
-FUNCTIONS_PATH="wazzuf-ripper-functions"
-FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
-FUNCTIONS_PRE="$FUNCTIONS_PATH/wazzuf-functions-pre"
-FUNCTIONS_IMDB="$FUNCTIONS_PATH/wazzuf-functions-imdb"
-WAZZUF_FILES="$CONF_FILE $FUNCTIONS_PRE $FUNCTIONS_IMDB"
+PATH_FILE="wazzuf-path.conf"
+source $PATH_FILE
 
 # check wazzuf files
 source $FUNCTIONS_CHECK
@@ -66,6 +61,11 @@ DVD )
 	echo " MPlayer informations"
 	mplayer -v -vo null -ao null -frames 0 -identify $DVD_PATH 2>/dev/null > DVD-mplayer.info
 	echo "-> see DVD-player.info"
+
+	echo -ne "*************************************\n"
+	echo " avconv informations"
+	avconv -i $DVD_PATH 2> DVD-avconv.info
+	echo "-> see ISO-avconv.info"
 
 	check_7z
 	echo -ne "*************************************\n"
@@ -195,18 +195,15 @@ N* | n* )
 * )
 	# get response
 	get_imdb_response_title
-	if  [[ $IMDB_RESPONSE == "False" ]]; then
-		echo -ne " No IMdb informations found ! Try with another release date (first season release date for show)\n"
-		echo -ne " Or directly search at http://www.imdb.com -> IMdb ID is XXXXXXXXX in URL: http://www.imdb.com/title/XXXXXXXXX \n"
-	else
+	if  [[ $IMDB_RESPONSE == "True" ]]; then
 		get_imdb_id
 		echo -ne " IMdb ID seems to be $IMDB_ID\n"
 		echo -ne " -> Please check in http://www.imdb.com/title/$IMDB_ID\n"
 		echo -ne "*************************************\n"
 
 		# download cover or not
-		echo -ne "*************************************\n"
-		echo -ne "\n Download $TITLE_NAME ($DATE) IMDb cover ? (N/y)\n"
+		echo -ne "\n*************************************\n"
+		echo -ne " Download $TITLE_NAME ($DATE) IMDb cover ? (N/y)\n"
 		read IMDB_ANSWER
 		case $IMDB_ANSWER in
 		Y* | y* )
@@ -217,6 +214,10 @@ N* | n* )
 			;;
 		esac
 		echo -ne "*************************************\n"
+	else
+		# $IMDB_RESPONSE == "False"
+		echo -ne " No IMdb informations found ! Try with another release date (first season release date for show)\n"
+		echo -ne " Or directly search at http://www.imdb.com -> IMdb ID is XXXXXXXXX in URL: http://www.imdb.com/title/XXXXXXXXX \n"
 	fi
 	;;
 esac

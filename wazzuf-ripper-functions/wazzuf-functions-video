@@ -23,6 +23,7 @@ video_rip () {
 	H264 )
 		# video h264 (2 pass) encode
 		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-x264.html
+		check_mencoder
 		VIDEO_FILE=$H264_FILE
 		if [ ! -f $VIDEO_FILE ]; then
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
@@ -44,6 +45,7 @@ video_rip () {
 	XVID )	
 		# video xvid encode
 		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
+		check_mencoder
 		VIDEO_FILE=$XVID_FILE
 		if [ -f $VIDEO_FILE ]
 		then

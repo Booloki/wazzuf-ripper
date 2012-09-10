@@ -52,12 +52,20 @@ echo -ne " Do you want to download/build ccextractor ? (N/y)\n"
 read answer
 case $answer in
 y* | Y* )
-	wget $CCEXTRACTOR_URL
+	wget -nc $CCEXTRACTOR_URL
 	check_7z
 	7z x $CCEXTRACTOR_FILE
-	cd $CCEXTRACTOR_DIRECTORY
-	./build
-	cd ../../
+	# Check g++
+	if [ ! -x "/usr/bin/g++" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne " Please install g++ !\n"
+		echo -ne " Skip ccextractor build.\n"
+		echo -ne " *************************************\n" && sleep 1
+	else
+		cd $CCEXTRACTOR_DIRECTORY
+		./build
+		cd ../../
+	fi
 	;;
 * )
 	echo -ne " Skip ccextractor download/build.\n"
@@ -76,7 +84,7 @@ echo -ne " Do you want to download/install tsMuxer ? (N/y)\n"
 read answer
 case $answer in
 y* | Y* )
-	wget $TSMUXER_URL
+	wget -nc $TSMUXER_URL
 	mkdir -p $TSMUXER_DIRECTORY
 	tar xvzf $TSMUXER_FILE -C $TSMUXER_DIRECTORY
 	;;

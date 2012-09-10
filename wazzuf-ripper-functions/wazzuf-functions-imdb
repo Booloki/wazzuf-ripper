@@ -2,8 +2,6 @@
 # thanks to https://github.com/bgr/imdb-cli
 # and http://www.imdbapi.com/
 
-IMDB_TOOL="../$EXTERNAL_TOOLS_PATH/imdb-cli/imdbtool.py"
-
 # need TITLE_NAME
 #      DATE
 # return IMDB_RESPONSE ("True" or "False")
@@ -43,12 +41,7 @@ get_imdb_informations () {
 	IMDB_FILE="$BASE_WORKING_FILE-imdb.txt"
 	python $IMDB_TOOL -i $IMDB_ID > $IMDB_FILE
 	get_imdb_response_file
-	if  [[ $IMDB_RESPONSE == "False" ]]; then
-		echo " No IMdb informations found ! Please check IMdb ID $IMDB_ID !"
-		echo " Skip IMdb informations." && sleep 1
-		# to avoid errors + nfo/xmltags issues
-		IMDB_ID=""
-	else
+	if  [[ $IMDB_RESPONSE == "True" ]]; then
 		IMDB_DIRECTOR=`sed -n '/director/{n;p;}' $IMDB_FILE`
 		IMDB_WRITER=`sed -n '/writer/{n;p;}' $IMDB_FILE`
 		IMDB_VOTES=`sed -n '/imdbvotes/{n;p;}' $IMDB_FILE`
@@ -58,5 +51,10 @@ get_imdb_informations () {
 		IMDB_RATED=`sed -n '/rated/{n;p;}' $IMDB_FILE`
 		IMDB_PLOT=`sed -n '/plot/{n;p;}' $IMDB_FILE`
 		IMDB_GENRE=`sed -n '/genre/{n;p;}' $IMDB_FILE`
+	else
+		echo " No IMdb informations found ! Please check IMdb ID $IMDB_ID !"
+		echo " Skip IMdb informations." && sleep 1
+		# to avoid errors + nfo/xmltags issues
+		IMDB_ID=""
 	fi
 }
