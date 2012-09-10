@@ -4,10 +4,12 @@
 # booloki@gmail.com
 
 CONF_FILE="wazzuf-ripper.conf"
+EXTERNAL_TOOLS_PATH="wazzuf-external-tools"
 FUNCTIONS_PATH="wazzuf-ripper-functions"
 FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
 FUNCTIONS_PRE="$FUNCTIONS_PATH/wazzuf-functions-pre"
-WAZZUF_FILES="$CONF_FILE $FUNCTIONS_PRE"
+FUNCTIONS_IMDB="$FUNCTIONS_PATH/wazzuf-functions-imdb"
+WAZZUF_FILES="$CONF_FILE $FUNCTIONS_PRE $FUNCTIONS_IMDB"
 
 # check wazzuf files
 source $FUNCTIONS_CHECK
@@ -181,5 +183,43 @@ ISO )
         exit 1
         ;;
 esac
+
+# IMDb: get ID and download poster image
+echo -ne "*************************************\n"
+echo -ne "\n Try to get IMDb ID with $TITLE_NAME ($DATE)  ? (Y/n)\n"
+read IMDB_ANSWER
+case $IMDB_ANSWER in
+N* | n* )
+	echo -ne " Skip IMDb informations.\n"
+	;;
+* )
+	# get response
+	get_imdb_response_title
+	if  [[ $IMDB_RESPONSE == "False" ]]; then
+		echo -ne " No IMdb informations found ! Try with another release date (first season release date for show)\n"
+		echo -ne " Or directly search at http://www.imdb.com -> IMdb ID is XXXXXXXXX in URL: http://www.imdb.com/title/XXXXXXXXX \n"
+	else
+		get_imdb_id
+		echo -ne " IMdb ID seems to be $IMDB_ID\n"
+		echo -ne " -> Please check in http://www.imdb.com/title/$IMDB_ID\n"
+		echo -ne "*************************************\n"
+
+		# download cover or not
+		echo -ne "*************************************\n"
+		echo -ne "\n Download $TITLE_NAME ($DATE) IMDb cover ? (N/y)\n"
+		read IMDB_ANSWER
+		case $IMDB_ANSWER in
+		Y* | y* )
+			download_imdb_poster
+			;;
+		* )
+			echo -ne " Skip IMDb cover download.\n"
+			;;
+		esac
+		echo -ne "*************************************\n"
+	fi
+	;;
+esac
+
 
 exit 0

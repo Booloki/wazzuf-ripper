@@ -38,7 +38,11 @@ xml_tagging () {
 				XMLTAG_TITLE="$TITLE_NAME"
 				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
 
-				XMLTAG_DIRECTOR="$DIRECTOR_NAME"
+				if  [[ $IMDB_DIRECTOR == "" || $IMDB_DIRECTOR == "N/A" ]]; then
+					XMLTAG_DIRECTOR="$DIRECTOR_NAME"
+				else
+					XMLTAG_DIRECTOR="$IMDB_DIRECTOR"
+				fi				
 				sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
 				echo -ne " *************************************\n"
 			fi

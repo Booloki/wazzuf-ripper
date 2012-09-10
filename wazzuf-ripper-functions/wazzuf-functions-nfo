@@ -1,0 +1,64 @@
+## nfo file function
+
+# generate .nfo file
+generate_nfo () {
+	echo "$MERGE_OUTPUT" > $MERGE_OUTPUT.nfo
+	cat /media/dev/rip/BOO.nfo >> $MERGE_OUTPUT.nfo
+	echo "" >> $MERGE_OUTPUT.nfo
+	case $VIDEO_TYPE in
+	MOVIE )
+		echo "Title        : $TITLE_NAME"  >> $MERGE_OUTPUT.nfo
+		if  [[ $IMDB_DIRECTOR == "" || $IMDB_DIRECTOR == "N/A" ]]; then
+			echo "Director     : $DIRECTOR_NAME"  >> $MERGE_OUTPUT.nfo
+		else
+			echo "Director     : $IMDB_DIRECTOR"  >> $MERGE_OUTPUT.nfo
+		fi
+		echo "Release Date : $DATE"  >> $MERGE_OUTPUT.nfo
+	        ;;
+	SHOW )
+		echo "Show           : $TITLE_NAME"  >> $MERGE_OUTPUT.nfo
+		echo "Season         : $SEASON_NUMBER"  >> $MERGE_OUTPUT.nfo
+		echo "Episode Number : $EPISODE_NUMBER/$EPISODES_TOTAL_NUMBER"  >> $MERGE_OUTPUT.nfo
+		echo "Episode Title  : $EPISODE_NAME"  >> $MERGE_OUTPUT.nfo
+		echo "Release Date   : $DATE"  >> $MERGE_OUTPUT.nfo
+	        ;;
+	MUSIC )
+		echo "Title        : $TITLE_NAME"  >> $MERGE_OUTPUT.nfo
+		echo "Artist       : $ARTIST_NAME"  >> $MERGE_OUTPUT.nfo
+		echo "Release Date : $DATE"  >> $MERGE_OUTPUT.nfo
+	        ;;
+	esac
+
+	# IMdb informations
+	if [[ ! $IMDB_ID == "" ]]; then
+		echo "Writer(s)      : $IMDB_WRITER"  >> $MERGE_OUTPUT.nfo
+		echo "Actors(s)      : $IMDB_ACTORS"  >> $MERGE_OUTPUT.nfo
+		echo "Genre(s)       : $IMDB_GENRE"  >> $MERGE_OUTPUT.nfo
+		echo "Plot           : $IMDB_PLOT"  >> $MERGE_OUTPUT.nfo
+		echo "Rated          : $IMDB_RATED"  >> $MERGE_OUTPUT.nfo
+		echo "IMdb Rating    : $IMDB_RATING"  >> $MERGE_OUTPUT.nfo
+		echo "IMdb Votes     : $IMDB_VOTES"  >> $MERGE_OUTPUT.nfo
+		echo "Runtime        : $IMDB_RUNTIME"  >> $MERGE_OUTPUT.nfo
+	fi
+
+	avconv -i "$MERGE_OUTPUT" 2> $MERGE_OUTPUT-avconv.info
+	grep Duration $MERGE_OUTPUT-avconv.info | cut -d ' ' -f 3-4 | sed s/,// | cut -d '.' -f 1 | sed s/'00:'// | sed s/'Duration'/'Duration       '/ >> $MERGE_OUTPUT.nfo
+
+	echo "" >> $MERGE_OUTPUT.nfo
+	echo "* Video track :" >> $MERGE_OUTPUT.nfo
+	echo "`grep Video $MERGE_OUTPUT-avconv.info | cut -d ':' -f 3-5 | cut -d ',' -f 1-4`" >> $MERGE_OUTPUT.nfo
+	echo "* Audio tracks : `grep Audio $MERGE_OUTPUT-avconv.info | wc -l`" >> $MERGE_OUTPUT.nfo
+	echo "`grep Audio $MERGE_OUTPUT-avconv.info | cut -d '(' -f 2 | cut -d ':' -f 1,3 | sed s/')'//`" >> $MERGE_OUTPUT.nfo
+	echo "* Subtitle tracks : `grep Subtitle $MERGE_OUTPUT-avconv.info | wc -l`" >> $MERGE_OUTPUT.nfo
+	echo "`grep Subtitle $MERGE_OUTPUT-avconv.info | cut -d '(' -f 2 | cut -d ':' -f 1,3 | sed s/')'//`" >> $MERGE_OUTPUT.nfo
+
+	echo "" >> $MERGE_OUTPUT.nfo
+	echo "$COMMENT" >> $MERGE_OUTPUT.nfo
+	echo "" >> $MERGE_OUTPUT.nfo
+	echo "Ripped by $TAG_SIGNATURE" >> $MERGE_OUTPUT.nfo
+	echo "`date +%Y/%m`" >> $MERGE_OUTPUT.nfo
+	echo "" >> $MERGE_OUTPUT.nfo
+	echo "With :" >> $MERGE_OUTPUT.nfo
+	echo `mkvmerge -V` >> $MERGE_OUTPUT.nfo
+	echo `mplayer | head -n1` >> $MERGE_OUTPUT.nfo
+}

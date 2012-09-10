@@ -5,6 +5,7 @@
 
 CONF_FILE="wazzuf-ripper.conf"
 TEMPLATES_PATH="wazzuf-ripper-templates"
+EXTERNAL_TOOLS_PATH="wazzuf-external-tools"
 FUNCTIONS_PATH="wazzuf-ripper-functions"
 FUNCTIONS_AUDIO_FILE="$FUNCTIONS_PATH/wazzuf-functions-audio"
 FUNCTIONS_VIDEO_FILE="$FUNCTIONS_PATH/wazzuf-functions-video"
@@ -12,7 +13,9 @@ FUNCTIONS_SUBTITLES_FILE="$FUNCTIONS_PATH/wazzuf-functions-subtitle"
 FUNCTIONS_COVERART_FILE="$FUNCTIONS_PATH/wazzuf-functions-coverart"
 FUNCTIONS_XMLTAG_FILE="$FUNCTIONS_PATH/wazzuf-functions-xmltag"
 FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
-WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE $FUNCTIONS_COVERART_FILE $FUNCTIONS_XMLTAG_FILE"
+FUNCTIONS_NFO="$FUNCTIONS_PATH/wazzuf-functions-nfo"
+FUNCTIONS_IMDB="$FUNCTIONS_PATH/wazzuf-functions-imdb"
+WAZZUF_FILES="$CONF_FILE $FUNCTIONS_AUDIO_FILE $FUNCTIONS_VIDEO_FILE $FUNCTIONS_SUBTITLES_FILE $FUNCTIONS_COVERART_FILE $FUNCTIONS_XMLTAG_FILE $FUNCTIONS_NFO $FUNCTIONS_IMDB"
 
 # basic error catching
 trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
@@ -242,6 +245,16 @@ do
 		echo -ne " *************************************\n"
 		;;
 	esac
+
+	# Retrieve IMdb informations
+	echo -ne "\n *************************************\n"
+	if [[ $IMDB_ID == "" ]]; then
+		echo -ne " No IMdb ID provided. Skipping..."
+	else
+		echo -ne " Retrieving IMdb inormations...\n"
+		get_imdb_informations
+	fi
+	echo -ne " *************************************\n"
 
 
 	# Extract full working file (.vob or .m2ts)
@@ -546,6 +559,14 @@ do
 		$MERGE_COVER \
 		$MERGE_XMLTAGS
 
+
+## nfo generator
+echo -ne "\n *************************************\n"
+echo " Generate nfo file..."
+generate_nfo
+echo -ne " *************************************\n"
+
+done
 done
 
 cd ..
