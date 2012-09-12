@@ -3,6 +3,9 @@
 # booloki@gmail.com
 # Changelog file
 
+2012-09-12
+* Add processor core numbers recognition
+
 2012-09-10
 * Lots of little improvements
 * New wazzuf-path.conf file
