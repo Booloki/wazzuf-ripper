@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-14
+* Faster audio track dump to wave file
+
 2012-09-13
 * Pre packaging files reorganization (v3)
 * New v2 release branch

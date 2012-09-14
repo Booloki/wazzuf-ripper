@@ -56,7 +56,7 @@ audio_rip () {
 			echo -ne " *************************************\n"
 		else
 			echo -ne "\n *************************************\n"
-			echo " Dumping $AUDIO_SOURCE_FILE...\n"
+			echo " Dumping $AUDIO_SOURCE_FILE..."
 			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 		fi
 		;;
@@ -64,8 +64,8 @@ audio_rip () {
 		# extract audio track to wave file
 		if [ ! -f $WAV_FILE ]; then
 			echo -ne "\n *************************************\n"
-			echo " Dumping $WAV_FILE...\n"
-			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:file=$WAV_FILE -vc null -vo null
+			echo " Dumping $WAV_FILE..."
+			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc null -vo null
 		else
 			echo -ne "\n *************************************\n"
 			echo " $WAV_FILE exists. Next..."  && sleep 1
@@ -120,7 +120,7 @@ audio_rip () {
 			check_ffmpeg
 			# DTS to AC3
 			echo -ne "\n *************************************\n"
-			echo " Convert $AUDIO_SOURCE_FILE to $AUDIO_FILE...\n"
+			echo " Convert $AUDIO_SOURCE_FILE to $AUDIO_FILE..."
 			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
 		fi
 		;;
