@@ -1,7 +1,11 @@
 # Wazzuf Ripper
 # DVD/BD rip script
-# booloki@gmail.com
+# booloki@lokizone.net
 # Changelog file
+
+2012-09-13
+* Pre packaging files reorganization (v3)
+* New v2 release branch
 
 2012-09-12
 * Add processor core numbers recognition

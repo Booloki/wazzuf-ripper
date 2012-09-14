@@ -1,9 +1,9 @@
 #! /bin/bash
 # Wazzuf Ripper
 # DVD/BD rip script
-# booloki@gmail.com
+# booloki@lokizone.net
 
-PATH_FILE="wazzuf-path.conf"
+PATH_FILE="/etc/wazzuf-ripper/wazzuf-path.conf"
 source $PATH_FILE
 
 # basic error catching

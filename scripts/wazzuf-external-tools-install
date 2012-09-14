@@ -1,11 +1,10 @@
 #! /bin/bash
 # Wazzuf Ripper
 # DVD/BD rip external tools download/install
-# booloki@gmail.com
+# booloki@lokizone.net
 
-FUNCTIONS_PATH="wazzuf-ripper-functions"
-FUNCTIONS_CHECK="$FUNCTIONS_PATH/wazzuf-functions-check"
-EXTERNAL_TOOLS_PATH="wazzuf-external-tools"
+PATH_FILE="/etc/wazzuf-ripper/wazzuf-path.conf"
+source $PATH_FILE
 
 source $FUNCTIONS_CHECK
 mkdir -p $EXTERNAL_TOOLS_PATH

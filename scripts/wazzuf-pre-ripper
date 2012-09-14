@@ -1,9 +1,9 @@
 #! /bin/bash
 # Wazzuf Ripper
 # DVD/BD pre-rip script helping to fill configuration file
-# booloki@gmail.com
+# booloki@lokizone.net
 
-PATH_FILE="wazzuf-path.conf"
+PATH_FILE="/etc/wazzuf-ripper/wazzuf-path.conf"
 source $PATH_FILE
 
 # check wazzuf files
@@ -17,6 +17,12 @@ ISO_FILE_PATH=$SOURCE_DIRECTORY/$ISO_FILE
 M2TS_FILE_PATH=$SOURCE_DIRECTORY/$M2TS_FILE
 
 # enter source directory
+if  [[ $SOURCE_DIRECTORY == "" ]]; then
+	echo -ne "\n *************************************\n"
+	echo " Please provide SOURCE_DIRECTORY in $CONF_FILE ! Exiting..."
+	echo -ne " *************************************\n"
+	exit 1
+fi
 mkdir -p $SOURCE_DIRECTORY
 cd $SOURCE_DIRECTORY
 
@@ -51,6 +57,7 @@ BD )
 	;;
 DVD )
 	DVD_PATH="/dev/dvd"
+	check_dvd DVD
 	check_lsdvd
 	echo -ne "*************************************\n"
 	echo " lsdvd informations"
@@ -108,13 +115,20 @@ DVD )
 	read answer
 	case $answer in
 	y* | Y* )
-		copy-dvd2iso
-		echo -ne "\n You can now use ISO instead of DVD in configuration file."
+		# only if ISO_FILE exists
+		if [[ $ISO_FILE == "" ]]; then
+			echo -ne " Please provide a filename in ISO_FILE first !\n"
+			echo -ne " Skip DVD copy.\n"
+		else
+			copy-dvd2iso
+			echo -ne "\n You can now use ISO instead of DVD in $CONF_FILE.\n"
+		fi
 		;;
 	* )
-		echo -ne "Skip DVD copy.\n"
+		echo -ne " Skip DVD copy.\n"
 		;;
 	esac
+	echo -ne "*************************************\n"
 	;;
 ISO )
 	if [ ! -f "$ISO_FILE_PATH" ]
@@ -186,13 +200,14 @@ esac
 
 # IMDb: get ID and download poster image
 echo -ne "*************************************\n"
-echo -ne "\n Try to get IMDb ID with $TITLE_NAME ($DATE)  ? (Y/n)\n"
+echo -ne "Try to get IMDb ID with $TITLE_NAME ($DATE)  ? (Y/n)\n"
 read IMDB_ANSWER
 case $IMDB_ANSWER in
 N* | n* )
 	echo -ne " Skip IMDb informations.\n"
 	;;
 * )
+	check_imdb
 	# get response
 	get_imdb_response_title
 	if  [[ $IMDB_RESPONSE == "True" ]]; then

@@ -1,6 +1,19 @@
 ## check functions
 
 checkandsource_wazzuf_files () {
+	if [ ! -f $CONF_FILE ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne " $CONF_FILE configuration file not found !\n"
+		echo -ne " Copying an example: please fill some informations in it !\n"
+		mkdir -p $CONF_PATH_BASE
+		cp -v $CONF_FILE_EXAMPLE $CONF_FILE
+		echo -ne " Exiting...\n"
+		echo -ne " *************************************\n"
+		exit 1
+	else
+		echo "Sourcing $CONF_FILE..."
+		source $CONF_FILE
+	fi
 	for WFILE in $WAZZUF_FILES
 	do
 		if [ ! -f $WFILE ]; then
@@ -47,6 +60,16 @@ check_dvd () {
 				echo " Bypassing media source."
 				;;
 	        esac
+	fi
+}
+
+# check imdb-cli
+check_imdb () {
+	if [ ! -f $IMDB_TOOL ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne " Please install imdb-cli (run wazzuf-external-tools-install) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
 	fi
 }
 
