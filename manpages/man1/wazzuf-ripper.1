@@ -1,0 +1,41 @@
+.TH WAZZUF-RIPPER 1 "September 15, 2012"
+.SH NAME
+wazzuf-ripper \- Rip DVD and BD to .mkv file(s)
+.SH SYNOPSIS
+.B wazzuf-ripper 
+[ Video Codec ] [ Audio 1 Codec ]
+.I [ Audio 2 Codec ]
+.SH DESCRIPTION
+\fBwazzuf-ripper\fP is a shell script (bash) to
+.B  rip
+various media as
+.B DVD
+(Digital Versatile Disc) and
+.B BD
+(Blu-ray Disk) to 
+.B .mkv 
+file(s) (Matroska container).
+.PP
+.SH OPTIONS
+.\" For a complete description, see the Info files.
+.TP
+.B Video Codec
+h264, xvid, or DUMP
+.TP
+.B Audio Codec
+AC3, vorbis, mp3, or DUMP
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.\" .TP
+.\" .B \-v, \-\-version
+.\" Show version of program.
+.SH SEE ALSO
+.BR wazzuf-external-tools-install (1),
+.BR wazzuf-pre-ripper (1),
+.BR wazzuf-ripper.conf (4).
+.SH AUTHOR
+wazzuf-ripper was written by Nicolas Perrin <booloki@lokizone.net>.
+.PP
+This manual page was written by Nicolas Perrin <booloki@lokizone.net>,
+for the Debian project (and may be used by others).

@@ -13,12 +13,15 @@ libdir = $(exec_prefix)/lib/wazzuf-ripper
 docdir = $(datarootdir)/doc/wazzuf-ripper
 datadir = $(datarootdir)/wazzuf-ripper
 templatesdir = $(datadir)/tag-templates
+manpagesdir1= $(datarootdir)/man/man1
+manpagesdir4= $(datarootdir)/man/man4
 
 installdirs: 
 	$(MKINSTALLDIRS) \
 	$(DESTDIR)$(bindir) $(DESTDIR)$(templatesdir) \
 	$(DESTDIR)$(libdir) $(DESTDIR)$(sysconfdir) \
-	$(DESTDIR)$(docdir) 
+	$(DESTDIR)$(docdir) $(DESTDIR)$(manpagesdir1) \
+	$(DESTDIR)$(manpagesdir4)
 
 install: installdirs 
 	$(NORMAL_INSTALL)
@@ -28,3 +31,5 @@ install: installdirs
 		$(INSTALL) conf/wazzuf-path.conf $(DESTDIR)$(sysconfdir)/
 		$(INSTALL) conf/wazzuf-ripper.conf $(DESTDIR)$(datadir)/
 		$(INSTALL) doc/* $(DESTDIR)$(docdir)/
+		$(INSTALL) manpages/man1/* $(DESTDIR)$(manpagesdir1)/
+		$(INSTALL) manpages/man4/* $(DESTDIR)$(manpagesdir4)/
