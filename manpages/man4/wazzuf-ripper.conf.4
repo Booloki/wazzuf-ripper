@@ -1,13 +1,315 @@
-.TH WAZZUF-RIPPER.CONF 4 "September 15, 2012"
+.TH WAZZUF-RIPPER.CONF 4 "September 16, 2012"
 .SH NAME
 wazzuf-ripper.conf \- Wazzuf Ripper configuration file
 .SH DESCRIPTION
-TODO
+.I wazzuf-ripper.conf
+has to be in 
+.I ~/wazzuf-ripper/
+directory.
+.PP
+Theses are his configuration options :
+.PP
+.B Medium informations
+.TP
+.B SOURCE
+Media support type: DVD, ISO or BD
+.TP
+.B SOURCE_DIRECTORY
+Directory for source files like m2ts/ts, iso, external subtitles, cover image, episodes list,...
+.br
+Example: "/home/user/video-source-directory"
+.TP
+.B M2TS_FILE
+BD source filename available in SOURCE_DIRECTORY. Could be m2ts or HDts file.
+.br
+Example: "00000.m2ts"
+.TP
+.B ISO_FILE
+DVD ISO source filename available in SOURCE_DIRECTORY.
+.br
+Example: "image.iso"
+.PP
+.BR Tagging
+.TP
+.B VIDEO_TYPE
+Video Type: MOVIE, SHOW or MUSIC. Affects tags management.
+.br
+SHOW is for DVD/ISO SOURCE only: allow multiple Matroska output files.
+.TP
+.B TITLE_NAME
+The video main title. Used for IMdb ID search by imdb-cli.
+.br
+Example: "My Movie"
+.TP
+.B TAG_TITLE_NAME
+The main title with no space nor special characters. It sets the working directory and the output files base-name.
+.br
+Example: "My.Movie"
+.TP
+.B DATE
+The video release date. Used for IMdb ID search by imdb-cli.
+.br
+Example: "1970"
+.TP
+.B IMDB_ID
+IMdb ID from http://www.imdb.com .
+.br
+Example: "tt0071853"
+.br
+Require imdb-cli download/install. See
+.BR wazzuf-external-tools-install (1)
+.
+.TP
+.B TAG_AUDIO
+Global audio/subtitle tag, usually language.
+.br
+Examples: ENGLISH, FRENCH, MULTI, VOST, subforced, ...
+.TP
+.B TAG_RIP
+Global rip tag.
+.br
+Examples: BDRIP, DVDRIP, DVDDUMP, 1080p, 720p, ...
+.TP
+.B TAG_SIGNATURE
+Signature Tag.
+.TP
+.B COMMENT
+Comment added to video.
+.br
+Example: "Created with Wazzuf Ripper"
+.TP
+.B COVER
+Optional image attachment filename in SOURCE_DIRECTORY. Supported input MIME types are jpeg and png only.
+.br
+Could be downloaded with imdb-cli via 
+.BR wazzuf-pre-ripper (1)
+.
+.br
+Example: "cover.jpg"
+.TP
+.B DIRECTOR_NAME
+The movie Director Name. For MOVIE VIDEO_TYPE only.
+.br
+Useless with use of IMDB_ID.
+.TP
+.B SEASON_NUMBER
+The season number. For SHOW VIDEO_TYPE only.
+.br
+Example: "02"
+.TP
+.B EPISODES_FILE
+The optional episodes names list filename in SOURCE_DIRECTORY. For SHOW VIDEO_TYPE only.
+.br
+The text file syntax has to be ordered lines like "05 - The haunted episode". The line numbers corresponds to DVD/ISO CHAPTERS or TITLES (depends on DVD_EPISODES_ORG).
+.TP
+.B EPISODES_TOTAL_NUMBER
+(Optional) total episodes count in the season. For SHOW VIDEO_TYPE only.
+.TP
+.B ARTIST_NAME
+The artist name. For MUSIC VIDEO_TYPE only.
+.PP
+.BR DVD/ISO
+.BR organization
+.TP
+.B DVD_TITLE_NUMBER
+The DVD title number to rip (integer). Useless with SHOW VIDEO_TYPE and DVD_EPISODES_ORG is TITLES.
+.br
+Could be found with help of
+.BR wazzuf-pre-ripper (1)
+or manually with 'mplayer dvd://DVD_TITLE_NUMBER' for physical DVD or 'mplayer -nocache dvdnav://'.
+.TP
+.B MULTICHAP_FORCE
+Set to "yes" to force multiple DVD/ISO chapters to the same output video. Useless with SHOW VIDEO_TYPE and DVD_EPISODES_ORG is CHAPTERS.
+.TP
+.B MULTICHAP_FIRST
+The first chapter number to rip (integer). Mandatory if MULTICHAP_FORCE.
+.TP
+.B MULTICHAP_LAST
+The last chapter number to rip (integer). Mandatory if MULTICHAP_FORCE.
+.TP
+.B DVD_EPISODES_ORG
+The DVD organization type. For SHOW VIDEO_TYPE only. Episodes are classified on DVD CHAPTERS ("CHAPTERS") *or* on DVD TITLES ("TITLES").
+.TP
+.B DVD_CHAPTER_FIRST
+The first chapter number to rip (integer). Mandatory if DVD_EPISODES_ORG is CHAPTERS.
+.TP
+.B DVD_CHAPTER_LAST
+The last chapter number to rip (integer). Mandatory if DVD_EPISODES_ORG is CHAPTERS.
+.TP
+.B DVD_TITLE_LIST
+The DVD Titles numbers list with space separation. Mandatory if DVD_EPISODES_ORG is TITLES.
+.br
+Example: "2 3 5 6"
+.PP
+.BR Tracks
+.BR options
+.TP
+.B VIDEO_CROP
+The video cropping used to eliminate unwanted areas of the video track.
+.br
+Could be found with help of
+.BR wazzuf-pre-ripper (1)
+or manually with 'mplayer dvd://DVD_TITLE_NUMBER -vf cropdetect' or 'mplayer -dvd-device dvd.iso dvd://DVD_TITLE_NUMBER -vf cropdetect'
+.br
+Example: "720:480:0:0"
+.TP
+.B VIDEO_NOSKIP_FORCE
+Set to "yes" to force frames skipping. For example if you got lots of duplicate frame(s), input fps field not specified,...
+.TP
+.B VIDEO_RATIO_FORCE
+Force scaling / movie aspect for final merge. Could be "4/3"|"1.33", "16/9"|"1.78", "2.21" or "2.35".
+.TP
+.B AUDIO_1_LANG
+Audio track language code. List all codes with 'mkvmerge --list-languages'. Idem for AUDIO_2_LANG.
+.br
+Example: "en"
+.TP
+.B AUDIO_1_AID
+Audio track id: 128,129,...(AC3) or 137,...(DTS) or 160 to 191 (PCM) for DVD. 4352,4353,... for BD. 20,... 1985,... for TS. Idem for AUDIO_2_AID.
+.br
+Could be tested with 'mplayer file.iso -aid AUDIO_1_AID'.
+.TP
+.B AUDIO_1_SOURCE
+Audio track source type: "AC3", "DTS" or "PCM". Idem for AUDIO_2_SOURCE.
+.TP
+.B AUDIO_1_NAME
+Audio track name. No spaces allowed. Idem for AUDIO_2_NAME.
+.br
+Examples: "5.1", "Stereo", "Mono", "Commentary",...
+.TP
+.B AUDIO_1_SYNC
+Force audio track synchronization. Idem for AUDIO_2_SYNC.
+.br
+Example with -1s (-1000 ms): "-1000"
+.br
+Example with +3s (+3000 ms): "+3000"
+.TP
+.B SUBTITLE_1_LANG
+Subtitle track language code. List all codes with 'mkvmerge --list-languages'. Idem for SUBTITLE_2_LANG.
+.br
+Example: "en"
+.TP
+.B SUBTITLE_1_NAME
+Subtitle track name. No spaces allowed. Idem for SUBTITLE_2_NAME.
+.br
+Examples: "English", "Français", "Commentary",...
+.TP
+.B SUBTITLE_1_SID
+Subtitle track id: could be "0" to "31". Idem for SUBTITLE_2_SID.
+.TP
+.B SUBTITLE_1_FILE_FORCE
+Previously extracted/written subtitle filename in SOURCE_DIRECTORY. Could be BD subtitle (PGS): .sup file; TS subtitle (CC): .srt file; text file subtitle: .srt . Idem for SUBTITLE_2_FILE_FORCE.
+.br
+.BR wazzuf-external-tools-install (1)
+could be useful.
+.TP
+.B SUBTITLE_NODEFAULT_FORCE
+Set to "yes" to force no default subtitle display.
+.PP
+.BR Codecs
+.BR options
+.TP
+.B DEFAULT_CODEC_VIDEO
+Default video codec: "H264", "XVID" or "DUMP." Taken in account only if no arguments to
+.BR wazzuf-ripper (1)
+.
+.TP
+.B DEFAULT_CODEC_AUDIO
+Default audio codec: "AC3", "MP3", "VORBIS" or DUMP. Taken in account only if no arguments to
+.BR wazzuf-ripper (1)
+.
+.TP
+.B AUDIO_OGG_QUAL
+Ogg vorbis encode quality.
+.br
+Examples: "4" ~128 kbit/s, "6" ~192 kbit/s, "9" ~320 kbit/s
+.br
+More informations at http://en.wikipedia.org/wiki/Vorbis#Technical_details .
+.TP
+.B AUDIO_MP3_MODE
+MP3 lame encode mode: "CBR" (constant bitrate) or "VBR" (variable bitrate).
+.TP
+.B AUDIO_MP3_CBR
+MP3 lame encode CBR bitrate: "128", "192", "320",...
+.TP
+.B AUDIO_MP3_VBR
+MP3 lame encode VBR quality: from "0" (highest quality) to "9" (lowest quality).
+.TP
+.B AUDIO_MP3_VOL
+MP3 volume change: > 1: increase volume / "1": no effect / < 1: reduce volume.
+.TP
+.B AUDIO_AC3_QUAL
+AC3 encode bitrate.
+.br
+Examples: "192k", "448k", "640k", "1500k",...
+.br
+Note: Only DTS to AC3 encoding is possible.
+.TP
+.B DVDRIP_VIDEO_BITRATE
+Video encode bitrate for DVD/ISO. Default value is "1500".
+.br
+Examples: "700", "8000"
+.TP
+.B BDRIP_VIDEO_BITRATE
+Video encode bitrate for BD. Default value is "4000".
+.br
+Examples: "3000", "40000"
+.TP
+.B VIDEO_X264_SUBQ_PASS1
+x264 first pass encoding subq. Change with care ! Default value is "1".
+.br
+More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
+.TP
+.B VIDEO_X264_FRAMEREF_PASS1
+x264 first pass encoding frameref. Change with care ! Default value is "1".
+.br
+More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
+.TP
+.B VIDEO_X264_SUBQ_PASS2
+x264 second pass encoding subq. Change with care ! Default value is "6".
+.br
+More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
+.TP
+.B VIDEO_X264_FRAMEREF_PASS2
+x264 second pass encoding frameref. Change with care ! Default value is "2".
+.br
+More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
+.PP
+.BR System
+.BR options
+.TP
+.B VIDEO_XVID_THREADS
+Threads number used for xvid encoding: "1" for monocore CPU, "2" for dualcore,...
+.br
+Default value is "$PROC_CORE" (automatic detection).
+.TP
+.B VIDEO_X264_THREADS
+Threads number used for x264 encoding: "1" for monocore CPU, "2" for dualcore,...
+.br
+Default value is "auto" (automatic detection only for x264).
+.TP
+.B AUDIO_AC3_THREADS
+Threads number used for AC3 encoding: "1" for monocore CPU, "2" for dualcore,...
+.br
+Default value is "$PROC_CORE" (automatic detection).
+.TP
+.B IONICENESS
+io scheduling class to avoid too much IO disk: "0" for none, "1" for real time, "2" for best-effort, "3" for idle.
+.br
+Default value is "3".
+.TP
+.B NICENESS
+Scheduling priority to avoid too much CPU charge: "-20" (most favorable scheduling) to "19" (least favorable).
+.br
+Default value is "5".
 .PP
 .SH SEE ALSO
-.BR wazzuf-ripper (1),
-.BR wazzuf-external-tools-install (1),
-.BR wazzuf-pre-ripper (1).
+.BR wazzuf-ripper (1)
+,
+.BR wazzuf-external-tools-install (1)
+,
+.BR wazzuf-pre-ripper (1)
+.
 .SH AUTHOR
 wazzuf-ripper was written by Nicolas Perrin <booloki@lokizone.net>.
 .PP
