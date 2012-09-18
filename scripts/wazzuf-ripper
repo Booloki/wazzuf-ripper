@@ -239,10 +239,10 @@ do
 	if [[ $IMDB_ID == "" ]]; then
 		echo -ne " No IMdb ID provided. Skipping..."
 	else
-		echo -ne " Retrieving IMdb informations...\n"
+		echo -ne " Retrieving IMdb informations..."
 		get_imdb_informations
 	fi
-	echo -ne " *************************************\n"
+	echo -ne "\n *************************************\n"
 
 
 	# Extract full working file (.vob or .m2ts)

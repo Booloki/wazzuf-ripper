@@ -164,6 +164,8 @@ audio_rip () {
 					exit 1
 					;;
 			esac
+			echo -ne "\n *************************************\n"
+			echo " Convert $WAV_FILE to $AUDIO_FILE...\n"
 			nice -n $NICENESS lame --scale $AUDIO_MP3_VOL $AUDIO_MP3_MODE_OPTION --ta "$TITLE_NAME" --tt "$AUDIO_NAME" --tl "$MERGE_TITLE" --tg 24 --ty $DATE --tc "$COMMENT" -h $WAV_FILE $AUDIO_FILE
 		fi
 		;;

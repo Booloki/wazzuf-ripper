@@ -52,8 +52,8 @@ get_imdb_informations () {
 		IMDB_PLOT=`sed -n '/plot/{n;p;}' $IMDB_FILE`
 		IMDB_GENRE=`sed -n '/genre/{n;p;}' $IMDB_FILE`
 	else
-		echo " No IMdb informations found ! Please check IMdb ID $IMDB_ID !"
-		echo " Skip IMdb informations." && sleep 1
+		echo -ne " No IMdb informations found ! Please check IMdb ID $IMDB_ID !\n"
+		echo -ne " Skip IMdb informations.\n" && sleep 1
 		# to avoid errors + nfo/xmltags issues
 		IMDB_ID=""
 	fi
