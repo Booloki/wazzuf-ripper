@@ -83,6 +83,7 @@ DVD )
 	echo -ne "*************************************\n"
 	grep "^Disc Title" DVD-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
+	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
 	if  [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
 		for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 		do
@@ -194,7 +195,7 @@ ISO )
 	fi
 	;;
 * )
-        echo -ne "\n Media source problem: make sure you filled DVD, ISO or BD in configuration file\n"
+        echo -ne "\n Media source issue: make sure you filled DVD, ISO or BD in configuration file.\n"
         exit 1
         ;;
 esac
@@ -214,21 +215,26 @@ N* | n* )
 	if  [[ $IMDB_RESPONSE == "True" ]]; then
 		get_imdb_id
 		echo -ne " IMdb ID seems to be $IMDB_ID\n"
-		echo -ne " -> Please check in http://www.imdb.com/title/$IMDB_ID\n"
-		echo -ne "*************************************\n"
+		echo " Please check in http://www.imdb.com/title/$IMDB_ID"
+		echo -ne "\n*************************************\n"
 
 		# download cover or not
 		echo -ne "\n*************************************\n"
-		echo -ne " Download $TITLE_NAME ($DATE) IMDb cover ? (N/y)\n"
-		read IMDB_ANSWER
-		case $IMDB_ANSWER in
-		Y* | y* )
-			download_imdb_poster
-			;;
-		* )
-			echo -ne " Skip IMDb cover download.\n"
-			;;
-		esac
+		if [ -f $SOURCE_DIRECTORY/cover.jpg ]
+		then
+			echo " cover.jpg exists. Skipping Download..." && sleep 1
+		else
+			echo " Download $TITLE_NAME ($DATE) IMDb cover ? (N/y)"
+			read IMDB_ANSWER
+			case $IMDB_ANSWER in
+			Y* | y* )
+				download_imdb_poster
+				;;
+			* )
+				echo " Skip IMDb cover download."
+				;;
+			esac
+		fi
 		echo -ne "*************************************\n"
 	else
 		# $IMDB_RESPONSE == "False"

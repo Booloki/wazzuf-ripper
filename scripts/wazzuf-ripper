@@ -135,7 +135,7 @@ ISO )
 	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
-        echo -ne "\n Media source problem: make sure you filled DVD ISO or BD in configuration file\n"
+        echo -ne "\n Media source issue: make sure you filled DVD ISO or BD in configuration file.\n"
         exit 1
         ;;
 esac
@@ -440,6 +440,7 @@ do
 	## video encode
 	trap "echo -e '\nManual killed script (Ctrl-C) during Video encoding' && exit 1" 2
 
+	if [[ $VIDEO_CROP == "" ]]; then echo " Warning: VIDEO_CROP is empty ! Run wazzuf-pre-ripper for crop detection." && sleep 2; fi
 	video_rip
 
 	if [[ $VIDEO_RATIO_FORCE == "" ]]; then
