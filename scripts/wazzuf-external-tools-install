@@ -73,8 +73,9 @@ esac
 
 # tsMuxer (Freeware No longer developed)
 # http://www.videohelp.com/tools/tsMuxeR
-TSMUXER_URL="http://www.videohelp.com/download/tsMuxeR_1.10.6.tar.gz?r=dQFgXXDBWw"
-TSMUXER_FILE="tsMuxeR_1.10.6.tar.gz?r=dQFgXXDBWw"
+TSMUXER_URL_BASE="http://www.videohelp.com/download"
+TSMUXER_FILENAME_BASE="tsMuxeR_1.10.6.tar.gz"
+TSMUXER_URL="$TSMUXER_URL_BASE/$TSMUXER_FILENAME_BASE"
 TSMUXER_DIRECTORY="tsmuxer"
 TSMUXER_TOOL="../$EXTERNAL_TOOLS_PATH/$TSMUXER_DIRECTORY/tsMuxeR"
 echo -ne "\n*************************************\n"
@@ -83,9 +84,14 @@ echo -ne " Do you want to download/install tsMuxer ? (N/y)\n"
 read answer
 case $answer in
 y* | Y* )
-	wget -nc $TSMUXER_URL
+	wget $TSMUXER_URL -O tsmuxer.html
+	TSMUXER_URL_FILE=`grep "click here" tsmuxer.html | cut -d '"' -f4`
+	rm tsmuxer.html
+	wget -nc $TSMUXER_URL_FILE
+	TSMUXER_FILE=`echo $TSMUXER_URL_FILE | cut -d '/' -f 5`
 	mkdir -p $TSMUXER_DIRECTORY
-	tar xvzf $TSMUXER_FILE -C $TSMUXER_DIRECTORY
+	mv $TSMUXER_FILE $TSMUXER_FILENAME_BASE
+	tar xvzf $TSMUXER_FILENAME_BASE -C $TSMUXER_DIRECTORY
 	;;
 * )
 	echo -ne " Skip tsMuxer download/install.\n"

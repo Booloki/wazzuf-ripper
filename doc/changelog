@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-18
+* Fix tsMuxer download url change
+
 2012-09-16
 * Manpages and wazzuf-ripper.conf improvements
 
