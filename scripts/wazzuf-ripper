@@ -95,6 +95,7 @@ MOVIE )
         ;;
 SHOW )
 	TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
+	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
 	if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then	DVD_TITLE_LIST=$DVD_TITLE_NUMBER; fi
         ;;
 MUSIC )
@@ -208,7 +209,7 @@ do
 		if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
 		then
 			echo -ne "\n *************************************\n"
-			echo " Warning ! $SOURCE_DIRECTORY/$EPISODES_FILE does not exists !" && sleep 2
+			echo " Warning ! $EPISODE_DENOMINATION text file does not exists in $SOURCE_DIRECTORY !" && sleep 2
 			echo -ne " *************************************\n"
 			EPISODE_NAME_FULL=$i
 			EPISODE_NAME=$i
@@ -226,7 +227,6 @@ do
 		fi
 		MERGE_OUTPUT="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 
-		EPISODE_DENOMINATION="Episode"
 		MERGE_TITLE="$TITLE_LONG - $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
 		echo -ne "\n *************************************\n"
 		echo " Work in progress: $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
@@ -236,11 +236,15 @@ do
 
 	# Retrieve IMdb informations
 	echo -ne "\n *************************************\n"
-	if [[ $IMDB_ID == "" ]]; then
-		echo -ne " No IMdb ID provided. Skipping..."
+	if [ ! -f $IMDB_TOOL ]; then
+		echo -ne " Warning ! Install imdb-cli with wazzuf-external-tools-install if you want IMdb ID to be taken in account! Skipping..." && sleep 2
 	else
-		echo -ne " Retrieving IMdb informations..."
-		get_imdb_informations
+		if [[ $IMDB_ID == "" ]]; then
+			echo -ne " No IMdb ID provided. Skipping..." && sleep 1
+		else
+			echo -ne " Retrieving IMdb informations..."
+			get_imdb_informations
+		fi
 	fi
 	echo -ne "\n *************************************\n"
 
@@ -322,6 +326,7 @@ do
 
 		# subtitle file (force external or not)
 		if [[ $SUBTITLE_1_FILE_FORCE == "" ]]; then
+			if echo $SUBTITLE_1_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_1_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 			SUBTITLE_SID=$SUBTITLE_1_SID
 			SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 			SUBTITLE_FILE=$SUB_FILE.idx
@@ -354,6 +359,7 @@ do
 		
 			# subtitle file (force external or not)
 			if [[ $SUBTITLE_2_FILE_FORCE == "" ]]; then
+				if echo $SUBTITLE_2_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_2_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 				SUBTITLE_SID=$SUBTITLE_2_SID
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 				SUBTITLE_FILE=$SUB_FILE.idx

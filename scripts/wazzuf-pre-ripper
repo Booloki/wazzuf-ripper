@@ -165,6 +165,7 @@ ISO )
 	echo "Tested iso:\"$ISO_FILE_PATH\""
 	grep "^Disc Title" ISO-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" ISO-lsdvd.info | sed s/'Longest track: '//`
+	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
 	if  [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
 		for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 		do
