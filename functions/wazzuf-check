@@ -32,24 +32,26 @@ checkandsource_wazzuf_files () {
 check_dvd () {
 	case ${1} in
 	DVD )
-		DEVICE_TEST="-d `mount | grep udf | cut -d ' ' -f 3`/VIDEO_TS/"
+		DEVICE_TEST="-d `mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`/VIDEO_TS/"
 		DEVICE_NAME="DVD"
+		WORKING_FILES=".vob"
 		;;
 	ISO )
 		DEVICE_TEST="-f $SOURCE_DIRECTORY/$ISO_FILE"
 		DEVICE_NAME="$SOURCE_DIRECTORY/$ISO_FILE iso file"
+		WORKING_FILES=".vob"
 		;;
 	* )
 		echo "Unexpected error: No device to check !"
 		;;
 	esac
 
-	if [ ! $DEVICE_TEST ]
+	if [ ! "${DEVICE_TEST}" ]
 	then
 		echo -ne "\n *************************************\n"
-		echo -ne "-> $DEVICE_NAME not found !\n"
+		echo -ne " $DEVICE_NAME not found !\n"
 		echo -ne " Do you you want to bypass media source (y/N)?\n"
-		echo -ne " Note: Working files (.vob...) had to be already extracted.\n"
+		echo -ne " Note: Working files ($WORKING_FILES,...) had to be already extracted.\n"
 		echo -ne " *************************************\n"
 		read DEVICE_ANSWER
 		case $DEVICE_ANSWER in

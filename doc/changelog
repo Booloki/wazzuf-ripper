@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-20
+* Configuration file cleaning
+* Bugfix: DVD name with spaces error
+
 2012-09-18
 * Some little display improvements and checks
 * Fix tsMuxer download url change
