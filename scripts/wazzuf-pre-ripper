@@ -29,14 +29,22 @@ cd $SOURCE_DIRECTORY
 # pre-rip source choice
 case $SOURCE in
 BD )
-	if [ ! -f "$M2TS_FILE_PATH" ]
-	then
-		echo -ne "\n *************************************\n"
-		echo " M2TS_FILE_PATH $M2TS_FILE_PATH does not exists ! Exiting..."
-		echo -ne " *************************************\n"
-		exit 1
-	fi
+	check_device BD PRE
+	BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`	
 
+	echo -ne " *************************************\n"
+	echo ${BD_MOUNT}
+	cropdetect "br:///${BD_MOUNT}"
+	echo -ne " *************************************\n"
+
+	echo -ne " *************************************\n"
+	echo " No more informations directly from physical BD."
+	echo " Please run wazzuf-ripper to extract .m2ts file,"
+	echo " and re-run wazzuf-pre-ripper with M2TS in SOURCE (configuration file)."
+	echo -ne " *************************************\n"
+	;;
+M2TS )
+	check_device M2TS PRE
 	echo -ne " *************************************\n"
 	echo " MPlayer informations"
 	mplayer -v -vo null -ao null -frames 0 -identify "$M2TS_FILE_PATH" 2>/dev/null > M2TS-mplayer.info
@@ -57,7 +65,7 @@ BD )
 	;;
 DVD )
 	DVD_PATH="/dev/dvd"
-	check_dvd DVD
+	check_device DVD PRE
 	check_lsdvd
 	echo -ne "*************************************\n"
 	echo " lsdvd informations"
@@ -132,14 +140,7 @@ DVD )
 	echo -ne "*************************************\n"
 	;;
 ISO )
-	if [ ! -f "$ISO_FILE_PATH" ]
-	then
-		echo -ne "\n *************************************\n"
-		echo " ISO_FILE_PATH $ISO_FILE_PATH does not exists ! Exiting..."
-		echo -ne " *************************************\n"
-		exit 1
-	fi
-
+	check_device ISO PRE
 	check_lsdvd
 	echo -ne "*************************************\n"
 	echo " lsdvd informations"
@@ -237,12 +238,10 @@ N* | n* )
 		fi
 		echo -ne "\n*************************************\n"
 	else
-		# $IMDB_RESPONSE == "False"
 		echo -ne " No IMdb informations found ! Try with another release date (first season release date for show)\n"
 		echo -ne " Or directly search at http://www.imdb.com -> IMdb ID is XXXXXXXXX in URL: http://www.imdb.com/title/XXXXXXXXX \n"
 	fi
 	;;
 esac
-
 
 exit 0

@@ -28,9 +28,19 @@ checkandsource_wazzuf_files () {
 	done
 }
 
-# check physical DVD (only one device) or ISO file presence
-check_dvd () {
+# check physical BD/DVD (only one device) or ISO file presence
+check_device () {
 	case ${1} in
+	BD )
+		DEVICE_TEST="-d `mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`/BDMV/"
+		DEVICE_NAME="BD"
+		WORKING_FILES=".m2ts"
+		;;
+	M2TS )
+		DEVICE_TEST="-f $M2TS_FILE_PATH"
+		DEVICE_NAME="$M2TS_FILE_PATH"
+		WORKING_FILES="?"
+		;;
 	DVD )
 		DEVICE_TEST="-d `mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`/VIDEO_TS/"
 		DEVICE_NAME="DVD"
@@ -50,18 +60,27 @@ check_dvd () {
 	then
 		echo -ne "\n *************************************\n"
 		echo -ne " $DEVICE_NAME not found !\n"
-		echo -ne " Do you you want to bypass media source (y/N)?\n"
-		echo -ne " Note: Working files ($WORKING_FILES,...) had to be already extracted.\n"
-		echo -ne " *************************************\n"
-		read DEVICE_ANSWER
-		case $DEVICE_ANSWER in
-			n* | N* | "" )
-				echo " Quit." && exit 0
-				;;
-			y* | Y* )
-				echo " Bypassing media source."
-				;;
-	        esac
+		case ${2} in
+		PRE )
+			echo -ne " Exiting...\n"
+			echo -ne " *************************************\n"
+			exit 1
+			;;
+		RIP )
+			echo -ne " Do you you want to bypass media source (y/N)?\n"
+			echo -ne " Note: Working files ($WORKING_FILES,...) had to be already extracted.\n"
+			echo -ne " *************************************\n"
+			read DEVICE_ANSWER
+			case $DEVICE_ANSWER in
+				n* | N* | "" )
+					echo " Quit." && exit 0
+					;;
+				y* | Y* )
+					echo " Bypassing media source."
+					;;
+			esac
+			;;
+		esac
 	fi
 }
 
