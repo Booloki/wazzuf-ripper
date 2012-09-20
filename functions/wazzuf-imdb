@@ -3,9 +3,15 @@
 # and http://www.imdbapi.com/
 
 # need TITLE_NAME
-#      DATE
 # return IMDB_RESPONSE ("True" or "False")
 get_imdb_response_title () {
+        IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" | sed -n '/response/{n;p;}'`
+}
+
+# need TITLE_NAME
+#      DATE
+# return IMDB_RESPONSE ("True" or "False")
+get_imdb_response_title_date () {
 	IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/response/{n;p;}'`
 }
 
@@ -16,15 +22,36 @@ get_imdb_response_file () {
 }
 
 # need TITLE_NAME
+# return IMDB_ID
+get_imdb_id_title () {
+        IMDB_ID=`imdbtool -t "$TITLE_NAME" | sed -n '/imdbid/{n;p;}'`
+}
+
+# need TITLE_NAME
 #      DATE
 # return IMDB_ID
-get_imdb_id () {
+get_imdb_id_title_date () {
 	IMDB_ID=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/imdbid/{n;p;}'`
 }
 
 # need IMDB_ID
+#      SOURCE_DIRECTORY
 download_imdb_poster () {
-	imdbtool -i $IMDB_ID | wget `sed -n '/poster/{n;p;}'` -O cover.jpg
+	if [ -f $SOURCE_DIRECTORY/cover.jpg ]; then
+		echo " cover.jpg exists. Skipping Download..." && sleep 1
+	else
+		echo " Download $IMDB_ID IMDb cover ? (Y/n)"
+		read IMDB_ANSWER
+		case $IMDB_ANSWER in
+		N* | n* )
+			echo " Skip IMDb cover download."
+			;;
+		* )
+			check_imdb
+			imdbtool -i $IMDB_ID | wget `sed -n '/poster/{n;p;}'` -O cover.jpg
+			;;
+		esac
+	fi
 }
 
 # need IMDB_ID

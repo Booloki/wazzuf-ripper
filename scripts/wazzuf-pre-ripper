@@ -201,47 +201,49 @@ ISO )
         ;;
 esac
 
-# IMDb: get ID and download poster image
+# IMDb: get ID / download poster image
 echo -ne "*************************************\n"
-echo -ne "Try to get IMDb ID with $TITLE_NAME ($DATE)  ? (Y/n)\n"
-read IMDB_ANSWER
-case $IMDB_ANSWER in
-N* | n* )
-	echo -ne " Skip IMDb informations.\n"
-	;;
-* )
-	check_imdb
-	# get response
-	get_imdb_response_title
-	if  [[ $IMDB_RESPONSE == "True" ]]; then
-		get_imdb_id
-		echo -ne " IMdb ID seems to be $IMDB_ID\n"
-		echo " Please check in http://www.imdb.com/title/$IMDB_ID"
-		echo -ne "\n*************************************\n"
-
-		# download cover or not
-		echo -ne "\n*************************************\n"
-		if [ -f $SOURCE_DIRECTORY/cover.jpg ]
-		then
-			echo " cover.jpg exists. Skipping Download..." && sleep 1
+if  [[ $IMDB_ID == "" ]]; then
+	echo -ne " Try to get IMDb ID with: $TITLE_NAME ? (Y/n)"
+	read IMDB_ANSWER
+	case $IMDB_ANSWER in
+	N* | n* )
+		echo -ne " Skip IMDb informations.\n"
+		echo -ne "*************************************\n"
+		;;
+	* )
+		check_imdb
+		get_imdb_response_title
+		if  [[ $IMDB_RESPONSE == "True" ]]; then
+			get_imdb_id_title
+			echo -ne " IMdb ID seems to be $IMDB_ID\n"
+			echo " Please check in http://www.imdb.com/title/$IMDB_ID"
+			download_imdb_poster
+			echo -ne "*************************************\n"
 		else
-			echo " Download $TITLE_NAME ($DATE) IMDb cover ? (N/y)"
-			read IMDB_ANSWER
-			case $IMDB_ANSWER in
-			Y* | y* )
+			echo -ne " No IMdb informations found !\n"
+			echo -ne "\n Trying with: $TITLE_NAME + $DATE.\n"
+			get_imdb_response_title_date
+			if  [[ $IMDB_RESPONSE == "True" ]]; then
+				get_imdb_id_title_date
+				echo -ne " IMdb ID seems to be $IMDB_ID\n"
+				echo " Please check in http://www.imdb.com/title/$IMDB_ID"
 				download_imdb_poster
-				;;
-			* )
-				echo " Skip IMDb cover download."
-				;;
-			esac
+				echo -ne "*************************************\n"
+			else
+				echo -ne " No IMdb informations found !\n"
+				echo -ne "\n Try with another release date (first season release date for show)\n"
+				echo -ne " Or directly search at http://www.imdb.com \n"
+				echo -ne " -> IMdb ID is XXXXXXXXX in URL: http://www.imdb.com/title/XXXXXXXXX \n"
+				echo -ne "*************************************\n"
+			fi
 		fi
-		echo -ne "\n*************************************\n"
-	else
-		echo -ne " No IMdb informations found ! Try with another release date (first season release date for show)\n"
-		echo -ne " Or directly search at http://www.imdb.com -> IMdb ID is XXXXXXXXX in URL: http://www.imdb.com/title/XXXXXXXXX \n"
-	fi
-	;;
-esac
+		;;
+	esac
+else
+	echo -ne " Provided IMDb ID is $IMDB_ID .\n"
+	download_imdb_poster
+	echo -ne "*************************************\n"
+fi
 
 exit 0
