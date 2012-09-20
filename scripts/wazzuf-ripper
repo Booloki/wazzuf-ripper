@@ -241,15 +241,12 @@ do
 
 	# Retrieve IMdb informations
 	echo -ne "\n *************************************\n"
-	if [ ! -f $IMDB_TOOL ]; then
-		echo -ne " Warning ! Install imdb-cli with wazzuf-external-tools-install if you want IMdb ID to be taken in account! Skipping..." && sleep 2
+	if [[ $IMDB_ID == "" ]]; then
+		echo -ne " No IMdb ID provided. Skipping..." && sleep 1
 	else
-		if [[ $IMDB_ID == "" ]]; then
-			echo -ne " No IMdb ID provided. Skipping..." && sleep 1
-		else
-			echo -ne " Retrieving IMdb informations..."
-			get_imdb_informations
-		fi
+		check_imdb
+		echo -ne " Retrieving IMdb informations..."
+		get_imdb_informations
 	fi
 	echo -ne "\n *************************************\n"
 

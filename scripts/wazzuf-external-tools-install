@@ -10,35 +10,6 @@ source $FUNCTIONS_CHECK
 mkdir -p $EXTERNAL_TOOLS_PATH
 cd $EXTERNAL_TOOLS_PATH
 
-# imdb-cli - no licence provided, but github so should be Open Source.
-# https://github.com/bgr/imdb-cli
-# + API http://www.imdbapi.com/
-IMDBCLI_GIT="git://github.com/bgr/imdb-cli"
-IMDBCLI_DIRECTORY="imdb-cli"
-IMDBCLI_TOOL="../$EXTERNAL_TOOLS_PATH/$IMDBCLI_DIRECTORY/imdbtool.py"
-echo -ne "\n*************************************\n"
-echo -ne " imdb-cli can retrieve IMdb informations.\n"
-echo -ne " Do you want to download/install imdb-cli ? (N/y)\n"
-read answer
-case $answer in
-y* | Y* )
-	# Check git
-	if [ ! -x "/usr/bin/git" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install git !\n"
-		echo -ne " Or manually download imdb-cli at https://github.com/bgr/imdb-cli/downloads\n"
-		echo -ne " and extract archive to $EXTERNAL_TOOLS_PATH/$IMDBCLI_DIRECTORY/\n"
-		echo -ne " Skip imdb-cli download/install.\n"
-		echo -ne " *************************************\n" && sleep 1
-	else
-		git clone $IMDBCLI_GIT
-	fi
-	;;
-* )
-	echo -ne " Skip imdb-cli download/install.\n"
-	;;
-esac
-
 # ccextractor - GPL 2.0
 # http://ccextractor.sourceforge.net
 CCEXTRACTOR_URL="http://sourceforge.net/projects/ccextractor/files/latest/download?source=files"

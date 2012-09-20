@@ -86,9 +86,9 @@ check_device () {
 
 # check imdb-cli
 check_imdb () {
-	if [ ! -f $IMDB_TOOL ]; then
+	if [ ! -x /usr/bin/imdbtool ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne " Please install imdb-cli (run wazzuf-external-tools-install) ! Exiting... \n"
+		echo -ne " Please install imdb-cli ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi

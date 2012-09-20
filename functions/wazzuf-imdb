@@ -6,7 +6,7 @@
 #      DATE
 # return IMDB_RESPONSE ("True" or "False")
 get_imdb_response_title () {
-	IMDB_RESPONSE=`python $IMDB_TOOL -t "$TITLE_NAME" -y $DATE | sed -n '/response/{n;p;}'`
+	IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/response/{n;p;}'`
 }
 
 # need IMDB_FILE
@@ -19,12 +19,12 @@ get_imdb_response_file () {
 #      DATE
 # return IMDB_ID
 get_imdb_id () {
-	IMDB_ID=`python $IMDB_TOOL -t "$TITLE_NAME" -y $DATE | sed -n '/imdbid/{n;p;}'`
+	IMDB_ID=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/imdbid/{n;p;}'`
 }
 
 # need IMDB_ID
 download_imdb_poster () {
-	python $IMDB_TOOL -i $IMDB_ID | wget `sed -n '/poster/{n;p;}'` -O cover.jpg
+	imdbtool -i $IMDB_ID | wget `sed -n '/poster/{n;p;}'` -O cover.jpg
 }
 
 # need IMDB_ID
@@ -39,7 +39,7 @@ download_imdb_poster () {
 #        IMDB_GENRE
 get_imdb_informations () {
 	IMDB_FILE="$BASE_WORKING_FILE-imdb.txt"
-	python $IMDB_TOOL -i $IMDB_ID > $IMDB_FILE
+	imdbtool -i $IMDB_ID > $IMDB_FILE
 	get_imdb_response_file
 	if  [[ $IMDB_RESPONSE == "True" ]]; then
 		IMDB_DIRECTOR=`sed -n '/director/{n;p;}' $IMDB_FILE`

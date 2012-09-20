@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-09-20
+* Remove imdb-cli downloader/installer (now packaged).
 * Configuration change: BD SOURCE is now for physical BD and M2TS for .m2ts file.
 * Configuration file cleaning
 * Bugfix: DVD name with spaces error
