@@ -5,33 +5,33 @@
 # need TITLE_NAME
 # return IMDB_RESPONSE ("True" or "False")
 get_imdb_response_title () {
-        IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" | sed -n '/response/{n;p;}'`
+        IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" | sed -n '/^response/{n;p;}'`
 }
 
 # need TITLE_NAME
 #      DATE
 # return IMDB_RESPONSE ("True" or "False")
 get_imdb_response_title_date () {
-	IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/response/{n;p;}'`
+	IMDB_RESPONSE=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/^response/{n;p;}'`
 }
 
 # need IMDB_FILE
 # return IMDB_RESPONSE ("True" or "False")
 get_imdb_response_file () {
- 	IMDB_RESPONSE=`sed -n '/response/{n;p;}' $IMDB_FILE`
+ 	IMDB_RESPONSE=`sed -n '/^response/{n;p;}' $IMDB_FILE`
 }
 
 # need TITLE_NAME
 # return IMDB_ID
 get_imdb_id_title () {
-        IMDB_ID=`imdbtool -t "$TITLE_NAME" | sed -n '/imdbid/{n;p;}'`
+        IMDB_ID=`imdbtool -t "$TITLE_NAME" | sed -n '/^imdbid/{n;p;}'`
 }
 
 # need TITLE_NAME
 #      DATE
 # return IMDB_ID
 get_imdb_id_title_date () {
-	IMDB_ID=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/imdbid/{n;p;}'`
+	IMDB_ID=`imdbtool -t "$TITLE_NAME" -y $DATE | sed -n '/^imdbid/{n;p;}'`
 }
 
 # need IMDB_ID
@@ -48,7 +48,7 @@ download_imdb_poster () {
 			;;
 		* )
 			check_imdb
-			imdbtool -i $IMDB_ID | wget `sed -n '/poster/{n;p;}'` -O cover.jpg
+			imdbtool -i $IMDB_ID | wget `sed -n '/^poster/{n;p;}'` -O cover.jpg
 			;;
 		esac
 	fi
@@ -69,15 +69,15 @@ get_imdb_informations () {
 	imdbtool -i $IMDB_ID > $IMDB_FILE
 	get_imdb_response_file
 	if  [[ $IMDB_RESPONSE == "True" ]]; then
-		IMDB_DIRECTOR=`sed -n '/director/{n;p;}' $IMDB_FILE`
-		IMDB_WRITER=`sed -n '/writer/{n;p;}' $IMDB_FILE`
-		IMDB_VOTES=`sed -n '/imdbvotes/{n;p;}' $IMDB_FILE`
-		IMDB_RATING=`sed -n '/imdbrating/{n;p;}' $IMDB_FILE`
-		IMDB_RUNTIME=`sed -n '/runtime/{n;p;}' $IMDB_FILE`
-		IMDB_ACTORS=`sed -n '/actors/{n;p;}' $IMDB_FILE`
-		IMDB_RATED=`sed -n '/rated/{n;p;}' $IMDB_FILE`
-		IMDB_PLOT=`sed -n '/plot/{n;p;}' $IMDB_FILE`
-		IMDB_GENRE=`sed -n '/genre/{n;p;}' $IMDB_FILE`
+		IMDB_DIRECTOR=`sed -n '/^director/{n;p;}' $IMDB_FILE`
+		IMDB_WRITER=`sed -n '/^writer/{n;p;}' $IMDB_FILE`
+		IMDB_VOTES=`sed -n '/^imdbvotes/{n;p;}' $IMDB_FILE`
+		IMDB_RATING=`sed -n '/^imdbrating/{n;p;}' $IMDB_FILE`
+		IMDB_RUNTIME=`sed -n '/^runtime/{n;p;}' $IMDB_FILE`
+		IMDB_ACTORS=`sed -n '/^actors/{n;p;}' $IMDB_FILE`
+		IMDB_RATED=`sed -n '/^rated/{n;p;}' $IMDB_FILE`
+		IMDB_PLOT=`sed -n '/^plot/{n;p;}' $IMDB_FILE`
+		IMDB_GENRE=`sed -n '/^genre/{n;p;}' $IMDB_FILE`
 	else
 		echo -ne " No IMdb informations found ! Please check IMdb ID $IMDB_ID !\n"
 		echo -ne " Skip IMdb informations.\n" && sleep 1

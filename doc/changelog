@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-21
+* IMdb-cli requests improvements
+
 2012-09-20
 * IMdb search + cover download improvements
 * Remove imdb-cli downloader/installer (now packaged).
