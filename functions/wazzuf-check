@@ -220,6 +220,15 @@ check_lame () {
 	fi
 }
 
+check_opusenc () {
+        if [ ! -x "/usr/bin/opusenc" ]; then
+                echo -ne "\n *************************************\n"
+                echo -ne " Please install opusenc (opus-tools) ! Exiting... \n"
+                echo -ne " *************************************\n"
+                exit 1
+        fi
+}
+
 check_imagemagick () {
 	if [ ! -x "/usr/bin/convert" ]; then
 		echo -ne "\n *************************************\n"

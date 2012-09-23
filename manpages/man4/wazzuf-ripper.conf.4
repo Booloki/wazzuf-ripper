@@ -211,7 +211,7 @@ Default video codec: "H264", "XVID" or "DUMP." Taken in account only if no argum
 .
 .TP
 .B DEFAULT_CODEC_AUDIO
-Default audio codec: "AC3", "MP3", "VORBIS" or DUMP. Taken in account only if no arguments to
+Default audio codec: "AC3", "MP3", "VORBIS", "OPUS" or "DUMP". Taken in account only if no arguments to
 .BR wazzuf-ripper (1)
 .
 .TP
@@ -226,13 +226,19 @@ More informations at http://en.wikipedia.org/wiki/Vorbis#Technical_details .
 MP3 lame encode mode: "CBR" (constant bitrate) or "VBR" (variable bitrate).
 .TP
 .B AUDIO_MP3_CBR
-MP3 lame encode CBR bitrate: "128", "192", "320",...
+MP3 lame encode CBR bitrate (kbit/s): "128", "192", "320",...
 .TP
 .B AUDIO_MP3_VBR
 MP3 lame encode VBR quality: from "0" (highest quality) to "9" (lowest quality).
 .TP
 .B AUDIO_MP3_VOL
 MP3 volume change: > 1: increase volume / "1": no effect / < 1: reduce volume.
+.TP
+.B AUDIO_OPUS_MODE
+Opus encode mode: "HCBR" (hard constant bitrate), "CVBR" (constrained variable bitrate) or "VBR" (variable bitrate).
+.TP
+.B AUDIO_OPUS_BITRATE
+Opus encode bitrate (kbit/s): "6" to "256" per channel
 .TP
 .B AUDIO_AC3_QUAL
 AC3 encode bitrate.

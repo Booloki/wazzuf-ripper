@@ -135,7 +135,7 @@ audio_rip () {
 	        else
 			check_oggenc
 			echo -ne "\n *************************************\n"
-			echo " Convert $WAV_FILE to $AUDIO_FILE...\n"
+			echo " Convert $WAV_FILE to $AUDIO_FILE..."
 			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $AUDIO_FILE -a "$TITLE_NAME" -t "$AUDIO_NAME" -l "$MERGE_TITLE" -G "Soundtrack" -d $DATE
 		fi
 		;;
@@ -165,8 +165,40 @@ audio_rip () {
 					;;
 			esac
 			echo -ne "\n *************************************\n"
-			echo " Convert $WAV_FILE to $AUDIO_FILE...\n"
+			echo " Convert $WAV_FILE to $AUDIO_FILE..."
 			nice -n $NICENESS lame --scale $AUDIO_MP3_VOL $AUDIO_MP3_MODE_OPTION --ta "$TITLE_NAME" --tt "$AUDIO_NAME" --tl "$MERGE_TITLE" --tg 24 --ty $DATE --tc "$COMMENT" -h $WAV_FILE $AUDIO_FILE
+		fi
+		;;
+	OPUS )
+		# audio opus encode
+		AUDIO_FILE=$OPUS_FILE
+		if [ -f $AUDIO_FILE ]; then
+			echo -ne "\n *************************************\n"
+			echo " $AUDIO_FILE exists, next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			check_opusenc
+			# opusenc mode choice
+			case $AUDIO_OPUS_MODE in
+			HCBR | hcbr )
+				AUDIO_OPUS_MODE_OPTION="--hard-cbr"
+				;;
+			CVBR | cvbr )
+				AUDIO_OPUS_MODE_OPTION="--cvbr"
+				;;
+			VBR | vbr )
+				AUDIO_OPUS_MODE_OPTION="--vbr"
+				;;
+			* )
+				echo -ne "\n *************************************\n"
+				echo " $AUDIO_OPUS_MODE : opus encoding mode not recognized ! Exiting..."
+				echo -ne " *************************************\n"
+				exit 1
+				;;
+			esac
+			echo -ne "\n *************************************\n"
+			echo " Convert $WAV_FILE to $AUDIO_FILE..."
+			nice -n $NICENESS opusenc --bitrate $AUDIO_OPUS_BITRATE $AUDIO_OPUS_MODE_OPTION --artist "$TITLE_NAME" --title "$AUDIO_NAME" $WAV_FILE $AUDIO_FILE
 		fi
 		;;
 	esac

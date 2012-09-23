@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-23
+* Experimental Opus audio codec support
+
 2012-09-21
 * IMdb-cli requests improvements
 
