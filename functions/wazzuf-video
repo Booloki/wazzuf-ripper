@@ -29,12 +29,14 @@ video_rip () {
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
-				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=2:threads=$VIDEO_X264_THREADS:pass=1:log=1 \
+				-ovc x264 -x264encopts \
+				bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS1:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=$VIDEO_X264_TRELLIS_PASS1:threads=$VIDEO_X264_THREADS:pass=1:log=1 \
 				-nosound -nosub
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP \
-				-ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=3:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=2:threads=$VIDEO_X264_THREADS:pass=2:log=1 \
+				-ovc x264 -x264encopts \
+				bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS2:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=$VIDEO_X264_TRELLIS_PASS2:threads=$VIDEO_X264_THREADS:pass=2:log=1 \
 				-nosound -nosub
 		else
 			echo -ne "\n *************************************\n"
