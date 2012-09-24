@@ -279,40 +279,14 @@ x264 second pass encoding frameref. Change with care ! Default value is "2".
 .br
 More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
 .PP
-.BR System
-.BR options
-.TP
-.B VIDEO_XVID_THREADS
-Threads number used for xvid encoding: "1" for monocore CPU, "2" for dualcore,...
-.br
-Default value is "$PROC_CORE" (automatic detection).
-.TP
-.B VIDEO_X264_THREADS
-Threads number used for x264 encoding: "1" for monocore CPU, "2" for dualcore,...
-.br
-Default value is "auto" (automatic detection only for x264).
-.TP
-.B AUDIO_AC3_THREADS
-Threads number used for AC3 encoding: "1" for monocore CPU, "2" for dualcore,...
-.br
-Default value is "$PROC_CORE" (automatic detection).
-.TP
-.B IONICENESS
-io scheduling class to avoid too much IO disk: "0" for none, "1" for real time, "2" for best-effort, "3" for idle.
-.br
-Default value is "3".
-.TP
-.B NICENESS
-Scheduling priority to avoid too much CPU charge: "-20" (most favorable scheduling) to "19" (least favorable).
-.br
-Default value is "5".
-.PP
 .SH SEE ALSO
 .BR wazzuf-ripper (1)
 ,
 .BR wazzuf-external-tools-install (1)
 ,
 .BR wazzuf-pre-ripper (1)
+,
+.BR wazzuf-ripper-global.conf (4)
 .
 .SH AUTHOR
 wazzuf-ripper was written by Nicolas Perrin <booloki@lokizone.net>.
