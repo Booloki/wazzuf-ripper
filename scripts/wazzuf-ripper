@@ -3,8 +3,8 @@
 # DVD/BD rip script
 # booloki@lokizone.net
 
-PATH_FILE="/etc/wazzuf-ripper/wazzuf-path.conf"
-source $PATH_FILE
+GLOBAL_CONF_FILE="/etc/wazzuf-ripper/wazzuf-ripper-global.conf"
+source $GLOBAL_CONF_FILE
 
 # basic error catching
 trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
@@ -52,7 +52,11 @@ OPUS | Opus | opus )
 	;;
 "" )
         # use default CODEC_AUDIO
-	CODEC_AUDIO_1=$DEFAULT_CODEC_AUDIO
+	if [ $DEFAULT_CODEC_AUDIO == "DUMP" ]; then
+		CODEC_AUDIO_1=$AUDIO_1_SOURCE
+	else
+		CODEC_AUDIO_1=$DEFAULT_CODEC_AUDIO
+	fi
         ;;
 * )
         wazzuf_usage
@@ -79,7 +83,11 @@ if [[ ! $AUDIO_2_LANG == "" ]]; then
 		;;
 	* )
 		# use default CODEC_AUDIO
-		CODEC_AUDIO_2=$DEFAULT_CODEC_AUDIO
+		if [ $DEFAULT_CODEC_AUDIO == "DUMP" ]; then
+			CODEC_AUDIO_2=$AUDIO_2_SOURCE
+		else
+			CODEC_AUDIO_2=$DEFAULT_CODEC_AUDIO
+		fi
 	        ;;
 	esac
 else

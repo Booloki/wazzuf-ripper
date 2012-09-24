@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-09-24
+* Bugfix: DEFAULT_CODEC_AUDIO DUMP errors.
 * New global configuration file manpage.
 * Add WORKING_PATH_BASE override feature in user configuration file.
 * System configuration from user configuration file to global configuration file.

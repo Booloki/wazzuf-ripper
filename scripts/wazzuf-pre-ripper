@@ -3,8 +3,8 @@
 # DVD/BD pre-rip script helping to fill configuration file
 # booloki@lokizone.net
 
-PATH_FILE="/etc/wazzuf-ripper/wazzuf-path.conf"
-source $PATH_FILE
+GLOBAL_CONF_FILE="/etc/wazzuf-ripper/wazzuf-ripper-global.conf"
+source $GLOBAL_CONF_FILE
 
 # check wazzuf files
 source $FUNCTIONS_CHECK

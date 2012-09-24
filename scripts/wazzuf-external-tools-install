@@ -3,8 +3,8 @@
 # DVD/BD rip external tools download/install
 # booloki@lokizone.net
 
-PATH_FILE="/etc/wazzuf-ripper/wazzuf-path.conf"
-source $PATH_FILE
+GLOBAL_CONF_FILE="/etc/wazzuf-ripper/wazzuf-ripper-global.conf"
+source $GLOBAL_CONF_FILE
 
 source $FUNCTIONS_CHECK
 mkdir -p $EXTERNAL_TOOLS_PATH
