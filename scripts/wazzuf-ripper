@@ -217,7 +217,7 @@ do
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpv"
 
-		if [ ! -f $SOURCE_DIRECTORY/$EPISODES_FILE ]
+		if [ ! -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ]
 		then
 			echo -ne "\n *************************************\n"
 			echo " Warning ! $EPISODE_DENOMINATION text file does not exists in $SOURCE_DIRECTORY !" && sleep 2
@@ -228,9 +228,9 @@ do
 			EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER
 		else
 			if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
-				EPISODE_NAME_FULL=`head -n $i $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
+				EPISODE_NAME_FULL=`head -n $i "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
 			else
-				EPISODE_NAME_FULL=`head -n $DVD_TITLE_NUMBER $SOURCE_DIRECTORY/$EPISODES_FILE | tail -n 1`
+				EPISODE_NAME_FULL=`head -n $DVD_TITLE_NUMBER "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
 			fi
 			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2-10 | sed s/\ //`
 			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`
@@ -292,7 +292,7 @@ do
 		case $MULTICHAP_FORCE in
 			y* | Y* )
 				echo -ne "\n *************************************\n"
-				if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS $SOURCE_DIRECTORY/$ISO_FILE > $CHAPTERS_FILE; else echo " $CHAPTERS_FILE file exists. Next..."; fi
+				if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE; else echo " $CHAPTERS_FILE file exists. Next..."; fi
 				echo -ne " *************************************\n"
 				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
 				;;
@@ -307,7 +307,7 @@ do
 		if [ ! -f $VOB_FILE ]; then
 			echo -ne "\n *************************************\n"
 			echo " Extracting $VOB_FILE from $ISO_FILE..."
-			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device $SOURCE_DIRECTORY/$ISO_FILE -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
 			echo -ne " *************************************\n"
 		else
 	                echo -ne "\n *************************************\n"
@@ -317,13 +317,13 @@ do
 		SOURCE_FILE=$VOB_FILE
 	        ;;
 	BD )
-		if [ ! -f $SOURCE_DIRECTORY/$M2TS_FILE ]; then
+		if [ ! -f "$SOURCE_DIRECTORY/$M2TS_FILE" ]; then
 			# extract local working file from BD
 			BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
 			echo -ne "\n *************************************\n"
 			echo " Extracting $M2TS_FILE from BR..."
 			# No way to have separated files for now...
-			ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream "br:///${BD_MOUNT}" -dumpfile $SOURCE_DIRECTORY/$M2TS_FILE
+			ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream "br:///${BD_MOUNT}" -dumpfile "$SOURCE_DIRECTORY/$M2TS_FILE"
 			echo -ne " You can now use M2TS instead of BD in $CONF_FILE,\n"
 			echo -ne " and run wazzuf-pre-ripper to get more tracks informations.\n"
 			echo -ne " *************************************\n"
@@ -332,11 +332,11 @@ do
 			echo " $M2TS_FILE file exists. Next..."  && sleep 1
 			echo -ne " *************************************\n"
 		fi
-		SOURCE_FILE=$SOURCE_DIRECTORY/$M2TS_FILE
+		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		MERGE_CHAPTERS=""
 		;;
 	M2TS )
-		SOURCE_FILE=$SOURCE_DIRECTORY/$M2TS_FILE
+		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		MERGE_CHAPTERS=""
 		;;
 	esac
@@ -352,10 +352,10 @@ do
 		# subtitle track 1
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
-		SUBTITLE_FILE_FORCE_PATH=$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE
+		SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE"
 
 		# subtitle file (force external or not)
-		if [[ $SUBTITLE_1_FILE_FORCE == "" ]]; then
+		if [[ "$SUBTITLE_1_FILE_FORCE" == "" ]]; then
 			if echo $SUBTITLE_1_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_1_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 			SUBTITLE_SID=$SUBTITLE_1_SID
 			SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
@@ -363,8 +363,9 @@ do
 			subtitle_rip
 		else
 			# check srt files encoding
-			if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
-			SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
+			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+			cp -v "$SUBTITLE_FILE_FORCE_PATH" .
+			SUBTITLE_FILE=$SUBTITLE_1_FILE_FORCE
 		fi
 	
 		# Force no default subtitle (or not)
@@ -382,13 +383,16 @@ do
 			echo -ne "\n *************************************\n"
 			echo " No second subtitle track choice. Next..." && sleep 1
 	        	echo -ne " *************************************\n"
+			MERGE_SUBTITLES_FULL=$MERGE_SUBTITLES_1
 		else
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
 			SUBTITLE_NAME=$SUBTITLE_2_NAME
-			SUBTITLE_FILE_FORCE_PATH=$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE
+			SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE"
 		
+			echo -ne "\n *************************************\n"
+			echo " Subtitle 2 track..."
 			# subtitle file (force external or not)
-			if [[ $SUBTITLE_2_FILE_FORCE == "" ]]; then
+			if [[ "$SUBTITLE_2_FILE_FORCE" == "" ]]; then
 				if echo $SUBTITLE_2_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_2_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 				SUBTITLE_SID=$SUBTITLE_2_SID
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
@@ -397,8 +401,10 @@ do
 			else
 				# check srt files encoding
 				if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
-				SUBTITLE_FILE=$SUBTITLE_FILE_FORCE_PATH
+				cp -v "$SUBTITLE_FILE_FORCE_PATH" .
+				SUBTITLE_FILE=$SUBTITLE_2_FILE_FORCE
 			fi
+			echo -ne " *************************************\n"
 
 			# Force no default subtitle (or not)
 			case $SUBTITLE_NODEFAULT_FORCE in
@@ -409,9 +415,8 @@ do
 				MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
 				;;
 			esac
+			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
 		fi
-
-		MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
 	fi
 
 
@@ -495,13 +500,13 @@ do
 
 	## Cover art
 	# Matroska Cover Art Guidelines http://www.matroska.org/technical/cover_art/index.html
-	if [[ $SOURCE_DIRECTORY/$COVER == "" ]]; then
+	if [[ "$SOURCE_DIRECTORY/$COVER" == "" ]]; then
 		echo -ne "\n *************************************\n"
 		echo " No image attachment. Skipping..." && sleep 1
 	        echo -ne " *************************************\n"
 		MERGE_COVER=""
 	else
-		if [ ! -f $SOURCE_DIRECTORY/$COVER ]; then
+		if [ ! -f "$SOURCE_DIRECTORY/$COVER" ]; then
 			echo -ne "\n *************************************\n"
 			echo " Warning ! $COVER image file does not exists in $SOURCE_DIRECTORY ! Skipping..." && sleep 2
 	        	echo -ne " *************************************\n"
@@ -511,17 +516,17 @@ do
 			# MIME types detection
 			# "The pictures should only use the JPEG and PNG picture formats", Matroska Cover Art Guidelines
 			# List of officially recognized image MIME types at the IANA homepage http://www.iana.org/assignments/media-types/image/index.html
-			COVER_FORMAT_TEST=`file $SOURCE_DIRECTORY/$COVER | cut -d ' ' -f 2`
+			COVER_FORMAT_TEST=`file "$SOURCE_DIRECTORY/$COVER" | cut -d ':' -f 2 | cut -d ' ' -f 2`
 			if [[ $COVER_FORMAT_TEST == "JPEG" ]]; then
 				COVER_FORMAT=jpeg
-				COVER_HEIGHT=`convert $SOURCE_DIRECTORY/$COVER -print "%h" /dev/null`
-				COVER_WIDTH=`convert $SOURCE_DIRECTORY/$COVER -print "%w" /dev/null`
+				COVER_HEIGHT=`convert "$SOURCE_DIRECTORY/$COVER" -print "%h" /dev/null`
+				COVER_WIDTH=`convert "$SOURCE_DIRECTORY/$COVER" -print "%w" /dev/null`
 				cover_art_convert
 			else
 				if [[ $COVER_FORMAT_TEST == "PNG" ]]; then
 					COVER_FORMAT=png
-					COVER_HEIGHT=`file $SOURCE_DIRECTORY/$COVER | cut -d "," -f 2 | cut -d " " -f 4`
-					COVER_WIDTH=`file $SOURCE_DIRECTORY/$COVER | cut -d "," -f 2 | cut -d " " -f 2`
+					COVER_HEIGHT=`file "$SOURCE_DIRECTORY/$COVER" | cut -d "," -f 2 | cut -d " " -f 4`
+					COVER_WIDTH=`file "$SOURCE_DIRECTORY/$COVER" | cut -d "," -f 2 | cut -d " " -f 2`
 					cover_art_convert
 				else
 					echo -ne "\n *************************************\n"

@@ -13,18 +13,18 @@ checkandsource_wazzuf_files
 check_mplayer
 check_avconv
 
-ISO_FILE_PATH=$SOURCE_DIRECTORY/$ISO_FILE
-M2TS_FILE_PATH=$SOURCE_DIRECTORY/$M2TS_FILE
+ISO_FILE_PATH="$SOURCE_DIRECTORY/$ISO_FILE"
+M2TS_FILE_PATH="$SOURCE_DIRECTORY/$M2TS_FILE"
 
 # enter source directory
-if  [[ $SOURCE_DIRECTORY == "" ]]; then
+if  [[ "$SOURCE_DIRECTORY" == "" ]]; then
 	echo -ne "\n *************************************\n"
 	echo " Please provide SOURCE_DIRECTORY in $CONF_FILE ! Exiting..."
 	echo -ne " *************************************\n"
 	exit 1
 fi
-mkdir -p $SOURCE_DIRECTORY
-cd $SOURCE_DIRECTORY
+mkdir -p "$SOURCE_DIRECTORY"
+cd "$SOURCE_DIRECTORY"
 
 # pre-rip source choice
 case $SOURCE in
@@ -34,7 +34,7 @@ BD )
 
 	echo -ne " *************************************\n"
 	echo ${BD_MOUNT}
-	cropdetect "br:///${BD_MOUNT}"
+	cropdetect
 	echo -ne " *************************************\n"
 
 	echo -ne " *************************************\n"
@@ -57,7 +57,7 @@ M2TS )
 
 	echo -ne " *************************************\n"
 	echo M2TS_FILE_PATH=\"$M2TS_FILE_PATH\"
-	cropdetect $M2TS_FILE_PATH
+	cropdetect
 
 	echo -ne "*************************************\n"
 	echo "All tracks:"
@@ -92,20 +92,20 @@ DVD )
 	grep "^Disc Title" DVD-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
 	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
-	if  [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
+	if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
 		for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 		do
 			echo "######### Title: $DVD_TITLE_NUMBER #########"
 			lsdvd -t $DVD_TITLE_NUMBER -acsv $DVD_PATH 2>/dev/null | grep -E "Subtitle|Audio|VTS" > DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 			echo `grep "Title: " DVD-lsdvd-T$DVD_TITLE_NUMBER.info | cut -d "," -f 2`
-			cropdetect "dvd://$DVD_TITLE_NUMBER"
+			cropdetect
 			grep VTS DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 			lsdvd-decode DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 		done
 	else
 		echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
 		echo `grep "Title: $DVD_TITLE_NUMBER" DVD-lsdvd.info | cut -d "," -f 2`
-		cropdetect "dvd://$DVD_TITLE_NUMBER"
+		cropdetect
 
 		echo -ne "*************************************\n"
 		echo "Title $DVD_TITLE_NUMBER Tracks:"
@@ -125,7 +125,7 @@ DVD )
 	case $answer in
 	y* | Y* )
 		# only if ISO_FILE exists
-		if [[ $ISO_FILE == "" ]]; then
+		if [[ "$ISO_FILE" == "" ]]; then
 			echo -ne " Please provide a filename in ISO_FILE first !\n"
 			echo -ne " Skip DVD copy.\n"
 		else
@@ -164,7 +164,7 @@ ISO )
 	echo "-> see ISO-DVDstruct.info"
 
 	echo -ne "*************************************\n"
-	echo "Tested iso:\"$ISO_FILE_PATH\""
+	echo "Tested iso: $ISO_FILE_PATH"
 	grep "^Disc Title" ISO-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" ISO-lsdvd.info | sed s/'Longest track: '//`
 	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
@@ -174,14 +174,14 @@ ISO )
 			echo "######### Title: $DVD_TITLE_NUMBER #########"
 			lsdvd -t $DVD_TITLE_NUMBER -acsv "$ISO_FILE_PATH" 2>/dev/null | grep -E "Subtitle|Audio|VTS" > ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 			echo `grep "Title: " ISO-lsdvd-T$DVD_TITLE_NUMBER.info | cut -d "," -f 2`
-			cropdetect "-dvd-device $ISO_FILE_PATH dvd://$DVD_TITLE_NUMBER"
+			cropdetect
 			grep VTS ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 			lsdvd-decode ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 		done
 	else
 		echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
 		echo `grep "Title: $DVD_TITLE_NUMBER" ISO-lsdvd.info | cut -d "," -f 2`
-		cropdetect "-dvd-device $ISO_FILE_PATH dvd://$DVD_TITLE_NUMBER"
+		cropdetect
 
 		echo -ne "*************************************\n"
 		echo "Title $DVD_TITLE_NUMBER Tracks:"

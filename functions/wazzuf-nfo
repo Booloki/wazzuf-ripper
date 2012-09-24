@@ -6,13 +6,13 @@ generate_nfo () {
 	echo "" >> $MERGE_OUTPUT.nfo
 	case $VIDEO_TYPE in
 	MOVIE )
-		echo "Title        : $TITLE_NAME"  >> $MERGE_OUTPUT.nfo
+		echo "Title          : $TITLE_NAME"  >> $MERGE_OUTPUT.nfo
 		if  [[ $IMDB_DIRECTOR == "" || $IMDB_DIRECTOR == "N/A" ]]; then
-			echo "Director     : $DIRECTOR_NAME"  >> $MERGE_OUTPUT.nfo
+			echo "Director       : $DIRECTOR_NAME"  >> $MERGE_OUTPUT.nfo
 		else
-			echo "Director     : $IMDB_DIRECTOR"  >> $MERGE_OUTPUT.nfo
+			echo "Director       : $IMDB_DIRECTOR"  >> $MERGE_OUTPUT.nfo
 		fi
-		echo "Release Date : $DATE"  >> $MERGE_OUTPUT.nfo
+		echo "Release Date   : $DATE"  >> $MERGE_OUTPUT.nfo
 	        ;;
 	SHOW )
 		echo "Show           : $TITLE_NAME"  >> $MERGE_OUTPUT.nfo

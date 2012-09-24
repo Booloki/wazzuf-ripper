@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-24
+* Bugfix: SOURCE_DIRECTORY with space(s) errors
+
 2012-09-23
 * Experimental Opus audio codec support
 

@@ -37,7 +37,7 @@ get_imdb_id_title_date () {
 # need IMDB_ID
 #      SOURCE_DIRECTORY
 download_imdb_poster () {
-	if [ -f $SOURCE_DIRECTORY/cover.jpg ]; then
+	if [ -f "$SOURCE_DIRECTORY/cover.jpg" ]; then
 		echo " cover.jpg exists. Skipping Download..." && sleep 1
 	else
 		echo " Download $IMDB_ID IMDb cover ? (Y/n)"

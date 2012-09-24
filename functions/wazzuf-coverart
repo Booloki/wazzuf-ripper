@@ -16,7 +16,7 @@ cover_art_convert () {
 			echo -ne "\n *************************************\n"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Resizing portrait cover art..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 600x800\> cover.jpg
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 600x800\> cover.jpg
 			else
 				echo " $COVER_OUTPUT portrait cover art exists. Next..."  && sleep 1	
 			fi
@@ -26,7 +26,7 @@ cover_art_convert () {
 			COVER_OUTPUT="small_cover.jpg"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Portrait cover art thumbnail generation..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 120x160\> $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 120x160\> $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art thumbnail exists. Next..."  && sleep 1	
 			fi
@@ -36,7 +36,7 @@ cover_art_convert () {
 			echo -ne "\n *************************************\n"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Copying portrait cover art..."
-				cp -v $SOURCE_DIRECTORY/$COVER $COVER_OUTPUT
+				cp -v "$SOURCE_DIRECTORY/$COVER" $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art exists. Next..."  && sleep 1	
 			fi
@@ -46,7 +46,7 @@ cover_art_convert () {
 			COVER_OUTPUT="small_cover.jpg"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Portrait cover art thumbnail generation..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 120x160\> $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 120x160\> $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art thumbnail exists. Next..."  && sleep 1	
 			fi
@@ -60,7 +60,7 @@ cover_art_convert () {
 			echo -ne "\n *************************************\n"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Resizing square cover art..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 600x600\>  $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 600x600\>  $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art exists. Next..."  && sleep 1	
 			fi
@@ -70,7 +70,7 @@ cover_art_convert () {
 			COVER_OUTPUT="small_cover.jpg"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Square cover art thumbnail generation..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 120x120\> $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 120x120\> $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art thumbnail exists. Next..."  && sleep 1	
 			fi
@@ -81,7 +81,7 @@ cover_art_convert () {
 			echo -ne "\n *************************************\n"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Copying square cover art..."
-				cp -v $SOURCE_DIRECTORY/$COVER $COVER_OUTPUT
+				cp -v "$SOURCE_DIRECTORY/$COVER" $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art exists. Next..."  && sleep 1	
 			fi
@@ -91,7 +91,7 @@ cover_art_convert () {
 			COVER_OUTPUT="small_cover.jpg"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Square cover art thumbnail generation..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 120x120\> $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 120x120\> $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art thumbnail exists. Next..."  && sleep 1	
 			fi
@@ -105,7 +105,7 @@ cover_art_convert () {
 			echo -ne "\n *************************************\n"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Resizing landscape cover art..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 960x600\>  $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 960x600\>  $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art exists. Next..."  && sleep 1	
 			fi
@@ -115,7 +115,7 @@ cover_art_convert () {
 			COVER_OUTPUT="small_cover_land.jpg"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Landscape cover art thumbnail generation..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 192x120\> $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 192x120\> $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art thumbnail exists. Next..."  && sleep 1	
 			fi
@@ -126,7 +126,7 @@ cover_art_convert () {
 			echo -ne "\n *************************************\n"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Copying square cover art..."
-				cp -v $SOURCE_DIRECTORY/$COVER $COVER_OUTPUT
+				cp -v "$SOURCE_DIRECTORY/$COVER" $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art exists. Next..."  && sleep 1	
 			fi
@@ -136,7 +136,7 @@ cover_art_convert () {
 			COVER_OUTPUT="small_cover_land.jpg"
 			if [ ! -f $COVER_OUTPUT ]; then
 				echo " Square cover art thumbnail generation..."
-				convert $SOURCE_DIRECTORY/$COVER -resize 192x120\> $COVER_OUTPUT
+				convert "$SOURCE_DIRECTORY/$COVER" -resize 192x120\> $COVER_OUTPUT
 			else
 				echo " $COVER_OUTPUT portrait cover art thumbnail exists. Next..."  && sleep 1	
 			fi

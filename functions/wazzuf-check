@@ -37,7 +37,7 @@ check_device () {
 		WORKING_FILES=".m2ts"
 		;;
 	M2TS )
-		DEVICE_TEST="-f $M2TS_FILE_PATH"
+		DEVICE_TEST="-f '$M2TS_FILE_PATH'"
 		DEVICE_NAME="$M2TS_FILE_PATH"
 		WORKING_FILES="?"
 		;;
@@ -47,8 +47,8 @@ check_device () {
 		WORKING_FILES=".vob"
 		;;
 	ISO )
-		DEVICE_TEST="-f $SOURCE_DIRECTORY/$ISO_FILE"
-		DEVICE_NAME="$SOURCE_DIRECTORY/$ISO_FILE iso file"
+		DEVICE_TEST="-f '$SOURCE_DIRECTORY/$ISO_FILE'"
+		DEVICE_NAME="'$SOURCE_DIRECTORY/$ISO_FILE' iso file"
 		WORKING_FILES=".vob"
 		;;
 	* )
@@ -248,6 +248,6 @@ check_mkvmerge () {
 }
 
 wazzuf_usage () {
-	echo -ne "\n Usage : $0 [Video Codec (h264,xvid,DUMP)] [Audio 1 Codec (AC3,vorbis,mp3,DUMP)] [Audio 2 Codec (AC3,vorbis,mp3,DUMP)]\n"
+	echo -ne "\n Usage : $0 [ Video Codec ] [ Audio 1 Codec ] [ Audio 2 Codec ]\n"
 	exit 1
 }

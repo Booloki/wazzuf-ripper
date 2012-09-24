@@ -3,10 +3,28 @@
 # Run cropdetect to establish the correct crop rectangle
 CROP_FRAMES=100
 cropdetect(){
-	mplayer "${1}" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
-	wait
+
+	echo -ne "...\n"
+	case $SOURCE in
+	BD )
+		mplayer br:///"$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
+		wait
+		;;
+	M2TS )
+		mplayer "$M2TS_FILE_PATH" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
+		wait
+		;;
+	DVD )
+		mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
+		wait
+		;;
+	ISO )
+		mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
+		wait
+		;;
+	esac
 	crop=$(cat /tmp/cropdetect.out | tr '\r' '\n' | grep 'vf crop\=' | tail -1 | awk -F\= '{print $2}' | awk -F\) '{print $1}')
-	echo -ne "\nVIDEO_CROP=\"${crop}\"\n"
+	echo -ne "VIDEO_CROP=\"${crop}\"\n"
 	rm /tmp/cropdetect.out
 }
 
@@ -14,9 +32,9 @@ cropdetect(){
 avconv-decode(){
 	while read line
 	do
-		ID_HEX=`echo ${line} | grep '^Stream' | cut -d '[' -f 2 | cut -d ']' -f 1`
+		ID_HEX=`echo "${line}" | grep '^Stream' | cut -d '[' -f 2 | cut -d ']' -f 1`
 		if [[ ! $ID_HEX == "" ]]; then
-			echo "ID $(($ID_HEX)) - `echo ${line} | grep ^Stream | cut -d ' ' -f 3-`"
+			echo "ID $(($ID_HEX)) - `echo "${line}" | grep ^Stream | cut -d ' ' -f 3-`"
 		fi
 	done  < ${1}
 }
@@ -36,7 +54,7 @@ lsdvd-decode(){
 copy-dvd2iso (){
 		check_vobcopy
 		check_mkisofs
-		vobcopy -m -i "$DVD_MOUNT_PATH" -o $SOURCE_DIRECTORY
-		cd $SOURCE_DIRECTORY
-		mkisofs -allow-limited-size -dvd-video -o $ISO_FILE $DVD_MOUNT_NAME && rm -rf $DVD_MOUNT_NAME
+		vobcopy -m -i "$DVD_MOUNT_PATH" -o "$SOURCE_DIRECTORY"
+		cd "$SOURCE_DIRECTORY"
+		mkisofs -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_NAME" && rm -rf "$DVD_MOUNT_NAME"
 }
