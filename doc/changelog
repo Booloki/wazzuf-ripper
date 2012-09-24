@@ -4,20 +4,21 @@
 # Changelog file
 
 2012-09-24
-* Bugfix: SOURCE_DIRECTORY with space(s) errors
+* More user configuration file explanations.
+* Bugfix: SOURCE_DIRECTORY with space(s) errors.
 
 2012-09-23
-* Experimental Opus audio codec support
+* Experimental Opus audio codec support.
 
 2012-09-21
-* IMdb-cli requests improvements
+* IMdb-cli requests improvements.
 
 2012-09-20
-* IMdb search + cover download improvements
+* IMdb search + cover download improvements.
 * Remove imdb-cli downloader/installer (now packaged).
 * Configuration change: BD SOURCE is now for physical BD and M2TS for .m2ts file.
-* Configuration file cleaning
-* Bugfix: DVD name with spaces error
+* Configuration file cleaning.
+* Bugfix: DVD name with spaces error.
 
 2012-09-18
 * Some little display improvements and checks

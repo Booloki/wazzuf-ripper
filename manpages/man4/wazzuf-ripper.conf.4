@@ -1,4 +1,4 @@
-.TH WAZZUF-RIPPER.CONF 4 "September 20, 2012"
+.TH WAZZUF-RIPPER.CONF 4 "September 24, 2012"
 .SH NAME
 wazzuf-ripper.conf \- Wazzuf Ripper configuration file
 .SH DESCRIPTION
@@ -34,7 +34,7 @@ Example: "image.iso"
 .B VIDEO_TYPE
 Video Type: MOVIE, SHOW or MUSIC. Affects tags management.
 .br
-SHOW is for DVD/ISO SOURCE only: allow multiple Matroska output files.
+SHOW is for DVD/ISO SOURCE only: allows multiple Matroska output files and input EPISODES_FILE.
 .TP
 .B TITLE_NAME
 The video main title. Used for IMdb ID search by imdb-cli.
@@ -134,6 +134,8 @@ The last chapter number to rip (integer). Mandatory if DVD_EPISODES_ORG is CHAPT
 .TP
 .B DVD_TITLE_LIST
 The DVD Titles numbers list with space separation. Mandatory if DVD_EPISODES_ORG is TITLES.
+.br
+Tips: use vlc navigation. Or test with 'mplayer dvd://DVD_TITLE_NUMBER -chapter $CHAPTER', or 'mplayer -dvd-device dvd.iso dvd://DVD_TITLE_NUMBER -chapter $CHAPTER'
 .br
 Example: "2 3 5 6"
 .PP
