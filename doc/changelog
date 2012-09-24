@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-09-24
+* DVD to iso file improvements: from mkisofs to genisoimage.
 * More user configuration file explanations.
 * Bugfix: SOURCE_DIRECTORY with space(s) errors.
 

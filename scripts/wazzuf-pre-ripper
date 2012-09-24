@@ -120,7 +120,8 @@ DVD )
 	DVD_MOUNT_PATH=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
 	DVD_MOUNT_NAME=`echo $DVD_MOUNT_PATH | cut -d '/' -f 3`
 	echo -ne "*************************************\n"
-	echo -ne " Wanna copy $DVD_MOUNT_PATH to $SOURCE_DIRECTORY/$ISO_FILE file ? (N/y)\n"
+	echo -ne " Do you want to make a local iso file of your DVD ? (N/y)\n"
+	echo -ne " ( $DVD_MOUNT_PATH to $SOURCE_DIRECTORY/$ISO_FILE )\n"
 	read answer
 	case $answer in
 	y* | Y* )

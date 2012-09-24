@@ -52,9 +52,6 @@ lsdvd-decode(){
 
 ## copy DVD to iso file
 copy-dvd2iso (){
-		check_vobcopy
-		check_mkisofs
-		vobcopy -m -i "$DVD_MOUNT_PATH" -o "$SOURCE_DIRECTORY"
-		cd "$SOURCE_DIRECTORY"
-		mkisofs -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_NAME" && rm -rf "$DVD_MOUNT_NAME"
+		check_genisoimage
+		genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH"
 }
