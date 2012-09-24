@@ -4,6 +4,8 @@
 # Changelog file
 
 2012-09-24
+* Makefile global configuration file change.
+* Add empty AUDIO_X_AID and AUDIO_X_SOURCE checks.
 * Add x264 trellis and bframes encoding options.
 * Bugfix: DEFAULT_CODEC_AUDIO DUMP errors.
 * New global configuration file manpage.

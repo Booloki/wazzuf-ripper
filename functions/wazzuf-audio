@@ -37,13 +37,26 @@ audio_rip () {
 	PCM )
 		AUDIO_SOURCE_FILE=$WAV_FILE
 		;;
+	"" )
+		echo -ne "\n *************************************\n"
+		echo " Please provide an AUDIO_X_SOURCE format in configuration file ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
 	* )
 		echo -ne "\n *************************************\n"
-		echo " $AUDIO_SOURCE : audio source format not recognized ! Exiting..."
+		echo " $AUDIO_SOURCE : AUDIO_X_SOURCE format not recognized ! Exiting..."
 		echo -ne " *************************************\n"
 		exit 1
 		;;
 	esac
+
+	if [[ $AUDIO_AID == "" ]]; then
+		echo -ne "\n *************************************\n"
+		echo " Please provide an AUDIO_X_AID in configuration file ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+	fi
 
 	# extract audio from local working file
 	case $CODEC_AUDIO in

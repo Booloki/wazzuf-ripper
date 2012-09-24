@@ -28,7 +28,7 @@ install: installdirs
 		$(INSTALL) scripts/* $(DESTDIR)$(bindir)/
 		$(INSTALL) functions/* $(DESTDIR)$(libdir)/
 		$(INSTALL) tag-templates/* $(DESTDIR)$(templatesdir)/
-		$(INSTALL) conf/wazzuf-path.conf $(DESTDIR)$(sysconfdir)/
+		$(INSTALL) conf/wazzuf-ripper-global.conf $(DESTDIR)$(sysconfdir)/
 		$(INSTALL) conf/wazzuf-ripper.conf $(DESTDIR)$(datadir)/
 		$(INSTALL) doc/* $(DESTDIR)$(docdir)/
 		$(INSTALL) manpages/man1/* $(DESTDIR)$(manpagesdir1)/
