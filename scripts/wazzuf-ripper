@@ -132,26 +132,21 @@ echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC
 echo -ne " *************************************\n"
 
 # Check if source is OK (DVD/ISO only)
-# Output VIDEO_BITRATE choice
 case $SOURCE in
 BD )
 	check_device BD RIP
-	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
 	;;
 M2TS )
 	check_device M2TS RIP
-	VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
         ;;
 DVD )
 	# TOCOMMENT if DVD NAME contains spaces...
 	check_device DVD RIP
 	check_ogmtools
-	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
         ;;
 ISO )	
 	check_device ISO RIP
 	check_ogmtools
-	VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
 	;;
 * )
         echo -ne "\n Media source issue: make sure you filled DVD ISO, BD or M2TS in configuration file.\n"
@@ -295,6 +290,11 @@ do
         	        echo -ne " *************************************\n"
 		fi
 		SOURCE_FILE=$VOB_FILE
+		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ]; then
+			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
+		else
+			VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+		fi
 	        ;;
 	ISO )
 		case $MULTICHAP_FORCE in
@@ -323,6 +323,11 @@ do
         	        echo -ne " *************************************\n"
 		fi
 		SOURCE_FILE=$VOB_FILE
+		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ]; then
+			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
+		else
+			VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
+		fi
 	        ;;
 	BD )
 		if [ ! -f "$SOURCE_DIRECTORY/$M2TS_FILE" ]; then
@@ -342,10 +347,20 @@ do
 		fi
 		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		MERGE_CHAPTERS=""
+		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ]; then
+			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
+		else
+			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
+		fi
 		;;
 	M2TS )
 		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		MERGE_CHAPTERS=""
+		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ]; then
+			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
+		else
+			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
+		fi
 		;;
 	esac
 
@@ -362,6 +377,8 @@ do
 		SUBTITLE_NAME=$SUBTITLE_1_NAME
 		SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE"
 
+		echo -ne "\n *************************************\n"
+		echo " Subtitle 1 track...."
 		# subtitle file (force external or not)
 		if [[ "$SUBTITLE_1_FILE_FORCE" == "" ]]; then
 			if echo $SUBTITLE_1_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_1_SID provided is not an integer ! Exiting....\n"; exit 1; fi
@@ -375,6 +392,7 @@ do
 			cp -v "$SUBTITLE_FILE_FORCE_PATH" .
 			SUBTITLE_FILE=$SUBTITLE_1_FILE_FORCE
 		fi
+		echo -ne " *************************************\n"
 	
 		# Force no default subtitle (or not)
 		case $SUBTITLE_NODEFAULT_FORCE in
