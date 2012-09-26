@@ -184,15 +184,6 @@ check_tcdemux () {
 	fi
 }
 
-check_ffmpeg () {
-	if [ ! -x "/usr/bin/ffmpeg" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install ffmpeg ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
-	fi
-}
-
 check_oggenc () {
 	if [ ! -x "/usr/bin/oggenc" ]; then
 		echo -ne "\n *************************************\n"

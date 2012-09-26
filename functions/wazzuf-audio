@@ -130,11 +130,11 @@ audio_rip () {
 			echo " $AUDIO_FILE exists, next..." && sleep 1
 			echo -ne " *************************************\n"
 		else
-			check_ffmpeg
-			# DTS to AC3
+			check_avconv
+			# DTS to AC3 (5.1)
 			echo -ne "\n *************************************\n"
 			echo " Convert $AUDIO_SOURCE_FILE to $AUDIO_FILE..."
-			nice -n $NICENESS ffmpeg -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
+			nice -n $NICENESS avconv -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
 		fi
 		;;
 	VORBIS )

@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-09-26
+* Replace ffpmeg by avconv for DTS to AC3 transcoding.
+
 2012-09-25
 * VIDEO_BITRATE can now be set to "orig" to re-use the source bitrate (mpeg2 source only).
 
