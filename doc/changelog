@@ -4,6 +4,8 @@
 # Changelog file
 
 2012-09-27
+* Improve Xvid encoding options: VIDEO_XVID_VHQ_PASSx and more.
+* Add video width scaling feature: VIDEO_SCALE (720p for example).
 * External subtitles could now be .idx/.sub files.
 
 2012-09-26

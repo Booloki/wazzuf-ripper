@@ -509,7 +509,18 @@ do
 	## video encode
 	trap "echo -e '\nManual killed script (Ctrl-C) during Video encoding' && exit 1" 2
 
+	# video scaling
+	if [[ "$VIDEO_SCALE" == "" ]]; then
+		MENCODER_SCALE=""
+	else
+		# check provided variable is a number
+		if echo "$VIDEO_SCALE" | egrep -vq '^[0-9]+$'; then echo -ne "VIDEO_SCALE provided is not an integer ! Exiting....\n"; exit 1; fi
+		MENCODER_SCALE=",scale=-2:$VIDEO_SCALE"
+	fi
+
+	# check video cropping
 	if [[ $VIDEO_CROP == "" ]]; then echo " Warning: VIDEO_CROP is empty ! Run wazzuf-pre-ripper for crop detection." && sleep 2; fi
+
 	video_rip
 
 	if [[ $VIDEO_RATIO_FORCE == "" ]]; then
