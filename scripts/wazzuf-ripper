@@ -365,7 +365,7 @@ do
 	esac
 
 
-	## subtitle(s) check/extract
+	## subtitle(s) check/extract/copy
 	trap "echo -e '\nManual killed script (Ctrl-C) during checking/extracting subtitles' && exit 1" 2
 	if [[ $SUBTITLE_1_LANG == "" ]]; then
 		echo -ne "\n *************************************\n"
@@ -374,7 +374,7 @@ do
 	else
 		# subtitle track 1
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
-		SUBTITLE_NAME=$SUBTITLE_1_NAME
+		SUBTITLE_NAME="$SUBTITLE_1_NAME"
 		SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE"
 
 		echo -ne "\n *************************************\n"
@@ -384,13 +384,16 @@ do
 			if echo $SUBTITLE_1_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_1_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 			SUBTITLE_SID=$SUBTITLE_1_SID
 			SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
-			SUBTITLE_FILE=$SUB_FILE.idx
+			SUBTITLE_FILE="$SUB_FILE.idx"
 			subtitle_rip
 		else
-			# check srt files encoding
+			# If srt file, check encoding
 			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+			# Copy subtitle file
 			cp -v "$SUBTITLE_FILE_FORCE_PATH" .
-			SUBTITLE_FILE=$SUBTITLE_1_FILE_FORCE
+			# If .idx file, copy .sub file too.
+			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then cp -v `echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/` . ; fi
+			SUBTITLE_FILE="$SUBTITLE_1_FILE_FORCE"
 		fi
 		echo -ne " *************************************\n"
 	
@@ -409,10 +412,10 @@ do
 			echo -ne "\n *************************************\n"
 			echo " No second subtitle track choice. Next..." && sleep 1
 	        	echo -ne " *************************************\n"
-			MERGE_SUBTITLES_FULL=$MERGE_SUBTITLES_1
+			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1"
 		else
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
-			SUBTITLE_NAME=$SUBTITLE_2_NAME
+			SUBTITLE_NAME="$SUBTITLE_2_NAME"
 			SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE"
 		
 			echo -ne "\n *************************************\n"
@@ -422,13 +425,16 @@ do
 				if echo $SUBTITLE_2_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_2_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 				SUBTITLE_SID=$SUBTITLE_2_SID
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
-				SUBTITLE_FILE=$SUB_FILE.idx
+				SUBTITLE_FILE="$SUB_FILE.idx"
 				subtitle_rip
 			else
-				# check srt files encoding
-				if  [[ `echo $SUBTITLE_1_FILE_FORCE | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+				# If srt file, check encoding
+				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+				# Copy subtitle file
 				cp -v "$SUBTITLE_FILE_FORCE_PATH" .
-				SUBTITLE_FILE=$SUBTITLE_2_FILE_FORCE
+				# If .idx file, copy .sub file too.
+				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then cp -v `echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/` . ; fi
+				SUBTITLE_FILE="$SUBTITLE_2_FILE_FORCE"
 			fi
 			echo -ne " *************************************\n"
 
