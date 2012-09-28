@@ -24,6 +24,9 @@ xvi* | Xvi* | XVI* )
 dump | DUMP )
         CODEC_VIDEO="DUMP"
         ;;
+dump_crop | DUMP_CROP )
+        CODEC_VIDEO="DUMP_CROP"
+        ;;
 "" )
 	# use default CODEC_VIDEO
 	CODEC_VIDEO=$DEFAULT_CODEC_VIDEO
@@ -203,6 +206,7 @@ do
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
+		DUMP_CROP_FILE="$BASE_WORKING_FILE.mpeg2"
 		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$BASE_WORKING_FILE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
@@ -219,6 +223,7 @@ do
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
+		DUMP_CROP_FILE="$BASE_WORKING_FILE.mpeg2"
 
 		if [ ! -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ]
 		then
@@ -289,8 +294,10 @@ do
 	                echo " $VOB_FILE file exists. Next..."  && sleep 1
         	        echo -ne " *************************************\n"
 		fi
+
 		SOURCE_FILE=$VOB_FILE
-		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ]; then
+
+		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
 			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
 		else
 			VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
@@ -322,8 +329,10 @@ do
 	                echo " $VOB_FILE file exists. Next..."  && sleep 1
         	        echo -ne " *************************************\n"
 		fi
+
 		SOURCE_FILE=$VOB_FILE
-		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ]; then
+
+		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
 			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
 		else
 			VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
@@ -345,9 +354,11 @@ do
 			echo " $M2TS_FILE file exists. Next..."  && sleep 1
 			echo -ne " *************************************\n"
 		fi
+
 		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		MERGE_CHAPTERS=""
-		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ]; then
+
+		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
 			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
 		else
 			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
@@ -356,7 +367,8 @@ do
 	M2TS )
 		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		MERGE_CHAPTERS=""
-		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ]; then
+
+		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
 			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
 		else
 			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE

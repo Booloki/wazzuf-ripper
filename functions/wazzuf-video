@@ -77,6 +77,7 @@ video_rip () {
 			echo " $VIDEO_FILE file exists. Next..." && sleep 1
 			echo -ne " *************************************\n"
 		 else
+			# raw dump using vlc
 			check_cvlc
 			echo -ne "\n *************************************\n"
 			echo " Dumping $VIDEO_FILE from $SOURCE_FILE ..."
@@ -85,6 +86,37 @@ video_rip () {
 				vlc://quit \
 				--no-repeat --no-sub-autodetect-file --no-sout-audio
 			echo -ne " *************************************\n"
+		fi
+		;;
+	DUMP_CROP )
+		# mpeg 'dump' with crop using vlc
+		check_cvlc
+		VIDEO_FILE=${DUMP_CROP_FILE}
+		if [ -f ${VIDEO_FILE} ]
+		then
+			echo -ne "\n *************************************\n"
+			echo " ${VIDEO_FILE} file exists. Next..." && sleep 1
+			echo -ne " *************************************\n"
+		else
+			echo -ne "\n ********************************************************\n"
+			echo " Creating ${VIDEO_FILE} as MPEG2 ${VIDEO_BITRATE} kbs/s..." && sleep 1
+			echo -ne " **********************************************************\n"
+			# cvlc works if VIDEO_CROP is empty
+			SIZE_ORIGIN=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: mpeg' | cut -d ',' -f 3 | cut -d ' ' -f 2`
+			WIDTH_ORIG=`echo $SIZE_ORIGIN | cut -d 'x' -f1`
+			HEIGHT_ORIG=`echo $SIZE_ORIGIN | cut -d 'x' -f2`
+			VIDEO_CROP_W=`echo $VIDEO_CROP | cut -d ':' -f 1`
+			VIDEO_CROP_H=`echo $VIDEO_CROP | cut -d ':' -f 2`
+			VIDEO_CROP_X=`echo $VIDEO_CROP | cut -d ':' -f 3`
+			VIDEO_CROP_Y=`echo $VIDEO_CROP | cut -d ':' -f 4`
+			VLC_CROP_TOP=$VIDEO_CROP_Y
+			VLC_CROP_BOTTOM=$(expr $HEIGHT_ORIG - $VIDEO_CROP_Y - $VIDEO_CROP_H)
+			VLC_CROP_LEFT=$VIDEO_CROP_X
+			VLC_CROP_RIGHT=$(expr $WIDTH_ORIG - $VIDEO_CROP_X - $VIDEO_CROP_W)
+			nice -n ${NICENESS} cvlc -I dummy \
+				${SOURCE_FILE} --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=$VLC_CROP_TOP,cropbottom=$VLC_CROP_BOTTOM,cropleft=$VLC_CROP_LEFT,cropright=$VLC_CROP_RIGHT}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
+				vlc://quit \
+				--no-repeat --no-sub-autodetect-file --no-sout-audio
 		fi
 		;;
 	esac

@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-09-28
+* Add DUMP_CROP mode for video dumping with cropping.
 * Replace tcdemux by cvlc for video dumping.
 
 2012-09-27
