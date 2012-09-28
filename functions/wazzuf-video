@@ -70,18 +70,21 @@ video_rip () {
 		;;
 	DUMP )
 		# only dump video without transcoding
-		check_tcdemux
-		# manpage http://www.transcoding.org/transcode?Tcdemux
 		VIDEO_FILE=$DUMP_FILE
-        if [ -f $VIDEO_FILE ]
-        then
+		if [ -f $VIDEO_FILE ]
+		then
 			echo -ne "\n *************************************\n"
 			echo " $VIDEO_FILE file exists. Next..." && sleep 1
 			echo -ne " *************************************\n"
-        else
-			check_tcdemux
+		 else
+			check_cvlc
+			echo -ne "\n *************************************\n"
 			echo " Dumping $VIDEO_FILE from $SOURCE_FILE ..."
-			ionice -c $IONICENESS nice -n $NICENESS tcdemux -i $SOURCE_FILE -x mpeg2 > $VIDEO_FILE
+			ionice -c $IONICENESS nice -n $NICENESS cvlc -I dummy \
+				$SOURCE_FILE --sout "#standard{access=file,mux=raw,dst=$VIDEO_FILE}" \
+				vlc://quit \
+				--no-repeat --no-sub-autodetect-file --no-sout-audio
+			echo -ne " *************************************\n"
 		fi
 		;;
 	esac

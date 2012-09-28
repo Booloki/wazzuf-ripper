@@ -175,10 +175,10 @@ check_mencoder () {
 	fi
 }
 
-check_tcdemux () {
-	if [ ! -x "/usr/bin/tcdemux" ]; then
+check_cvlc () {
+	if [ ! -x "/usr/bin/cvlc" ]; then
 		echo -ne "\n *************************************\n"
-		echo -ne " Please install tcdemux (transcode) ! Exiting... \n"
+		echo -ne " Please install cvlc (vlc) ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi

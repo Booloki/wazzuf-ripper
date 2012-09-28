@@ -188,7 +188,7 @@ do
 		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
-		DUMP_FILE="$BASE_WORKING_FILE.mpv"
+		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
 		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$BASE_WORKING_FILE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
@@ -202,7 +202,7 @@ do
 		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
-		DUMP_FILE="$BASE_WORKING_FILE.mpv"
+		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
 		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$BASE_WORKING_FILE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
@@ -218,7 +218,7 @@ do
 		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
-		DUMP_FILE="$BASE_WORKING_FILE.mpv"
+		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
 
 		if [ ! -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ]
 		then
@@ -395,7 +395,6 @@ do
 			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then cp -v `echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/` . ; fi
 			SUBTITLE_FILE="$SUBTITLE_1_FILE_FORCE"
 		fi
-		echo -ne " *************************************\n"
 	
 		# Force no default subtitle (or not)
 		case $SUBTITLE_NODEFAULT_FORCE in
@@ -436,7 +435,6 @@ do
 				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then cp -v `echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/` . ; fi
 				SUBTITLE_FILE="$SUBTITLE_2_FILE_FORCE"
 			fi
-			echo -ne " *************************************\n"
 
 			# Force no default subtitle (or not)
 			case $SUBTITLE_NODEFAULT_FORCE in
