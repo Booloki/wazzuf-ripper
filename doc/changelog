@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-10-02
+* Add TARGET_SIZE option (CD, DVD or bytes number): OK for Xvid encoding, approximate for h264 encoding.
+
 2012-09-28
 * Add DUMP_CROP mode for video dumping with cropping.
 * Replace tcdemux by cvlc for video dumping.

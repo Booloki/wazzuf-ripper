@@ -192,6 +192,7 @@ do
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
+		DUMP_CROP_FILE="$BASE_WORKING_FILE.mpeg2"
 		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$BASE_WORKING_FILE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
@@ -383,6 +384,7 @@ do
 		echo -ne "\n *************************************\n"
 		echo " No subtitle track choice, next..." && sleep 1
 		echo -ne " *************************************\n"
+		TOTAL_SUBTITLE_SIZE="0"
 	else
 		# subtitle track 1
 		SUBTITLE_LANG=$SUBTITLE_1_LANG
@@ -397,6 +399,7 @@ do
 			SUBTITLE_SID=$SUBTITLE_1_SID
 			SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 			SUBTITLE_FILE="$SUB_FILE.idx"
+			SUBTITLE_FILE_SUB="$SUB_FILE.sub"
 			subtitle_rip
 		else
 			# If srt file, check encoding
@@ -404,10 +407,20 @@ do
 			# Copy subtitle file
 			cp -v "$SUBTITLE_FILE_FORCE_PATH" .
 			# If .idx file, copy .sub file too.
-			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then cp -v `echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/` . ; fi
+			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
+				SUBTITLE_FILE_SUB=`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`
+				cp -v $SUBTITLE_FILE_SUB .				
+			fi
 			SUBTITLE_FILE="$SUBTITLE_1_FILE_FORCE"
 		fi
-	
+
+		# subtitle 1 files size
+		if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
+			SUBTITLE_1_SIZE=$(expr `ls -l $SUBTITLE_FILE | cut -d ' ' -f 5` + `ls -l $SUBTITLE_FILE_SUB | cut -d ' ' -f 5`)
+		else
+			SUBTITLE_1_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
+		fi
+ 
 		# Force no default subtitle (or not)
 		case $SUBTITLE_NODEFAULT_FORCE in
 		Y* | y* )
@@ -424,6 +437,7 @@ do
 			echo " No second subtitle track choice. Next..." && sleep 1
 	        	echo -ne " *************************************\n"
 			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1"
+			SUBTITLE_2_SIZE="0"
 		else
 			SUBTITLE_LANG=$SUBTITLE_2_LANG
 			SUBTITLE_NAME="$SUBTITLE_2_NAME"
@@ -437,6 +451,7 @@ do
 				SUBTITLE_SID=$SUBTITLE_2_SID
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 				SUBTITLE_FILE="$SUB_FILE.idx"
+				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
 				subtitle_rip
 			else
 				# If srt file, check encoding
@@ -444,8 +459,18 @@ do
 				# Copy subtitle file
 				cp -v "$SUBTITLE_FILE_FORCE_PATH" .
 				# If .idx file, copy .sub file too.
-				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then cp -v `echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/` . ; fi
+				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
+					SUBTITLE_FILE_SUB=`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`
+					cp -v $SUBTITLE_FILE_SUB .					
+				fi
 				SUBTITLE_FILE="$SUBTITLE_2_FILE_FORCE"
+			fi
+
+			# subtitle 2 files size
+			if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
+				SUBTITLE_2_SIZE=$(expr `ls -l $SUBTITLE_FILE | cut -d ' ' -f 5` + `ls -l $SUBTITLE_FILE_SUB | cut -d ' ' -f 5`)
+			else
+				SUBTITLE_2_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
 			fi
 
 			# Force no default subtitle (or not)
@@ -459,6 +484,8 @@ do
 			esac
 			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
 		fi
+
+		TOTAL_SUBTITLE_SIZE=$(expr $SUBTITLE_1_SIZE + $SUBTITLE_2_SIZE) 
 	fi
 
 
@@ -480,6 +507,8 @@ do
 
 	audio_rip
 
+	AUDIO_1_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
+
 	# merge with or without audio sync
 	if [[ $AUDIO_1_SYNC == "" ]]; then
 		MERGE_AUDIO_1="--language 0:$AUDIO_1_LANG --track-name 0:$AUDIO_1_NAME $AUDIO_FILE"
@@ -492,6 +521,7 @@ do
 		echo -ne "\n *************************************\n"
 		echo " No second audio track choice. Next..."  && sleep 1
         	echo -ne " *************************************\n"
+		AUDIO_2_SIZE="0"
 	else
 		AUDIO_AID=$AUDIO_2_AID
 		AUDIO_SOURCE=$AUDIO_2_SOURCE
@@ -507,6 +537,8 @@ do
 
 		audio_rip
 
+		AUDIO_2_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
+
 		if [[ $AUDIO_2_SYNC == "" ]]; then
 			MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME $AUDIO_FILE"
 		else	
@@ -514,10 +546,55 @@ do
 		fi					
 	fi
 	MERGE_AUDIO_FULL="$MERGE_AUDIO_1 $MERGE_AUDIO_2"
+	TOTAL_AUDIO_SIZE=$(expr $AUDIO_1_SIZE + $AUDIO_2_SIZE)
 
 
 	## video encode
 	trap "echo -e '\nManual killed script (Ctrl-C) during Video encoding' && exit 1" 2
+
+	# change video bitrate if maximum target size provided
+	if [[ ! "$TARGET_SIZE" == "" ]]; then
+
+		# check provided TARGET_SIZE
+		if [[ "$TARGET_SIZE" == "CD" ]]; then
+			MAX_TARGET_SIZE=$CD_SIZE_DEFAULT
+		elif [[ "$TARGET_SIZE" == "DVD" ]]; then
+			MAX_TARGET_SIZE=$DVD_SIZE_DEFAULT
+		else
+			# test if a number
+			if echo "$TARGET_SIZE" | egrep -vq '^[0-9]+$'; then
+				echo -ne "TARGET_SIZE provided is not set to CD, DVD, or an integer ! Exiting....\n"
+				exit 1
+			else
+				MAX_TARGET_SIZE=$TARGET_SIZE
+			fi
+		fi
+
+		# It is assumed that images size is negligible
+		TOTAL_IMAGE_SIZE="0"
+		OTHER_TRACKS_SIZE=$(expr $TOTAL_AUDIO_SIZE + $TOTAL_SUBTITLE_SIZE + $TOTAL_IMAGE_SIZE)
+		MAX_VIDEO_SIZE=$(expr $MAX_TARGET_SIZE - $OTHER_TRACKS_SIZE)
+
+		case $CODEC_VIDEO in
+		H264 )
+			# global source bitrate (kb/s)
+			SOURCE_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep "bitrate: " | cut -d ' ' -f 8`
+			# global source size (bytes)
+			VIDEO_SIZE=`ls -l ${SOURCE_FILE}  | cut -d ' ' -f 5`
+
+			# estimated needed bitrate
+			VIDEO_BITRATE=$(echo "scale=6; tmp = $SOURCE_BITRATE * $MAX_VIDEO_SIZE / $VIDEO_SIZE - 0.5; scale=0; tmp / 1" | bc)
+			echo "Estimated VIDEO_BITRATE for h264 encoding: $VIDEO_BITRATE kb/s."
+			echo "Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit you." && sleep 1
+			;;
+		XVID )
+			# If bitrate value is negative, Xvid will use its absolute value as the target size (in kBytes) of the video
+			# and compute the associated bitrate automagically
+			# Convert bytes to kBytes
+			VIDEO_BITRATE="-$(echo "scale=6; tmp = $MAX_VIDEO_SIZE / 1024 ; scale=0; tmp / 1" | bc)"
+			;;
+		esac
+	fi
 
 	# video scaling
 	if [[ "$VIDEO_SCALE" == "" ]]; then
@@ -531,7 +608,10 @@ do
 	# check video cropping
 	if [[ $VIDEO_CROP == "" ]]; then echo " Warning: VIDEO_CROP is empty ! Run wazzuf-pre-ripper for crop detection." && sleep 2; fi
 
+	echo -ne "\n *************************************\n"
+	echo " $SOURCE_FILE 2 pass $CODEC_VIDEO encoding"  && sleep 1
 	video_rip
+	echo -ne " *************************************\n"
 
 	if [[ $VIDEO_RATIO_FORCE == "" ]]; then
 		MERGE_VIDEO="$VIDEO_FILE"
