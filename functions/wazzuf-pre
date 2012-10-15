@@ -6,7 +6,7 @@ cropdetect(){
 
 	echo -ne "...\n"
 	case $SOURCE in
-	BD )
+	BD | ISO_BD )
 		mplayer br:///"$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;
@@ -18,7 +18,7 @@ cropdetect(){
 		mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;
-	ISO )
+	ISO_DVD )
 		mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;

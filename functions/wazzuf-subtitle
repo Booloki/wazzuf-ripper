@@ -3,8 +3,8 @@
 # DVD only - .idx and .sub files
 # BD - sup files
 subtitle_rip () {
-        case $SOURCE in
-        DVD )
+	case $SOURCE in
+	DVD )
 		if [ -f "$SUBTITLE_FILE" ]
 	        then
 			echo -ne "\n *************************************\n"
@@ -20,7 +20,7 @@ subtitle_rip () {
 				-o /dev/null -nosound -ovc frameno
 		fi
 		;;
-	ISO )
+	ISO_DVD )
 		if [ -f "$SUBTITLE_FILE" ]
 	        then
 			echo -ne "\n *************************************\n"

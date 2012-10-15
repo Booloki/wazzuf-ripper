@@ -28,17 +28,25 @@ cd "$SOURCE_DIRECTORY"
 
 # pre-rip source choice
 case $SOURCE in
-BD )
-	check_device BD PRE
-	BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`	
+BD | ISO_BD )
+	if [[ $SOURCE == "ISO_BD" ]]; then
+		check_device ISO_BD PRE
+		iso_bd_manage mount
+		BD_MOUNT=$ISO_MOUNT_POINT
+	else
+		check_device BD PRE
+		BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
+	fi
 
 	echo -ne " *************************************\n"
 	echo ${BD_MOUNT}
 	cropdetect
 	echo -ne " *************************************\n"
 
+	if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount; fi
+
 	echo -ne " *************************************\n"
-	echo " No more informations directly from physical BD."
+	echo " No more informations directly from BD."
 	echo " Please run wazzuf-ripper to extract .m2ts file,"
 	echo " and re-run wazzuf-pre-ripper with M2TS in SOURCE (configuration file)."
 	echo -ne " *************************************\n"
@@ -80,13 +88,13 @@ DVD )
 	echo -ne "*************************************\n"
 	echo " avconv informations"
 	avconv -i $DVD_PATH 2> DVD-avconv.info
-	echo "-> see ISO-avconv.info"
+	echo "-> see DVD-avconv.info"
 
 	check_7z
 	echo -ne "*************************************\n"
 	echo " DVD structure informations"
 	7z l $DVD_PATH > DVD-DVDstruct.info
-	echo "-> see ISO-DVDstruct.info"
+	echo "-> see DVD-DVDstruct.info"
 
 	echo -ne "*************************************\n"
 	grep "^Disc Title" DVD-lsdvd.info
@@ -131,7 +139,7 @@ DVD )
 			echo -ne " Skip DVD copy.\n"
 		else
 			copy-dvd2iso
-			echo -ne "\n You can now use ISO instead of DVD in $CONF_FILE.\n"
+			echo -ne "\n You can now use ISO_DVD instead of DVD in $CONF_FILE.\n"
 		fi
 		;;
 	* )
@@ -140,8 +148,8 @@ DVD )
 	esac
 	echo -ne "*************************************\n"
 	;;
-ISO )
-	check_device ISO PRE
+ISO_DVD )
+	check_device ISO_DVD PRE
 	check_lsdvd
 	echo -ne "*************************************\n"
 	echo " lsdvd informations"
@@ -197,7 +205,7 @@ ISO )
 	fi
 	;;
 * )
-        echo -ne "\n Media source issue: make sure you filled DVD, ISO or BD in configuration file.\n"
+        echo -ne "\n Media source issue: make sure you filled DVD, ISO_DVD, BD or ISO_BD in configuration file.\n"
         exit 1
         ;;
 esac

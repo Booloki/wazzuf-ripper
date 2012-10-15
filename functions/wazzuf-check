@@ -28,7 +28,7 @@ checkandsource_wazzuf_files () {
 	done
 }
 
-# check physical BD/DVD (only one device) or ISO file presence
+# check physical BD/DVD (only one device) or ISO_DVD/ISO_BD file presence
 check_device () {
 	case ${1} in
 	BD )
@@ -46,10 +46,10 @@ check_device () {
 		DEVICE_NAME="DVD"
 		WORKING_FILES=".vob"
 		;;
-	ISO )
+	ISO_DVD | ISO_BD )
 		DEVICE_TEST="-f '$SOURCE_DIRECTORY/$ISO_FILE'"
 		DEVICE_NAME="'$SOURCE_DIRECTORY/$ISO_FILE' iso file"
-		WORKING_FILES=".vob"
+		if [[ ${1} == "ISO_DVD" ]]; then WORKING_FILES=".vob"; else WORKING_FILES=".m2ts"; fi
 		;;
 	* )
 		echo "Unexpected error: No device to check !"
@@ -82,6 +82,27 @@ check_device () {
 			;;
 		esac
 	fi
+}
+
+# mount/umount BD iso file
+iso_bd_manage () {
+	case ${1} in
+	mount )
+		# check if ISO_BD not already mounted
+		if [[ `mount | grep udf | grep $ISO_MOUNT_POINT | wc -l` == "1" ]]; then
+			echo "$ISO_MOUNT_POINT mount point already used"
+			exit 1
+		else			
+			echo "Mount ISO_BD to $ISO_MOUNT_POINT"
+			mkdir -p $ISO_MOUNT_POINT
+			# mounted read-only to avoid warning
+			sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT
+		fi
+		;;
+	umount )
+		sudo umount $ISO_MOUNT_POINT
+		;;
+	esac
 }
 
 # check imdb-cli
