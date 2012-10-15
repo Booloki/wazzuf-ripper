@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-10-15
+* manpages update.
 * ISO media support is now divided into ISO_DVD and ISO_BD media supports.
 * BD working files extraction from m2ts dump to m2ts copy.
 

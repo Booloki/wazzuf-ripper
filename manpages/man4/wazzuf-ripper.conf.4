@@ -1,4 +1,4 @@
-.TH WAZZUF-RIPPER.CONF 4 "September 24, 2012"
+.TH WAZZUF-RIPPER.CONF 4 "October 15, 2012"
 .SH NAME
 wazzuf-ripper.conf \- Wazzuf Ripper configuration file
 .SH DESCRIPTION
@@ -12,12 +12,15 @@ Theses are his configuration options :
 .B Medium informations
 .TP
 .B SOURCE
-Media support type: DVD, ISO, BD or M2TS
+Media support type: DVD, ISO_DVD, BD, ISO_BD or M2TS
 .TP
 .B SOURCE_DIRECTORY
 Directory for source files like m2ts/ts, iso, external subtitles, cover image, episodes list,...
 .br
 Example: "/home/user/video-source-directory"
+.TP
+.B WORKING_PATH_BASE
+Directory to override working files base path (if not set: "$HOME/wazzuf-ripper").
 .TP
 .B M2TS_FILE
 BD source filename available in SOURCE_DIRECTORY. Could be m2ts or HDts file.
@@ -25,7 +28,7 @@ BD source filename available in SOURCE_DIRECTORY. Could be m2ts or HDts file.
 Example: "00000.m2ts"
 .TP
 .B ISO_FILE
-DVD ISO source filename available in SOURCE_DIRECTORY.
+ISO_DVD or ISO_BD source filename available in SOURCE_DIRECTORY.
 .br
 Example: "image.iso"
 .PP
@@ -104,7 +107,7 @@ The text file syntax has to be ordered lines like "05 - The haunted episode". Th
 .B ARTIST_NAME
 The artist name. For MUSIC VIDEO_TYPE only.
 .PP
-.BR DVD/ISO
+.BR DVD/ISO_DVD
 .BR organization
 .TP
 .B DVD_TITLE_NUMBER
@@ -151,6 +154,13 @@ or manually with 'mplayer dvd://DVD_TITLE_NUMBER -vf cropdetect' or 'mplayer -dv
 .br
 Example: "720:480:0:0"
 .TP
+.B VIDEO_SCALE
+Force video width scaling.
+.br
+For example "720" for 720p HD rip
+.br
+Warning: if you add .sup subtitles, they have to fit on the screen !
+.TP
 .B VIDEO_NOSKIP_FORCE
 Set to "yes" to force frames skipping. For example if you got lots of duplicate frame(s), input fps field not specified,...
 .TP
@@ -196,7 +206,7 @@ Examples: "English", "Français", "Commentary",...
 Subtitle track id: could be "0" to "31". Idem for SUBTITLE_2_SID.
 .TP
 .B SUBTITLE_1_FILE_FORCE
-Previously extracted/written subtitle filename in SOURCE_DIRECTORY. Could be BD subtitle (PGS): .sup file; TS subtitle (CC): .srt file; text file subtitle: .srt . Idem for SUBTITLE_2_FILE_FORCE.
+Previously extracted/written subtitle filename in SOURCE_DIRECTORY. Could be BD subtitle (PGS): .sup file; TS subtitle (CC): .srt file; text file subtitle: .srt; DVDSUB: .idx (+ .sub with same name). Idem for SUBTITLE_2_FILE_FORCE.
 .br
 .BR wazzuf-external-tools-install (1)
 could be useful.
@@ -208,9 +218,11 @@ Set to "yes" to force no default subtitle display.
 .BR options
 .TP
 .B DEFAULT_CODEC_VIDEO
-Default video codec: "H264", "XVID" or "DUMP." Taken in account only if no arguments to
+Default video codec: "H264", "XVID", "DUMP" or "DUMP_CROP". Taken in account only if no arguments to
 .BR wazzuf-ripper (1)
 .
+.br
+DUMP/DUMP_CROP are for mpeg source only.
 .TP
 .B DEFAULT_CODEC_AUDIO
 Default audio codec: "AC3", "MP3", "VORBIS", "OPUS" or "DUMP". Taken in account only if no arguments to
@@ -249,6 +261,20 @@ Examples: "192k", "448k", "640k", "1500k",...
 .br
 Note: Only DTS to AC3 encoding is possible.
 .TP
+.B 
+TARGET_SIZE
+Final mkv target size (in bytes)
+.br
+Warning: approximate for h264 encoding !
+.br
+Warning: will override XXRIP_VIDEO_BITRATE.
+.br
+For 1 CD Size target : "CD" and for 1 DVD Size target : "DVD".
+.br
+Others target sizes in bytes. Example: 1GB -> "1073741824" bytes.
+.br
+Default: empty
+.TP
 .B DVDRIP_VIDEO_BITRATE
 Video encode bitrate for DVD/ISO. Default value is "1500".
 .br
@@ -269,6 +295,9 @@ x264 first pass encoding frameref. Change with care ! Default value is "1".
 .br
 More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
 .TP
+.B VIDEO_X264_TRELLIS_PASS1
+x264 first pass encoding trellis. Change with care ! Default value is "2".
+.TP
 .B VIDEO_X264_SUBQ_PASS2
 x264 second pass encoding subq. Change with care ! Default value is "6".
 .br
@@ -278,6 +307,19 @@ More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
 x264 second pass encoding frameref. Change with care ! Default value is "2".
 .br
 More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-x264.html .
+.TP
+.B VIDEO_X264_TRELLIS_PASS2
+x264 second pass encoding trellis. Change with care ! Default value is "2".
+.TP
+.B VIDEO_XVID_VHQ_PASS1
+Xvid first pass encoding vhq. Change with care ! Default value is "0".
+.br
+More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-xvid.html .
+.TP
+.B VIDEO_XVID_VHQ_PASS2
+Xvid second pass encoding vhq. Change with care ! Default value is "3".
+.br
+More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-xvid.html .
 .PP
 .SH SEE ALSO
 .BR wazzuf-ripper (1)
