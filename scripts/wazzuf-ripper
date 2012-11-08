@@ -11,6 +11,7 @@ trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
 
 # check wazzuf files
 source $FUNCTIONS_CHECK
+checkandsource_wazzuf_conf
 checkandsource_wazzuf_files
 
 # video codec choice check

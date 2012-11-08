@@ -8,6 +8,7 @@ source $GLOBAL_CONF_FILE
 
 # check wazzuf files
 source $FUNCTIONS_CHECK
+checkandsource_wazzuf_conf
 checkandsource_wazzuf_files
 
 check_mplayer

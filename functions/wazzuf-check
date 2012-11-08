@@ -1,6 +1,6 @@
 ## check functions
 
-checkandsource_wazzuf_files () {
+checkandsource_wazzuf_conf () {
 	if [ ! -f $CONF_FILE ]; then
 		echo -ne "\n *************************************\n"
 		echo -ne " $CONF_FILE configuration file not found !\n"
@@ -14,6 +14,9 @@ checkandsource_wazzuf_files () {
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG Sourcing $CONF_FILE..."; fi
 		source $CONF_FILE
 	fi
+}
+
+checkandsource_wazzuf_files () {
 	for WFILE in $WAZZUF_FILES
 	do
 		if [ ! -f $WFILE ]; then
