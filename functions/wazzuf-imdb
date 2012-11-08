@@ -48,6 +48,7 @@ download_imdb_poster () {
 			;;
 		* )
 			check_imdb
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG imdbtool -i $IMDB_ID | wget \`sed -n '/^poster/{n;p;}'\` -O cover.jpg"; fi
 			imdbtool -i $IMDB_ID | wget `sed -n '/^poster/{n;p;}'` -O cover.jpg
 			;;
 		esac

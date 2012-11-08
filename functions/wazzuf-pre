@@ -7,18 +7,22 @@ cropdetect(){
 	echo -ne "...\n"
 	case $SOURCE in
 	BD | ISO_BD )
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer br://"$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
 		mplayer br:///"$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;
 	M2TS )
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer "$M2TS_FILE_PATH" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
 		mplayer "$M2TS_FILE_PATH" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;
 	DVD )
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
 		mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;
 	ISO_DVD )
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/	cropdetect.out"; fi
 		mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 		wait
 		;;
@@ -53,5 +57,6 @@ lsdvd-decode(){
 ## copy DVD to iso file
 copy-dvd2iso (){
 		check_genisoimage
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH""; fi
 		genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH"
 }

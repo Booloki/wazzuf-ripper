@@ -212,6 +212,10 @@ esac
 
 # IMDb: get ID / download poster image
 echo -ne "*************************************\n"
+if [[ $DEBUG == "1" ]]; then
+	echo "DEBUG TITLE_NAME $TITLE_NAME"
+	echo "DEBUG DATE $DATE"
+fi
 if  [[ $IMDB_ID == "" ]]; then
 	echo -ne " Try to get IMDb ID with: $TITLE_NAME ? (Y/n)"
 	read IMDB_ANSWER

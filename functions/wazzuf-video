@@ -26,12 +26,16 @@ video_rip () {
 		check_mencoder
 		VIDEO_FILE=$H264_FILE
 		if [ ! -f $VIDEO_FILE ]; then
+
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE $VIDEO_SKIP -vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE -ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS1:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=$VIDEO_X264_TRELLIS_PASS1:threads=$VIDEO_X264_THREADS:pass=1:log=1 -nosound -nosub"; fi
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE \
 				-ovc x264 -x264encopts \
 				bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS1:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=$VIDEO_X264_TRELLIS_PASS1:threads=$VIDEO_X264_THREADS:pass=1:log=1 \
 				-nosound -nosub
+			
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE $VIDEO_SKIP -vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE -ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS2:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=$VIDEO_X264_TRELLIS_PASS2:threads=$VIDEO_X264_THREADS:pass=2:log=1 -nosound -nosub"; fi
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE \
@@ -56,11 +60,14 @@ video_rip () {
 			echo -ne " *************************************\n"
 		else
 			# xvid: bitrate setting is ignored during first pass
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder $SOURCE_FILE -o /dev/null $VIDEO_SKIP -vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE -ovc xvid -xvidencopts pass=1:turbo:threads=$VIDEO_XVID_THREADS:autoaspect:vhq=$VIDEO_XVID_VHQ_PASS1 -nosound -nosub"; fi
 			nice -n $NICENESS mencoder $SOURCE_FILE -o /dev/null \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE \
 				-ovc xvid -xvidencopts pass=1:turbo:threads=$VIDEO_XVID_THREADS:autoaspect:vhq=$VIDEO_XVID_VHQ_PASS1 \
 				-nosound -nosub
+
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE $VIDEO_SKIP -vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE -ovc xvid -xvidencopts pass=2:threads=$VIDEO_XVID_THREADS:autoaspect:vhq=$VIDEO_XVID_VHQ_PASS2:bitrate=$VIDEO_BITRATE -nosound -nosub"; fi
 			nice -n $NICENESS mencoder $SOURCE_FILE -o $VIDEO_FILE \
 				$VIDEO_SKIP \
 				-vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE \
@@ -81,6 +88,7 @@ video_rip () {
 			check_cvlc
 			echo -ne "\n *************************************\n"
 			echo " Dumping $VIDEO_FILE from $SOURCE_FILE ..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS cvlc -I dummy $SOURCE_FILE --sout "#standard{access=file,mux=raw,dst=$VIDEO_FILE}" vlc://quit --no-repeat --no-sub-autodetect-file --no-sout-audio"; fi
 			ionice -c $IONICENESS nice -n $NICENESS cvlc -I dummy \
 				$SOURCE_FILE --sout "#standard{access=file,mux=raw,dst=$VIDEO_FILE}" \
 				vlc://quit \
@@ -113,6 +121,8 @@ video_rip () {
 			VLC_CROP_BOTTOM=$(expr $HEIGHT_ORIG - $VIDEO_CROP_Y - $VIDEO_CROP_H)
 			VLC_CROP_LEFT=$VIDEO_CROP_X
 			VLC_CROP_RIGHT=$(expr $WIDTH_ORIG - $VIDEO_CROP_X - $VIDEO_CROP_W)
+
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n ${NICENESS} cvlc -I dummy ${SOURCE_FILE} --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=$VLC_CROP_TOP,cropbottom=$VLC_CROP_BOTTOM,cropleft=$VLC_CROP_LEFT,cropright=$VLC_CROP_RIGHT}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" vlc://quit --no-repeat --no-sub-autodetect-file --no-sout-audio"; fi
 			nice -n ${NICENESS} cvlc -I dummy \
 				${SOURCE_FILE} --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=$VLC_CROP_TOP,cropbottom=$VLC_CROP_BOTTOM,cropleft=$VLC_CROP_LEFT,cropright=$VLC_CROP_RIGHT}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
 				vlc://quit \

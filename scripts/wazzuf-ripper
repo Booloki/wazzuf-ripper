@@ -257,6 +257,7 @@ do
 		echo -ne " *************************************\n"
 		;;
 	esac
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_OUTPUT $MERGE_OUTPUT"; fi
 
 	# Retrieve IMdb informations
 	echo -ne "\n *************************************\n"
@@ -432,6 +433,12 @@ do
 		else
 			SUBTITLE_1_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
 		fi
+
+		if [[ $DEBUG == "1" ]]; then
+			echo "DEBUG SUBTITLE_FILE $SUBTITLE_FILE"
+			echo "DEBUG SUBTITLE_FILE_SUB $SUBTITLE_FILE_SUB"
+			echo "DEBUG SUBTITLE_1_SIZE $SUBTITLE_1_SIZE"
+		fi
  
 		# Force no default subtitle (or not)
 		case $SUBTITLE_NODEFAULT_FORCE in
@@ -485,6 +492,12 @@ do
 				SUBTITLE_2_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
 			fi
 
+			if [[ $DEBUG == "1" ]]; then
+				echo "DEBUG SUBTITLE_FILE $SUBTITLE_FILE"
+				echo "DEBUG SUBTITLE_FILE_SUB $SUBTITLE_FILE_SUB"
+				echo "DEBUG SUBTITLE_2_SIZE $SUBTITLE_2_SIZE"
+			fi
+
 			# Force no default subtitle (or not)
 			case $SUBTITLE_NODEFAULT_FORCE in
 			Y* | y* )
@@ -497,7 +510,12 @@ do
 			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
 		fi
 
-		TOTAL_SUBTITLE_SIZE=$(expr $SUBTITLE_1_SIZE + $SUBTITLE_2_SIZE) 
+		TOTAL_SUBTITLE_SIZE=$(expr $SUBTITLE_1_SIZE + $SUBTITLE_2_SIZE)
+		if [[ $DEBUG == "1" ]]; then
+			echo "DEBUG SUBTITLE_1_SIZE $SUBTITLE_1_SIZE"
+			echo "DEBUG SUBTITLE_2_SIZE $SUBTITLE_2_SIZE"
+			echo "DEBUG TOTAL_SUBTITLE_SIZE $TOTAL_SUBTITLE_SIZE"
+		fi
 	fi
 
 
@@ -559,6 +577,11 @@ do
 	fi
 	MERGE_AUDIO_FULL="$MERGE_AUDIO_1 $MERGE_AUDIO_2"
 	TOTAL_AUDIO_SIZE=$(expr $AUDIO_1_SIZE + $AUDIO_2_SIZE)
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG AUDIO_1_SIZE $AUDIO_1_SIZE"
+		echo "DEBUG AUDIO_2_SIZE $AUDIO_2_SIZE"
+		echo "DEBUG TOTAL_AUDIO_SIZE $TOTAL_AUDIO_SIZE"
+	fi
 
 
 	## video encode
@@ -586,6 +609,12 @@ do
 		TOTAL_IMAGE_SIZE="0"
 		OTHER_TRACKS_SIZE=$(expr $TOTAL_AUDIO_SIZE + $TOTAL_SUBTITLE_SIZE + $TOTAL_IMAGE_SIZE)
 		MAX_VIDEO_SIZE=$(expr $MAX_TARGET_SIZE - $OTHER_TRACKS_SIZE)
+
+		if [[ $DEBUG == "1" ]]; then
+			echo "DEBUG MAX_TARGET_SIZE $MAX_TARGET_SIZE"
+			echo "DEBUG MAX_TARGET_SIZE $MAX_TARGET_SIZE"
+			echo "DEBUG MAX_VIDEO_SIZE: $MAX_VIDEO_SIZE"
+		fi
 
 		case $CODEC_VIDEO in
 		H264 )
@@ -622,6 +651,11 @@ do
 
 	echo -ne "\n *************************************\n"
 	echo " $SOURCE_FILE 2 pass $CODEC_VIDEO encoding"  && sleep 1
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG VIDEO_BITRATE $VIDEO_BITRATE"
+		echo "DEBUG VIDEO_SCALE $VIDEO_SCALE"
+		echo "DEBUG VIDEO_CROP $VIDEO_CROP"
+	fi
 	echo -ne " *************************************\n"
 
 	video_rip
@@ -726,6 +760,7 @@ do
 	# global merge command
 	echo -ne "\n *************************************\n"
 	echo " Final file merge:"
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title "$MERGE_TITLE" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"; fi
 	echo -ne " *************************************\n"
 	check_mkvmerge
 	nice -n $NICENESS mkvmerge \

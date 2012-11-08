@@ -70,6 +70,7 @@ audio_rip () {
 		else
 			echo -ne "\n *************************************\n"
 			echo " Dumping $AUDIO_SOURCE_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE"; fi
 			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 		fi
 		;;
@@ -78,6 +79,7 @@ audio_rip () {
 		if [ ! -f $WAV_FILE ]; then
 			echo -ne "\n *************************************\n"
 			echo " Dumping $WAV_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null"; fi
 			ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null
 		else
 			echo -ne "\n *************************************\n"
@@ -134,6 +136,7 @@ audio_rip () {
 			# DTS to AC3 (5.1)
 			echo -ne "\n *************************************\n"
 			echo " Convert $AUDIO_SOURCE_FILE to $AUDIO_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS avconv -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE"; fi
 			nice -n $NICENESS avconv -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
 		fi
 		;;
@@ -149,6 +152,7 @@ audio_rip () {
 			check_oggenc
 			echo -ne "\n *************************************\n"
 			echo " Convert $WAV_FILE to $AUDIO_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $AUDIO_FILE -a "$TITLE_NAME" -t "$AUDIO_NAME" -l "$MERGE_TITLE" -G Soundtrack -d $DATE"; fi
 			nice -n $NICENESS oggenc $WAV_FILE -q $AUDIO_OGG_QUAL -o $AUDIO_FILE -a "$TITLE_NAME" -t "$AUDIO_NAME" -l "$MERGE_TITLE" -G "Soundtrack" -d $DATE
 		fi
 		;;
@@ -179,6 +183,7 @@ audio_rip () {
 			esac
 			echo -ne "\n *************************************\n"
 			echo " Convert $WAV_FILE to $AUDIO_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS lame --scale $AUDIO_MP3_VOL $AUDIO_MP3_MODE_OPTION --ta "$TITLE_NAME" --tt "$AUDIO_NAME" --tl "$MERGE_TITLE" --tg 24 --ty $DATE --tc "$COMMENT" -h $WAV_FILE $AUDIO_FILE"; fi
 			nice -n $NICENESS lame --scale $AUDIO_MP3_VOL $AUDIO_MP3_MODE_OPTION --ta "$TITLE_NAME" --tt "$AUDIO_NAME" --tl "$MERGE_TITLE" --tg 24 --ty $DATE --tc "$COMMENT" -h $WAV_FILE $AUDIO_FILE
 		fi
 		;;
@@ -211,6 +216,7 @@ audio_rip () {
 			esac
 			echo -ne "\n *************************************\n"
 			echo " Convert $WAV_FILE to $AUDIO_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS opusenc --bitrate $AUDIO_OPUS_BITRATE $AUDIO_OPUS_MODE_OPTION --artist "$TITLE_NAME" --title "$AUDIO_NAME" $WAV_FILE $AUDIO_FILE"; fi
 			nice -n $NICENESS opusenc --bitrate $AUDIO_OPUS_BITRATE $AUDIO_OPUS_MODE_OPTION --artist "$TITLE_NAME" --title "$AUDIO_NAME" $WAV_FILE $AUDIO_FILE
 		fi
 		;;

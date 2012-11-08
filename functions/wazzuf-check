@@ -11,7 +11,7 @@ checkandsource_wazzuf_files () {
 		echo -ne " *************************************\n"
 		exit 1
 	else
-		echo "Sourcing $CONF_FILE..."
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG Sourcing $CONF_FILE..."; fi
 		source $CONF_FILE
 	fi
 	for WFILE in $WAZZUF_FILES
@@ -22,7 +22,7 @@ checkandsource_wazzuf_files () {
 			echo -ne " *************************************\n"
 		        exit 1
 		else	
-			echo "Sourcing $WFILE..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG Sourcing $WFILE..."; fi
 			source $WFILE
 		fi
 	done
@@ -55,6 +55,12 @@ check_device () {
 		echo "Unexpected error: No device to check !"
 		;;
 	esac
+
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG DEVICE_TEST $DEVICE_TEST"
+		echo "DEBUG DEVICE_NAME $DEVICE_NAME"
+		echo "DEBUG WORKING_FILES $WORKING_FILES"
+	fi
 
 	if [ ! "${DEVICE_TEST}" ]
 	then
@@ -94,8 +100,9 @@ iso_bd_manage () {
 			exit 1
 		else			
 			echo "Mount ISO_BD to $ISO_MOUNT_POINT"
-			mkdir -p $ISO_MOUNT_POINT
+			sudo mkdir -p $ISO_MOUNT_POINT
 			# mounted read-only to avoid warning
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT";fi
 			sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT
 		fi
 		;;

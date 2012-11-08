@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-08
+* Add DEBUG option.
+
 2012-10-15
 * manpages update.
 * ISO media support is now divided into ISO_DVD and ISO_BD media supports.
