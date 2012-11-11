@@ -90,6 +90,10 @@ check_device () {
 			esac
 			;;
 		esac
+	else
+		echo -ne "\n *************************************\n"
+		echo -ne " $DEVICE_NAME found.\n"
+		echo -ne " *************************************\n"
 	fi
 }
 
@@ -147,6 +151,15 @@ check_ogmtools () {
 	if [ ! -x "/usr/bin/dvdxchap" ]; then
 		echo -ne "\n *************************************\n"
 		echo -ne " Please install dvdxchap (ogmtools) ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_bdchapters () {
+	if [ ! -x "/usr/bin/bdchapters" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne " Please install bdchapters ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi

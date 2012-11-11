@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-11
+* Add BD chapters extraction with bdchapters
+
 2012-11-08
 * Divide checkandsource_wazzuf_files function in checkandsource_wazzuf_files and checkandsource_wazzuf_conf.
 * Add DEBUG option.

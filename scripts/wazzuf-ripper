@@ -143,9 +143,11 @@ BD )
 ISO_BD )
 	check_device ISO_BD RIP
 	ISO_FILE_PATH="$SOURCE_DIRECTORY/$ISO_FILE"
-	iso_bd_manage mount
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG ISO_FILE_PATH $ISO_FILE_PATH"; fi
 	;;
 M2TS )
+	M2TS_FILE_PATH="$SOURCE_DIRECTORY/$M2TS_FILE"
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS_FILE_PATH $M2TS_FILE_PATH"; fi
 	check_device M2TS RIP
         ;;
 DVD )
@@ -193,7 +195,8 @@ do
 	MOVIE )
 		BASE_WORKING_FILE=$TAG_TITLE_NAME.$DATE
 		VOB_FILE="$BASE_WORKING_FILE.vob"
-		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
+		CHAPTERS_FILE_TXT="$BASE_WORKING_FILE-chapters.txt"
+		CHAPTERS_FILE_XML="$BASE_WORKING_FILE-chapters.xml"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
@@ -208,7 +211,8 @@ do
 	MUSIC )
 		BASE_WORKING_FILE=$TAG_TITLE_NAME.$DATE
 		VOB_FILE="$BASE_WORKING_FILE.vob"
-		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
+		CHAPTERS_FILE_TXT="$BASE_WORKING_FILE-chapters.txt"
+		CHAPTERS_FILE_XML="$BASE_WORKING_FILE-chapters.xml"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
@@ -225,7 +229,8 @@ do
 		EPISODE_TYPE="E"
 		BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.T$DVD_TITLE_NUMBER.C$DVD_CHAPTER_NUMBER"
 		VOB_FILE="$BASE_WORKING_FILE.vob"
-		CHAPTERS_FILE="$BASE_WORKING_FILE-chapters.txt"
+		CHAPTERS_FILE_TXT="$BASE_WORKING_FILE-chapters.txt"
+		CHAPTERS_FILE_XML="$BASE_WORKING_FILE-chapters.xml"
 		XVID_FILE="$BASE_WORKING_FILE.xvid"
 		H264_FILE="$BASE_WORKING_FILE.h264"
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
@@ -274,6 +279,7 @@ do
 
 	# Extract full working file (.vob or .m2ts)
 	# Save chapters informations (DVD/ISO_DVD only) and set chapters merge informations
+	# dvdxchap doesn't work on vob files... so DVD/ISO_DVD media is mandatory
 	check_mplayer
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
@@ -281,9 +287,9 @@ do
 		case $MULTICHAP_FORCE in
 			y* | Y* )
 				echo -ne "\n *************************************\n"
-				if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE; else echo " $CHAPTERS_FILE file exists. Next..."; fi
+				if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
 				echo -ne " *************************************\n"
-				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
+				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
 				;;
 			* )
 				echo -ne "\n *************************************\n"
@@ -314,9 +320,9 @@ do
 		case $MULTICHAP_FORCE in
 			y* | Y* )
 				echo -ne "\n *************************************\n"
-				if [ ! -f $CHAPTERS_FILE ]; then echo " Creating $CHAPTERS_FILE..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE; else echo " $CHAPTERS_FILE file exists. Next..."; fi
+				if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
 				echo -ne " *************************************\n"
-				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE"
+				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
 				;;
 			* )
 				echo -ne "\n *************************************\n"
@@ -346,22 +352,35 @@ do
 		fi
 	        ;;
 	BD | ISO_BD )
-		# extract local working file from BD
+		# extract/copy local working file(s) from BD
 
 		if [[ $SOURCE == "ISO_BD" ]]; then
 			BD_MOUNT=$ISO_MOUNT_POINT
+			iso_bd_manage mount
 		else
 			BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
 		fi
 
 		echo -ne "\n *************************************\n"
-		# No way to dump separated files for now...
-		# so if mutiple useful tracks, just copy them:
-		echo " Copying all m2ts files from BR..."
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS cp -v '${BD_MOUNT}'/BDMV/STREAM/*.m2ts '$SOURCE_DIRECTORY'/"; fi
+		echo " Copying all m2ts/mpls files from BR..."
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS cp -vn \"${BD_MOUNT}\"/BDMV/STREAM/*.m2ts \"$SOURCE_DIRECTORY\"/"; fi
 		ionice -c $IONICENESS nice -n $NICENESS cp -vn "${BD_MOUNT}"/BDMV/STREAM/*.m2ts "$SOURCE_DIRECTORY"/
 		# file have 444 rights cause read-only source
 		sudo chmod 644 "$SOURCE_DIRECTORY"/*.m2ts
+		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
+		# chapters management
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/PLAYLIST/*.mpls $SOURCE_DIRECTORY/"; fi
+		sudo chmod 644 "$SOURCE_DIRECTORY"/*.mpls
+		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.mpls "$SOURCE_DIRECTORY"/
+
+		SOURCE_FILE="$M2TS_FILE"
+		MERGE_CHAPTERS=""
+
+		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
+			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
+		else
+			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
+		fi
 
 		if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount; fi
 
@@ -369,18 +388,9 @@ do
 		echo -ne " and run wazzuf-pre-ripper to get more tracks informations.\n"
 		exit 0
 		echo -ne " *************************************\n"
-
-		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
-		MERGE_CHAPTERS=""
-
-		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
-		else
-			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
-		fi
 		;;
 	M2TS )
-		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
+		SOURCE_FILE="$M2TS_FILE_PATH"
 		MERGE_CHAPTERS=""
 
 		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
@@ -388,6 +398,20 @@ do
 		else
 			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
 		fi
+
+		# chapters management
+		MPLS_FILE="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
+		echo -ne "\n *************************************\n"
+		if [ -f $MPLS_FILE ]; then
+			echo " Creating $CHAPTERS_FILE_XML..."
+			check_bdchapters
+			bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML
+			MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_XML"
+		else
+			echo " No chapters file to create. Next..."
+			MERGE_CHAPTERS=""
+		fi
+		echo -ne "\n *************************************\n"
 		;;
 	esac
 
