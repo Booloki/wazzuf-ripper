@@ -38,10 +38,17 @@ BD | ISO_BD )
 		check_device BD PRE
 		BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
 	fi
+	mplayer -v -vo null -ao null -frames 0 -identify br:// -bluray-device "$BD_MOUNT" 2>/dev/null > BD-mplayer.info
+
+	bd_get_longest_title
+	BD_LONGEST_TITLE_CHAPTERS=`grep ^ID_BLURAY_TITLE_$BD_LONGEST_TITLE_NUMBER BD-mplayer.info | grep _CHAPTERS | cut -d '=' -f 2`
+	BD_TOTAL_TITLES=`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f 2`
 
 	echo -ne " *************************************\n"
 	echo ${BD_MOUNT}
+	echo "Longest track chosen for crop detection: Title $BD_LONGEST_TITLE_NUMBER / $BD_TOTAL_TITLES (Chapters: $BD_LONGEST_TITLE_CHAPTERS)"
 	cropdetect
+	echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 	echo -ne " *************************************\n"
 
 	if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount; fi
@@ -67,6 +74,7 @@ M2TS )
 	echo -ne " *************************************\n"
 	echo M2TS_FILE_PATH=\"$M2TS_FILE_PATH\"
 	cropdetect
+	echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 
 	echo -ne "*************************************\n"
 	echo "All tracks:"
@@ -108,6 +116,7 @@ DVD )
 			lsdvd -t $DVD_TITLE_NUMBER -acsv $DVD_PATH 2>/dev/null | grep -E "Subtitle|Audio|VTS" > DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 			echo `grep "Title: " DVD-lsdvd-T$DVD_TITLE_NUMBER.info | cut -d "," -f 2`
 			cropdetect
+			echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 			grep VTS DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 			lsdvd-decode DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 		done
@@ -115,6 +124,7 @@ DVD )
 		echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
 		echo `grep "Title: $DVD_TITLE_NUMBER" DVD-lsdvd.info | cut -d "," -f 2`
 		cropdetect
+		echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 
 		echo -ne "*************************************\n"
 		echo "Title $DVD_TITLE_NUMBER Tracks:"
@@ -185,6 +195,7 @@ ISO_DVD )
 			lsdvd -t $DVD_TITLE_NUMBER -acsv "$ISO_FILE_PATH" 2>/dev/null | grep -E "Subtitle|Audio|VTS" > ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 			echo `grep "Title: " ISO-lsdvd-T$DVD_TITLE_NUMBER.info | cut -d "," -f 2`
 			cropdetect
+			echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 			grep VTS ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 			lsdvd-decode ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 		done
@@ -192,6 +203,7 @@ ISO_DVD )
 		echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
 		echo `grep "Title: $DVD_TITLE_NUMBER" ISO-lsdvd.info | cut -d "," -f 2`
 		cropdetect
+		echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 
 		echo -ne "*************************************\n"
 		echo "Title $DVD_TITLE_NUMBER Tracks:"

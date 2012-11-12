@@ -102,19 +102,32 @@ iso_bd_manage () {
 	case ${1} in
 	mount )
 		# check if ISO_BD not already mounted
-		if [[ `mount | grep udf | grep $ISO_MOUNT_POINT | wc -l` == "1" ]]; then
+		if [[ `mount | grep udf | grep "$ISO_MOUNT_POINT" | wc -l` == "1" ]]; then
 			echo "$ISO_MOUNT_POINT mount point already used"
 			exit 1
-		else			
-			echo "Mount ISO_BD to $ISO_MOUNT_POINT"
-			sudo mkdir -p $ISO_MOUNT_POINT
-			# mounted read-only to avoid warning
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT";fi
-			sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT
+		else
+			if [[ ${2} == "GUI" ]]; then
+				# useless ?
+				gksudo --description Wazzuf-Ripper "mkdir -p $ISO_MOUNT_POINT"
+				# mounted read-only to avoid warning
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG gksudo --description Wazzuf-Ripper \"mount -r -o loop $ISO_FILE_PATH ${ISO_MOUNT_POINT}\"";fi
+				gksudo --description Wazzuf-Ripper "mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT"
+			else
+				echo "Mount ISO_BD to $ISO_MOUNT_POINT"
+				sudo mkdir -p $ISO_MOUNT_POINT
+				# mounted read-only to avoid warning
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT";fi
+				sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT
+			fi
 		fi
 		;;
 	umount )
-		sudo umount $ISO_MOUNT_POINT
+		if [[ ${2} == "GUI" ]]; then
+			gksudo --description Wazzuf-Ripper "umount $ISO_MOUNT_POINT"
+		else
+			echo "Umount ISO_BD"
+			sudo umount $ISO_MOUNT_POINT
+		fi
 		;;
 	esac
 }
@@ -169,6 +182,15 @@ check_lsdvd () {
 	if [ ! -x "/usr/bin/lsdvd" ]; then
 		echo -ne "\n *************************************\n"
 		echo -ne " Please install lsdvd ! Exiting... \n"
+		echo -ne " *************************************\n"
+		exit 1
+	fi
+}
+
+check_mediainfo () {
+	if [ ! -x "/usr/bin/mediainfo" ]; then
+		echo -ne "\n *************************************\n"
+		echo -ne " Please install mediainfo ! Exiting... \n"
 		echo -ne " *************************************\n"
 		exit 1
 	fi

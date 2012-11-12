@@ -12,16 +12,19 @@ bindir = $(exec_prefix)/bin
 libdir = $(exec_prefix)/lib/wazzuf-ripper
 docdir = $(datarootdir)/doc/wazzuf-ripper
 datadir = $(datarootdir)/wazzuf-ripper
-templatesdir = $(datadir)/tag-templates
+desktopdir = $(datarootdir)/applications
 manpagesdir1= $(datarootdir)/man/man1
 manpagesdir4= $(datarootdir)/man/man4
+templatesdir = $(datadir)/tag-templates
+iconsdir = $(datadir)/icons
 
 installdirs: 
 	$(MKINSTALLDIRS) \
 	$(DESTDIR)$(bindir) $(DESTDIR)$(templatesdir) \
 	$(DESTDIR)$(libdir) $(DESTDIR)$(sysconfdir) \
 	$(DESTDIR)$(docdir) $(DESTDIR)$(manpagesdir1) \
-	$(DESTDIR)$(manpagesdir4)
+	$(DESTDIR)$(manpagesdir4) $(DESTDIR)$(desktopdir) \
+	$(DESTDIR)$(iconsdir)
 
 install: installdirs 
 	$(NORMAL_INSTALL)
@@ -33,3 +36,5 @@ install: installdirs
 		$(INSTALL) doc/* $(DESTDIR)$(docdir)/
 		$(INSTALL) manpages/man1/* $(DESTDIR)$(manpagesdir1)/
 		$(INSTALL) manpages/man4/* $(DESTDIR)$(manpagesdir4)/
+		$(INSTALL) gui/desktop/* $(DESTDIR)$(desktopdir)/
+		$(INSTALL) gui/icons/* $(DESTDIR)$(iconsdir)/

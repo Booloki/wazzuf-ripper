@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Wazzuf Conf Generator
+Comment=Generate a new Wazzuf Ripper configuration file.
+Icon=/usr/share/wazzuf-ripper/media-optical-video.png
+Type=Application
+Exec=/usr/bin/wazzuf-conf-generator
+Terminal=false
