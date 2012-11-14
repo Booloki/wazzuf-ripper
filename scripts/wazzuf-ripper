@@ -103,33 +103,88 @@ fi
 mkdir -p "$WORKING_PATH_BASE/$TAG_TITLE_NAME"
 cd $WORKING_PATH_BASE/$TAG_TITLE_NAME
 
-
-case $VIDEO_TYPE in
-MOVIE )
-	TITLE_LONG=$TITLE_NAME
-	DVD_CHAPTER_FIRST="1"
-	DVD_CHAPTER_LAST="1"
-	DVD_TITLE_LIST=$DVD_TITLE_NUMBER
-        ;;
-SHOW )
-	TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
-	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
-	if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then	DVD_TITLE_LIST=$DVD_TITLE_NUMBER; fi
-        ;;
-MUSIC )
-	TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
-	DVD_CHAPTER_FIRST="1"
-	DVD_CHAPTER_LAST="1"
-	DVD_TITLE_LIST=$DVD_TITLE_NUMBER
-        ;;
+# set organization
+case $SOURCE in
+BD | ISO_BD )
+	case $VIDEO_TYPE in
+	MOVIE )
+		TITLE_LONG="$TITLE_NAME"
+		TITLE_LIST=$BD_TITLE_NUMBER
+		CHAPTER_FIRST="1"
+		CHAPTER_LAST="1"
+		;;
+	SHOW )
+		TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
+		TITLE_LIST="$BD_TITLE_LIST"
+		CHAPTER_FIRST="1"
+		CHAPTER_LAST="1"
+		;;
+	MUSIC )
+		TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
+		TITLE_LIST=$BD_TITLE_NUMBER
+		CHAPTER_FIRST="1"
+		CHAPTER_LAST="1"
+		;;
+	* )
+		echo -ne "\n *************************************\n"
+		echo " VIDEO_TYPE not set to MOVIE, SHOW or MUSIC ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
+	esac
+	;;
+M2TS )
+	TITLE_LONG="$TITLE_NAME"
+	TITLE_LIST="1"
+	CHAPTER_FIRST="1"
+	CHAPTER_LAST="1"
+	;;
+DVD | ISO_DVD )
+	case $VIDEO_TYPE in
+	MOVIE )
+		TITLE_LONG="$TITLE_NAME"
+		CHAPTER_FIRST="1"
+		CHAPTER_LAST="1"
+		TITLE_LIST=$DVD_TITLE_NUMBER
+		;;
+	SHOW )
+		TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
+		if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
+		if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+			TITLE_LIST=$DVD_TITLE_NUMBER
+			CHAPTER_FIRST=$DVD_CHAPTER_FIRST
+			CHAPTER_LAST=$DVD_CHAPTER_LAST
+		else
+			TITLE_LIST="$DVD_TITLE_LIST"
+			CHAPTER_FIRST="1"
+			CHAPTER_LAST="1"		
+		fi
+		;;
+	MUSIC )
+		TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
+		CHAPTER_FIRST="1"
+		CHAPTER_LAST="1"
+		TITLE_LIST=$DVD_TITLE_NUMBER
+		;;
+	* )
+		echo -ne "\n *************************************\n"
+		echo " VIDEO_TYPE not set to MOVIE, SHOW or MUSIC ! Exiting..."
+		echo -ne " *************************************\n"
+		exit 1
+		;;
+	esac
+	;;
 * )
-	echo -ne "\n *************************************\n"
-	echo " VIDEO_TYPE not set to MOVIE, SHOW or MUSIC ! Exiting..."
-	echo -ne " *************************************\n"
+	echo -ne "\n Media source issue: make sure you filled DVD, ISO_DVD, BD, ISO_BD or M2TS in configuration file.\n"
 	exit 1
-        ;;
+	;;
 esac
 
+if [[ $DEBUG == "1" ]]; then
+	echo "DEBUG TITLE_LIST $TITLE_LIST"
+	echo "DEBUG CHAPTER_FIRST $CHAPTER_FIRST"
+	echo "DEBUG CHAPTER_LAST $CHAPTER_LAST"
+fi
 
 echo -ne "\n *************************************\n"
 echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
@@ -159,34 +214,26 @@ ISO_DVD )
 	check_ogmtools
 	;;
 * )
-        echo -ne "\n Media source issue: make sure you filled DVD, ISO_DVD, BD, ISO_BD or M2TS in configuration file.\n"
-        exit 1
-        ;;
+	echo -ne "\n Media source issue: make sure you filled DVD, ISO_DVD, BD, ISO_BD or M2TS in configuration file.\n"
+	exit 1
+	;;
 esac
 
 check_nice
 check_ionice
 
-time for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
+# Title(s) loop
+time for TITLE_NUMBER in $TITLE_LIST
 do
-time for ((i=$DVD_CHAPTER_FIRST; i <= DVD_CHAPTER_LAST ; i++))
+# Chapters(s) loop (useful if VIDEO_TYPE is SHOW and if DVD_EPISODES_ORG is CHAPTERS)
+time for ((i=$CHAPTER_FIRST; i <= CHAPTER_LAST ; i++))
 do
-	# check multichapters
-	case $MULTICHAP_FORCE in
+	case $CHAPTERS_CHOICE_FORCE in
 		y* | Y* )
-			CHAPTERS="$MULTICHAP_FIRST-$MULTICHAP_LAST"
-			case $SOURCE in
-			DVD | ISO_DVD )
-				DVD_CHAPTER_NUMBER=$CHAPTERS
-				;;
-			* )
-				DVD_CHAPTER_NUMBER=$i
-				;;
-			esac
+			CHAPTERS="$CHAPTERS_CHOICE_FIRST-$CHAPTERS_CHOICE_LAST"
 			;;
 		* )
-			DVD_CHAPTER_NUMBER=$i
-			CHAPTERS="$i-$i"
+			# nothing
 			;;
 	esac
 
@@ -227,7 +274,12 @@ do
 	SHOW )
 		SEASON_TYPE="S"
 		EPISODE_TYPE="E"
-		BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.T$DVD_TITLE_NUMBER.C$DVD_CHAPTER_NUMBER"
+		if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+			BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.T$TITLE_NUMBER.C$i"			
+			CHAPTERS="$i-$i"
+		else
+			BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.T$TITLE_NUMBER"		
+		fi
 		VOB_FILE="$BASE_WORKING_FILE.vob"
 		CHAPTERS_FILE_TXT="$BASE_WORKING_FILE-chapters.txt"
 		CHAPTERS_FILE_XML="$BASE_WORKING_FILE-chapters.xml"
@@ -249,7 +301,7 @@ do
 			if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 				EPISODE_NAME_FULL=`head -n $i "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
 			else
-				EPISODE_NAME_FULL=`head -n $DVD_TITLE_NUMBER "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
+				EPISODE_NAME_FULL=`head -n $TITLE_NUMBER "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
 			fi
 			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2-10 | sed s/\ //`
 			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`
@@ -284,28 +336,38 @@ do
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
 	DVD )
-		case $MULTICHAP_FORCE in
-			y* | Y* )
-				echo -ne "\n *************************************\n"
-				if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
-				echo -ne " *************************************\n"
-				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
-				;;
-			* )
-				echo -ne "\n *************************************\n"
-				echo " No chapters file to create. Next..."
-				echo -ne " *************************************\n"
-				MERGE_CHAPTERS=""
-				;;
-		esac
+		if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+			MERGE_CHAPTERS=""
+		else
+			case $CHAPTERS_CHOICE_FORCE in
+				y* | Y* )
+					echo -ne "\n *************************************\n"
+					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
+					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
+					;;
+				* )
+					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER /dev/dvd > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
+					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
+					;;
+			esac
+		fi
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_CHAPTERS $MERGE_CHAPTERS"; fi
 
 		if [ ! -f $VOB_FILE ]; then
-                	# extract local working file from DVD
-	               ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+			# extract local working file from DVD
+			case $CHAPTERS_CHOICE_FORCE in
+				y* | Y* )
+					echo -ne "\n *************************************\n"
+					ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+					;;
+				* )
+					ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE
+					;;
+			esac
 		else
-	                echo -ne "\n *************************************\n"
-	                echo " $VOB_FILE file exists. Next..."  && sleep 1
-        	        echo -ne " *************************************\n"
+			echo -ne "\n *************************************\n"
+			echo " $VOB_FILE file exists. Next..."  && sleep 1
+ 			echo -ne " *************************************\n"
 		fi
 
 		SOURCE_FILE=$VOB_FILE
@@ -317,30 +379,46 @@ do
 		fi
 	        ;;
 	ISO_DVD )
-		case $MULTICHAP_FORCE in
-			y* | Y* )
-				echo -ne "\n *************************************\n"
-				if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $DVD_TITLE_NUMBER -c $CHAPTERS "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
-				echo -ne " *************************************\n"
-				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
-				;;
-			* )
-				echo -ne "\n *************************************\n"
-				echo " No chapters file to create. Next..."
-				echo -ne " *************************************\n"
-				MERGE_CHAPTERS=""
-				;;
-		esac
+		if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+			MERGE_CHAPTERS=""
+		else
+			case $CHAPTERS_CHOICE_FORCE in
+				y* | Y* )
+					echo -ne "\n *************************************\n"
+					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER -c $CHAPTERS "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
+					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
+					;;
+				* )
+					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
+					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
+					;;
+			esac
+		fi
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_CHAPTERS $MERGE_CHAPTERS"; fi
 
 		if [ ! -f $VOB_FILE ]; then
 			echo -ne "\n *************************************\n"
 			echo " Extracting $VOB_FILE from $ISO_FILE..."
-			ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$DVD_TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+			if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device \"$SOURCE_DIRECTORY/$ISO_FILE\" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE"; fi
+				ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+			else
+				case $CHAPTERS_CHOICE_FORCE in
+					y* | Y* )
+						if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device \"$SOURCE_DIRECTORY/$ISO_FILE\" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE"; fi
+						ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+						;;
+					* )
+						if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device \"$SOURCE_DIRECTORY/$ISO_FILE\" -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE"; fi
+						ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE
+						;;
+				esac				
+			fi
 			echo -ne " *************************************\n"
 		else
-	                echo -ne "\n *************************************\n"
-	                echo " $VOB_FILE file exists. Next..."  && sleep 1
-        	        echo -ne " *************************************\n"
+			echo -ne "\n *************************************\n"
+			echo " $VOB_FILE file exists. Next..."  && sleep 1
+			echo -ne " *************************************\n"
 		fi
 
 		SOURCE_FILE=$VOB_FILE
@@ -368,7 +446,7 @@ do
 		# file have 444 rights cause read-only source
 		sudo chmod 644 "$SOURCE_DIRECTORY"/*.m2ts
 		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
-		# chapters management
+		# chapters playlist management
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/PLAYLIST/*.mpls $SOURCE_DIRECTORY/"; fi
 		sudo chmod 644 "$SOURCE_DIRECTORY"/*.mpls
 		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.mpls "$SOURCE_DIRECTORY"/
@@ -391,7 +469,6 @@ do
 		;;
 	M2TS )
 		SOURCE_FILE="$M2TS_FILE_PATH"
-		MERGE_CHAPTERS=""
 
 		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
 			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
@@ -438,6 +515,19 @@ do
 			SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 			SUBTITLE_FILE="$SUB_FILE.idx"
 			SUBTITLE_FILE_SUB="$SUB_FILE.sub"
+
+			if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+				MPLAYER_CHAPTERS="-chapter $CHAPTERS"
+			else
+				case $CHAPTERS_CHOICE_FORCE in
+					y* | Y* )
+						MPLAYER_CHAPTERS="-chapter $CHAPTERS"
+						;;
+					* )
+						MPLAYER_CHAPTERS=""
+						;;
+				esac				
+			fi
 			subtitle_rip
 		else
 			# If srt file, check encoding
@@ -496,6 +586,18 @@ do
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 				SUBTITLE_FILE="$SUB_FILE.idx"
 				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
+				if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+					MPLAYER_CHAPTERS="-chapter $CHAPTERS"
+				else
+					case $CHAPTERS_CHOICE_FORCE in
+						y* | Y* )
+							MPLAYER_CHAPTERS="-chapter $CHAPTERS"
+							;;
+						* )
+							MPLAYER_CHAPTERS=""
+							;;
+					esac				
+				fi
 				subtitle_rip
 			else
 				# If srt file, check encoding

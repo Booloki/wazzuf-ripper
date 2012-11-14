@@ -153,8 +153,8 @@ ZENITY_INFOS=$(zenity --forms \
     --add-entry="Release date" \
     --separator="|")
 if [ $? = "1" ]; then exit 0; fi
-ZENITY_TITLE=`echo "${ZENITY_INFOS}" | cut -d "|" -f1`
-ZENITY_DATE=`echo "${ZENITY_INFOS}" | cut -d "|" -f2`
+ZENITY_TITLE="`echo "${ZENITY_INFOS}" | cut -d "|" -f1`"
+ZENITY_DATE="`echo "${ZENITY_INFOS}" | cut -d "|" -f2`"
 
 # test empty ZENITY_TITLE
 if  [[ ! $ZENITY_TITLE == "" ]]; then
@@ -187,7 +187,7 @@ if [ $? = "1" ]; then
 	if [ $? = "1" ]; then
 		IMDB_ID=""
 	else
-		if [[ $IMDB_ID == "" || $IMDB_ID == "tt" ]]; then
+		if [[ $ZENITY_IMDBID == "" || $ZENITY_IMDBID == "tt" ]]; then
 			IMDB_ID=""
 		else
 			IMDB_ID="$ZENITY_IMDBID"
@@ -196,14 +196,14 @@ if [ $? = "1" ]; then
 fi
 if  [[ ! $IMDB_ID == "" ]]; then
 	echo "IMDB_ID=\"$IMDB_ID\"" >> $CONF_FILE_TMP
-	( imdbtool -i $IMDB_ID | wget -q `sed -n '/^poster/{n;p;}'` -O cover.jpg ) | zenity --progress \
+	( imdbtool -i $IMDB_ID | wget -q "`sed -n '/^poster/{n;p;}'`" -O cover.jpg ) | zenity --progress \
 	        --title="$ZEN_TITLE" \
 	        --text="Downloading cover" \
 	        --cancel-label="Cancel" \
 	        --pulsate \
 	        --auto-close
 	if [ $? = "1" ]; then
-		echo "cover download cancelled !"
+		echo "DEBUG Cover download cancelled !"
 		echo "COVER="\"\""" >> $CONF_FILE_TMP
 	else
 		echo "COVER="\"cover.jpg\""" >> $CONF_FILE_TMP
@@ -290,10 +290,13 @@ SHOW )
 			EPISODES_FILE="`echo ${ZENITY_EPISODES_FILE} | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%`"
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG EPISODES_FILE $EPISODES_FILE"; fi 
 			# Test if "empty"
-			if [[ ! "${EPISODES_FILE}" == "" ]]; then
-				echo "EPISODES_FILE="\"$ZENITY_EPISODES_FILE\""" >> $CONF_FILE_TMP
+			if [[ "`echo ${EPISODES_FILE}`" == "" ]]; then
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG No episode file !"
+					echo "EPISODES_FILE="\"\""" >> $CONF_FILE_TMP
+				fi
 			else
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG No episode file !" && exit 1; fi
+				echo "EPISODES_FILE="\"$EPISODES_FILE\""" >> $CONF_FILE_TMP
 			fi
 		else
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG Episode file not in source directory !" && exit 1; fi
@@ -332,7 +335,7 @@ BD | ISO_BD )
 		BD_MOUNT=$ISO_MOUNT_POINT
 	else
 		check_device BD PRE
-		BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
+		BD_MOUNT="`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`"
 	fi
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG BD_MOUNT ${BD_MOUNT}"; fi
 	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify br:// -bluray-device "$BD_MOUNT" 2>/dev/null > BD-mplayer.info ) | zenity --progress \
@@ -343,8 +346,8 @@ BD | ISO_BD )
 	        --auto-close
 
 	bd_get_longest_title
-	BD_LONGEST_TITLE_CHAPTERS=`grep ^ID_BLURAY_TITLE_$BD_LONGEST_TITLE_NUMBER BD-mplayer.info | grep _CHAPTERS | cut -d '=' -f 2`
-	BD_TOTAL_TITLES=`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f 2`
+	BD_LONGEST_TITLE_CHAPTERS="`grep ^ID_BLURAY_TITLE_$BD_LONGEST_TITLE_NUMBER BD-mplayer.info | grep _CHAPTERS | cut -d '=' -f 2`"
+	BD_TOTAL_TITLES="`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f 2`"
 
 	if [[ $DEBUG == "1" ]]; then
 		echo "DEBUG BD_LONGEST_TITLE_NUMBER $BD_LONGEST_TITLE_NUMBER"
@@ -369,13 +372,16 @@ DVD | ISO_DVD )
 	if [ $? = "1" ]; then exit 0; fi
 
 	if [[ $ZENITY_VIDEO_TYPE == "SHOW" ]]; then
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG Warning ! Assume DVD_EPISODES_ORG is TITLES !"; fi
 		# Episodes are classified on DVD CHAPTERS ("CHAPTERS") *or* on DVD TITLES ("TITLES")
 		# Default: Titles
 		DVD_EPISODES_ORG="TITLES"
+	#	DVD_EPISODES_ORG="CHAPTERS"
 		echo "DVD_EPISODES_ORG="\"$DVD_EPISODES_ORG\""" >> $CONF_FILE_TMP
 
 		case $DVD_EPISODES_ORG in
 		TITLES )
+			# If episodes are on DVD TITLES
 			grep "^Title:" DVD-lsdvd.info > DVD-Titles-lsdvd.info
 
 			# Titles
@@ -383,11 +389,11 @@ DVD | ISO_DVD )
 			while read line
 			do
 				i=`expr $i + 1`
-				DVD_TITLE_ID[$i]=`echo ${line} | cut -d ',' -f1 | cut -d ':' -f2 | sed s/\ //`
-				DVD_TITLE_LENGTH[$i]=`echo ${line} | cut -d ',' -f2 | cut -d '.' -f1 | sed s/\ //| cut -d ' ' -f2`
-				DVD_TITLE_CHAPTERS[$i]=`echo ${line} | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //`
-				DVD_TITLE_TRACKS_AUDIO[$i]=`echo ${line} | cut -d ',' -f4 | cut -d ':' -f2 | sed s/\ //`
-				DVD_TITLE_TRACKS_SUBTITLES[$i]=`echo ${line} | cut -d ',' -f5 | cut -d ':' -f2 | sed s/\ //`
+				DVD_TITLE_ID[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f2 | sed s/\ //`"
+				DVD_TITLE_LENGTH[$i]="`echo ${line} | cut -d ',' -f2 | cut -d '.' -f1 | sed s/\ //| cut -d ' ' -f2`"
+				DVD_TITLE_CHAPTERS[$i]="`echo ${line} | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //`"
+				DVD_TITLE_TRACKS_AUDIO[$i]="`echo ${line} | cut -d ',' -f4 | cut -d ':' -f2 | sed s/\ //`"
+				DVD_TITLE_TRACKS_SUBTITLES[$i]="`echo ${line} | cut -d ',' -f5 | cut -d ':' -f2 | sed s/\ //`"
 			done  < DVD-Titles-lsdvd.info
 			if [[ $DEBUG == "1" ]]; then
 				echo "DEBUG DVD_TITLE_IDs ${DVD_TITLE_ID[1]} ${DVD_TITLE_ID[2]} ${DVD_TITLE_ID[3]} ${DVD_TITLE_ID[4]}"
@@ -395,7 +401,7 @@ DVD | ISO_DVD )
 	
 			# For now, don't check Titles with DVD_TITLE_LENGTH < "00:01:00"
 			ZENITY_TITLES=$(
-				for ((l=1; l <= $i ; l++)); do if [[ `echo "${DVD_TITLE_LENGTH[l]}" | cut -d ':' -f 1-2` == "00:00" ]]; then echo FALSE; else echo TRUE; fi ; echo "${DVD_TITLE_ID[l]}"; echo "${DVD_TITLE_LENGTH[l]}"; echo "${DVD_TITLE_CHAPTERS[l]}"; echo "${DVD_TITLE_TRACKS_AUDIO[l]}"; echo "${DVD_TITLE_TRACKS_SUBTITLES[l]} "; done | zenity --list --checklist \
+				for ((l=1; l <= $i ; l++)); do if [[ "`echo "${DVD_TITLE_LENGTH[l]}" | cut -d ':' -f 1-2`" == "00:00" ]]; then echo FALSE; else echo TRUE; fi ; echo "${DVD_TITLE_ID[l]}"; echo "${DVD_TITLE_LENGTH[l]}"; echo "${DVD_TITLE_CHAPTERS[l]}"; echo "${DVD_TITLE_TRACKS_AUDIO[l]}"; echo "${DVD_TITLE_TRACKS_SUBTITLES[l]} "; done | zenity --list --checklist \
 				--title="$ZEN_TITLE" \
 				--ok-label "Next" --cancel-label "Quit" \
 				--width "600" \
@@ -412,10 +418,10 @@ DVD | ISO_DVD )
 			echo "DVD_TITLE_LIST="\"$DVD_TITLE_LIST\""" >> $CONF_FILE_TMP
 			;;
 		CHAPTERS )
-			# Not used for now
-			DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
-			echo "DVD_TITLE_NUMBER="\"$DVD_TITLE_NUMBER\""" >> $CONF_FILE_TMP
 			# If episodes are on DVD CHAPTERS
+			# Not used for now
+			DVD_TITLE_NUMBER="`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`"
+			echo "DVD_TITLE_NUMBER="\"$DVD_TITLE_NUMBER\""" >> $CONF_FILE_TMP
 			DVD_CHAPTER_FIRST="1"
 			DVD_CHAPTER_LAST="`grep "^Title: $DVD_TITLE_NUMBER" DVD-lsdvd.info | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //`"
 			echo "DVD_CHAPTER_FIRST="\"$DVD_CHAPTER_FIRST\""" >> $CONF_FILE_TMP
@@ -423,7 +429,7 @@ DVD | ISO_DVD )
 			;;
 		esac
 	else
-		DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
+		DVD_TITLE_NUMBER="`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`"
 		echo "DVD_TITLE_NUMBER="\"$DVD_TITLE_NUMBER\""" >> $CONF_FILE_TMP
 		zenity --info --title "$ZEN_TITLE" --text "The longest track is <b>Title $DVD_TITLE_NUMBER</b>.
 This one will be use for cropping detection." --ok-label "Next"
@@ -465,7 +471,7 @@ M2TS )
 	while read line
 	do
 		i=`expr $i + 1`
-		ID_HEX=`echo "${line}" | cut -d '[' -f 2 | cut -d ']' -f 1`
+		ID_HEX="`echo "${line}" | cut -d '[' -f 2 | cut -d ']' -f 1`"
 		if [[ ! $ID_HEX == "" ]]; then
 			ID=$(($ID_HEX))
 			M2TS_AUDIO_ID[$i]=$ID
@@ -473,16 +479,16 @@ M2TS )
 			if [ -f $MPLS_FILE_PATH ]; then
 				M2TS_AUDIO_LANG[$i]="`grep -A 6 $ID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
 			else
-				if [[ `echo ${line}  | cut -d ':' -f1 | cut -d ']' -f 2` == "" ]]; then
+				if [[ "`echo ${line}  | cut -d ':' -f1 | cut -d ']' -f 2`" == "" ]]; then
 					M2TS_AUDIO_LANG[$i]="unknown"
 				else
-					M2TS_AUDIO_LANG[$i]=`echo ${line} | cut -d '(' -f 2 | cut -d ')' -f 1`
+					M2TS_AUDIO_LANG[$i]="`echo ${line} | cut -d '(' -f 2 | cut -d ')' -f 1`"
 				fi
 			fi
 
-			M2TS_AUDIO_FORMAT[$i]=`echo ${line} | cut -d ',' -f1 | cut -d ':' -f3 | sed s/\ //g`
-			M2TS_AUDIO_CHANNELS[$i]=`echo ${line} | cut -d ',' -f3 | sed s/\ //g`
-			M2TS_AUDIO_BITRATE[$i]=`echo ${line} | cut -d ',' -f5 | sed s/\ //g`
+			M2TS_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f3 | sed s/\ //g`"
+			M2TS_AUDIO_CHANNELS[$i]="`echo ${line} | cut -d ',' -f3 | sed s/\ //g`"
+			M2TS_AUDIO_BITRATE[$i]="`echo ${line} | cut -d ',' -f5 | sed s/\ //g`"
 		fi
 	done < M2TS-avconv-audio.info
 	if [[ $DEBUG == "1" ]]; then
@@ -545,7 +551,7 @@ M2TS )
 		while read line
 		do
 			i=`expr $i + 1`
-			ID_HEX=`echo ${line} | cut -d '[' -f 2 | cut -d ']' -f 1`
+			ID_HEX="`echo ${line} | cut -d '[' -f 2 | cut -d ']' -f 1`"
 			if [[ ! $ID_HEX == "" ]]; then
 				SID=$(($ID_HEX))
 				M2TS_SUB_ID[$i]=$SID
@@ -558,7 +564,7 @@ M2TS )
 				else
 					M2TS_SUB_LANG[$i]="unknown"
 					# should be always pgssub
-					M2TS_SUB_FORMAT[$i]=`echo ${line} | grep -o '.\{6\}$'`
+					M2TS_SUB_FORMAT[$i]="`echo ${line} | grep -o '.\{6\}$'`"
 				fi
 			fi
 		done < M2TS-avconv-sub.info
@@ -661,13 +667,13 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 	while read line
 	do
 		i=`expr $i + 1`
-		ID_HEX=`echo ${line} | grep -o '.\{5\}$' | sed s/,//`
+		ID_HEX="`echo ${line} | grep -o '.\{5\}$' | sed s/,//`"
 		if [[ ! $ID_HEX == "" ]]; then
 			ID=$(($ID_HEX))
 			DVD_AUDIO_ID[$i]=$ID
-			DVD_AUDIO_LANG[$i]=`echo ${line} | cut -d ',' -f2 | cut -d ':' -f2 | sed s/\ //`
-			DVD_AUDIO_FORMAT[$i]=`echo ${line} | cut -d ',' -f3 | cut -d ':' -f2 | sed s/\ //`
-			DVD_AUDIO_CHANNELS[$i]=`echo ${line} | cut -d ',' -f6 | cut -d ':' -f2 | sed s/\ //`
+			DVD_AUDIO_LANG[$i]="`echo ${line} | cut -d ',' -f2 | cut -d ':' -f2 | sed s/\ //`"
+			DVD_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f3 | cut -d ':' -f2 | sed s/\ //`"
+			DVD_AUDIO_CHANNELS[$i]="`echo ${line} | cut -d ',' -f6 | cut -d ':' -f2 | sed s/\ //`"
 		fi
 	done  < DVD-lsdvd-T$DVD_TITLE_NUMBER-audio.info
 	if [[ $DEBUG == "1" ]]; then
@@ -699,7 +705,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 				if [[ $DEBUG == "1" ]]; then echo "DEBUG k -> $k - AID ${DVD_AUDIO_ID[$k]}"; fi
 				echo "" >> $CONF_FILE_TMP
 
-				ZENITY_AUDIO_TRACK_LANG=`echo ${DVD_AUDIO_LANG[$k]} | cut -d '|' -f2 | cut -d '-' -f1 | sed s/\ //`
+				ZENITY_AUDIO_TRACK_LANG="`echo ${DVD_AUDIO_LANG[$k]} | cut -d '|' -f2 | cut -d '-' -f1 | sed s/\ //`"
 				if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACK_LANG $ZENITY_AUDIO_TRACK_LANG"; fi
 				if [[ $ZENITY_AUDIO_TRACK_LANG == "xx" || $ZENITY_AUDIO_TRACK_LANG == "��" ]]; then
 					# replace xx or �� by und (Undetermined)
@@ -710,7 +716,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 
 				echo "AUDIO_${j}_AID=\"`echo ${DVD_AUDIO_ID[$k]} | cut -d '|' -f1`\"" >> $CONF_FILE_TMP
 
-				ZENITY_AUDIO_TRACK_SOURCE=`echo ${DVD_AUDIO_FORMAT[$k]} | cut -d '|' -f3`
+				ZENITY_AUDIO_TRACK_SOURCE="`echo ${DVD_AUDIO_FORMAT[$k]} | cut -d '|' -f3`"
 				case $ZENITY_AUDIO_TRACK_SOURCE in
 				ac3 )
 					echo "AUDIO_${j}_SOURCE=\"AC3\"" >> $CONF_FILE_TMP
@@ -726,7 +732,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 					;;
 				esac
 
-				ZENITY_AUDIO_TRACK_CHANNELS=`echo ${DVD_AUDIO_CHANNELS[$k]} | cut -d '|' -f4`
+				ZENITY_AUDIO_TRACK_CHANNELS="`echo ${DVD_AUDIO_CHANNELS[$k]} | cut -d '|' -f4`"
 				case $ZENITY_AUDIO_TRACK_CHANNELS in
 				2 )
 					echo "AUDIO_${j}_NAME=\"Stereo\"" >> $CONF_FILE_TMP
@@ -754,11 +760,11 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 		while read line
 		do
 			i=`expr $i + 1`
-			ID_HEX=`echo ${line} | grep -o '.\{6\}$' | sed s/,//`
+			ID_HEX="`echo ${line} | grep -o '.\{6\}$' | sed s/,//`"
 			if [[ ! $ID_HEX == "" ]]; then
 				SID=$(($ID_HEX))
 				DVD_SUB_ID[$i]=$SID
-				DVD_SUB_LANG[$i]=`echo ${line} | cut -d ',' -f2 | cut -d ':' -f2 | sed s/\ //`
+				DVD_SUB_LANG[$i]="`echo ${line} | cut -d ',' -f2 | cut -d ':' -f2 | sed s/\ //`"
 			fi
 		done < DVD-lsdvd-T$DVD_TITLE_NUMBER-sub.info
 		if [[ $DEBUG == "1" ]]; then
@@ -790,7 +796,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 					if [[ $DEBUG == "1" ]]; then echo "DEBUG k -> $k - SID ${DVD_SUB_ID[$k]}"; fi
 					echo "" >> $CONF_FILE_TMP
 	
-					ZENITY_SUBTITLE_TRACK_LANG=`echo ${DVD_SUB_LANG[$k]} | cut -d '|' -f2 | cut -d '-' -f1 | sed s/\ //`
+					ZENITY_SUBTITLE_TRACK_LANG="`echo ${DVD_SUB_LANG[$k]} | cut -d '|' -f2 | cut -d '-' -f1 | sed s/\ //`"
 					if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACK_LANG $ZENITY_SUBTITLE_TRACK_LANG"; fi
 					if [[ $ZENITY_SUBTITLE_TRACK_LANG == "xx" || $ZENITY_SUBTITLE_TRACK_LANG == "��" ]]; then
 						# replace xx or �� by und (Undetermined)

@@ -53,7 +53,6 @@ cropdetect(){
 		case $SOURCE in
 		BD | ISO_BD )
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer br://$BD_LONGEST_TITLE_NUMBER -bluray-device "$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			#mplayer br:///"$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 			mplayer br://$BD_LONGEST_TITLE_NUMBER -bluray-device "$BD_MOUNT" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 			wait
 			;;
@@ -106,7 +105,6 @@ copy-dvd2iso (){
 		check_genisoimage
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH""; fi
 		genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH"
-		# I: -input-charset not specified, using utf-8 (detected in locale settings)
 }
 
 ## get BD longest Title

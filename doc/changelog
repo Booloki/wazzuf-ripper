@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-14
+* Chapters / Playlist chapters management change
+* bugfixes: wazzuf-conf-generator
+
 2012-11-12
 * Add wazzuf-conf-generator GUI (zenity) script + corresponding icon and desktop file
 
