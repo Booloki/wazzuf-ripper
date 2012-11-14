@@ -329,6 +329,7 @@ M2TS_FILE_PATH="$SOURCE_DIRECTORY/$M2TS_FILE"
 # Media analyse
 case $SOURCE in
 BD | ISO_BD )
+	echo "M2TS_FILE="\"\""" >> $CONF_FILE_TMP
 	if [[ $SOURCE == "ISO_BD" ]]; then
 		check_device ISO_BD PRE
 		iso_bd_manage mount GUI
@@ -353,7 +354,7 @@ BD | ISO_BD )
 		echo "DEBUG BD_LONGEST_TITLE_NUMBER $BD_LONGEST_TITLE_NUMBER"
 		echo "DEBUG BD_TOTAL_TITLES $BD_TOTAL_TITLES"
 		echo "DEBUG BD_LONGEST_TITLE_CHAPTERS $BD_LONGEST_TITLE_CHAPTERS"
-		echo "BD_TITLE_NUMBER="\"$BD_LONGEST_TITLE_NUMBER\""" >> $CONF_FILE_TMP
+	#	echo "BD_TITLE_NUMBER="\"$BD_LONGEST_TITLE_NUMBER\""" >> $CONF_FILE_TMP
 	fi
 
 	zenity --info --title "$ZEN_TITLE" --text "The longest track is <b>Title $BD_LONGEST_TITLE_NUMBER</b> / $BD_TOTAL_TITLES (Chapters: $BD_LONGEST_TITLE_CHAPTERS).
