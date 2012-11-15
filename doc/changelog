@@ -3,7 +3,11 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-15
+* wazzuf-conf-generator: IMdb bugfix + improvements
+
 2012-11-14
+* Bugfixe: Desktop entry Icon + Categories
 * Bugfixes: BD conf-generator + ripper
 * Chapters / Playlist chapters management change
 * Bugfixes: wazzuf-conf-generator

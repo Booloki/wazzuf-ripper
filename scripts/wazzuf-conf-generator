@@ -149,7 +149,7 @@ echo "VIDEO_TYPE="\"${ZENITY_VIDEO_TYPE}"\"" >> $CONF_FILE_TMP
 ZENITY_INFOS=$(zenity --forms \
     --title="$ZEN_TITLE" \
     --text="Videos informations" \
-    --add-entry="Original title" \
+    --add-entry="Original title *" \
     --add-entry="Release date" \
     --separator="|")
 if [ $? = "1" ]; then exit 0; fi
@@ -166,47 +166,71 @@ else
 	exit 1
 fi
 
-echo "DATE="\"$ZENITY_DATE\""" >> $CONF_FILE_TMP
+# test ZENITY_DATE integer
+if echo "$ZENITY_DATE" | egrep -vq '^[0-9]+$'; then
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG Warning ! Provided date is not an integer !"; fi
+	# exit 1
+	echo "DATE="\"$ZENITY_DATE\""" >> $CONF_FILE_TMP
+else
+	echo "DATE="\"$ZENITY_DATE\""" >> $CONF_FILE_TMP
+fi
 
 # check ImdbID page
+TITLE_NAME="$ZENITY_TITLE"
 DATE="$ZENITY_DATE"
-get_imdb_id_title
-zenity --text-info --title "$ZEN_TITLE" \
-	--height "520" \
-	--width "700" \
-	--checkbox="It's the right one" \
-	--html --url "http://www.imdb.com/title/$IMDB_ID" \
-	--ok-label "OK" --cancel-label="No"
-if [ $? = "1" ]; then
-	# If not the good Imdb ID, ask it
-	ZENITY_IMDBID=$(zenity --entry \
-		--title="$ZEN_TITLE" \
-		--text="Please provide an Imdb ID: the ID in http://www.imdb.com/title/ID " \
-		--ok-label "OK" --cancel-label="No" \
-		--entry-text "tt" )
+get_imdb_response_title
+if  [[ $IMDB_RESPONSE == "True" ]]; then
+	get_imdb_id_title
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG IMDB_ID $IMDB_ID"; fi
+	zenity --text-info --title "$ZEN_TITLE" \
+		--height "520" \
+		--width "700" \
+		--checkbox="It's the right one" \
+		--html --url "http://www.imdb.com/title/$IMDB_ID" \
+		--ok-label "OK" --cancel-label="No"
 	if [ $? = "1" ]; then
-		IMDB_ID=""
-	else
-		if [[ $ZENITY_IMDBID == "" || $ZENITY_IMDBID == "tt" ]]; then
+		# If not the good Imdb ID, ask it
+		ZENITY_IMDBID=$(zenity --entry \
+			--title="$ZEN_TITLE" \
+			--text="Please provide an Imdb ID: the ID in http://www.imdb.com/title/ID " \
+			--ok-label "OK" --cancel-label="No" \
+			--entry-text "tt" )
+		if [ $? = "1" ]; then
 			IMDB_ID=""
 		else
-			IMDB_ID="$ZENITY_IMDBID"
+			if [[ $ZENITY_IMDBID == "" || $ZENITY_IMDBID == "tt" ]]; then
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG Wrong IMdb ID provided !"; fi
+				IMDB_ID=""
+			else
+				IMDB_ID="$ZENITY_IMDBID"
+			fi
 		fi
 	fi
+else
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG No IMdb informations found !"; fi
+	IMDB_ID=""
 fi
 if  [[ ! $IMDB_ID == "" ]]; then
 	echo "IMDB_ID=\"$IMDB_ID\"" >> $CONF_FILE_TMP
-	( imdbtool -i $IMDB_ID | wget -q "`sed -n '/^poster/{n;p;}'`" -O cover.jpg ) | zenity --progress \
-	        --title="$ZEN_TITLE" \
-	        --text="Downloading cover" \
-	        --cancel-label="Cancel" \
-	        --pulsate \
-	        --auto-close
-	if [ $? = "1" ]; then
-		echo "DEBUG Cover download cancelled !"
-		echo "COVER="\"\""" >> $CONF_FILE_TMP
+	IMDB_URL_COVER=`imdbtool -i $IMDB_ID | sed -n '/^poster/{n;p;}'`
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG IMDB_URL_COVER $IMDB_URL_COVER"; fi
+	# check if url exists
+	if [[ ! $IMDB_URL_COVER == "N/A" ]]; then
+		( wget -q "$IMDB_URL_COVER" -O cover.jpg ) | zenity --progress \
+		        --title="$ZEN_TITLE" \
+		        --text="Downloading cover" \
+		        --cancel-label="Cancel" \
+		        --pulsate \
+		        --auto-close
+		if [ $? = "1" ]; then
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG Cover download cancelled !"; fi
+			echo "COVER="\"\""" >> $CONF_FILE_TMP
+		else
+			echo "COVER="\"cover.jpg\""" >> $CONF_FILE_TMP
+		fi
 	else
-		echo "COVER="\"cover.jpg\""" >> $CONF_FILE_TMP
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG No cover available !"; fi
+		echo "COVER="\"\""" >> $CONF_FILE_TMP
 	fi
 else
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG No ID so no cover"; fi
