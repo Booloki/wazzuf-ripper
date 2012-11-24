@@ -454,10 +454,23 @@ M2TS )
 	        --pulsate \
 	        --auto-close
 
-	# extract informations from mpls file
+	# extract informations from associated mpls or clpi file
 	MPLS_FILE_PATH="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
 	check_mediainfo
-	if [ -f $MPLS_FILE_PATH ]; then mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "$MPLS_FILE_PATH" 2&>1; fi
+	if [ -f $MPLS_FILE_PATH ]; then
+		mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "$MPLS_FILE_PATH" 2&>1
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from mpls file"; fi
+	else
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG no associated mpls file found"; fi
+		# Parfois pas de mpls mais BDMV/CLIPINF/00000.clpi ! (infos audio/video/sub au moins) works !!
+		CLPI_FILE_PATH="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!clpi!'`"
+		if [ -f $CLPI_FILE_PATH ]; then
+			mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "$CLPI_FILE_PATH" 2&>1
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from clpi file"; fi
+		else
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG no associated clpi file found"; fi
+		fi
+	fi
 
 	echo "# useless for m2ts/ts files" >> $CONF_FILE_TMP
         ;;
@@ -543,6 +556,9 @@ M2TS )
 				case $ZENITY_AUDIO_TRACK_SOURCE in
 				ac3 )
 					echo "AUDIO_${j}_SOURCE=\"AC3\"" >> $CONF_FILE_TMP
+					;;
+				"dca(DTS)" | "dca(DTS-HDMA)" )
+					echo "AUDIO_${j}_SOURCE=\"DTS\"" >> $CONF_FILE_TMP
 					;;
 				* )
 					echo "AUDIO_${j}_SOURCE=\"$ZENITY_AUDIO_TRACK_SOURCE\"" >> $CONF_FILE_TMP

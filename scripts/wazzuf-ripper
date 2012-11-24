@@ -449,7 +449,10 @@ do
 		# chapters playlist management
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/PLAYLIST/*.mpls $SOURCE_DIRECTORY/"; fi
 		sudo chmod 644 "$SOURCE_DIRECTORY"/*.mpls
-		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.mpls "$SOURCE_DIRECTORY"/
+		# others informations (useful for wazzuf-conf-generator)
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/CLIPINF/*.clpi $SOURCE_DIRECTORY/"; fi
+		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.clpi "$SOURCE_DIRECTORY"/
+		sudo chmod 644 "$SOURCE_DIRECTORY"/*.clpi
 
 		SOURCE_FILE="$M2TS_FILE"
 		MERGE_CHAPTERS=""
