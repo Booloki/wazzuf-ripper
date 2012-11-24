@@ -190,25 +190,11 @@ if  [[ $IMDB_RESPONSE == "True" ]]; then
 		--ok-label "OK" --cancel-label="No"
 	if [ $? = "1" ]; then
 		# If not the good Imdb ID, ask it
-		ZENITY_IMDBID=$(zenity --entry \
-			--title="$ZEN_TITLE" \
-			--text="Please provide an Imdb ID: the ID in http://www.imdb.com/title/ID " \
-			--ok-label "OK" --cancel-label="No" \
-			--entry-text "tt" )
-		if [ $? = "1" ]; then
-			IMDB_ID=""
-		else
-			if [[ $ZENITY_IMDBID == "" || $ZENITY_IMDBID == "tt" ]]; then
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG Wrong IMdb ID provided !"; fi
-				IMDB_ID=""
-			else
-				IMDB_ID="$ZENITY_IMDBID"
-			fi
-		fi
+		imdb_id_ask_gui
 	fi
 else
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG No IMdb informations found !"; fi
-	IMDB_ID=""
+	imdb_id_ask_gui
 fi
 if  [[ ! $IMDB_ID == "" ]]; then
 	echo "IMDB_ID=\"$IMDB_ID\"" >> $CONF_FILE_TMP
