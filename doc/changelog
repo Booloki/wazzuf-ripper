@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-25
+* Add multi (>2) subtitles support
+
 2012-11-24
 * Add BD clpi files support for informations extraction
 * wazzuf-conf-generator: IMdb improvements

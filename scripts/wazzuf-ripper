@@ -496,99 +496,39 @@ do
 	esac
 
 
-	## subtitle(s) check/extract/copy
+	## subtitle file(s) check/extract/copy
 	trap "echo -e '\nManual killed script (Ctrl-C) during checking/extracting subtitles' && exit 1" 2
-	if [[ $SUBTITLE_1_LANG == "" ]]; then
-		echo -ne "\n *************************************\n"
-		echo " No subtitle track choice, next..." && sleep 1
-		echo -ne " *************************************\n"
-		TOTAL_SUBTITLE_SIZE="0"
-	else
-		# subtitle track 1
-		SUBTITLE_LANG=$SUBTITLE_1_LANG
-		SUBTITLE_NAME="$SUBTITLE_1_NAME"
-		SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_1_FILE_FORCE"
+	TOTAL_SUBTITLE_SIZE="0"
+	SUB_COUNTER=1
+	while [ ! $SUB_COUNTER -eq 0 ]; do
+		SUBTITLE_LANG_VARNAME=\$SUBTITLE_${SUB_COUNTER}_LANG
+		SUBTITLE_LANG=`eval "echo $SUBTITLE_LANG_VARNAME"`
 
-		echo -ne "\n *************************************\n"
-		echo " Subtitle 1 track...."
-		# subtitle file (force external or not)
-		if [[ "$SUBTITLE_1_FILE_FORCE" == "" ]]; then
-			if echo $SUBTITLE_1_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_1_SID provided is not an integer ! Exiting....\n"; exit 1; fi
-			SUBTITLE_SID=$SUBTITLE_1_SID
-			SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
-			SUBTITLE_FILE="$SUB_FILE.idx"
-			SUBTITLE_FILE_SUB="$SUB_FILE.sub"
-
-			if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
-				MPLAYER_CHAPTERS="-chapter $CHAPTERS"
-			else
-				case $CHAPTERS_CHOICE_FORCE in
-					y* | Y* )
-						MPLAYER_CHAPTERS="-chapter $CHAPTERS"
-						;;
-					* )
-						MPLAYER_CHAPTERS=""
-						;;
-				esac				
-			fi
-			subtitle_rip
-		else
-			# If srt file, check encoding
-			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
-			# Copy subtitle file
-			cp -v "$SUBTITLE_FILE_FORCE_PATH" .
-			# If .idx file, copy .sub file too.
-			if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
-				SUBTITLE_FILE_SUB=`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`
-				cp -v $SUBTITLE_FILE_SUB .				
-			fi
-			SUBTITLE_FILE="$SUBTITLE_1_FILE_FORCE"
-		fi
-
-		# subtitle 1 files size
-		if  [[ `echo "$SUBTITLE_1_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
-			SUBTITLE_1_SIZE=$(expr `ls -l $SUBTITLE_FILE | cut -d ' ' -f 5` + `ls -l $SUBTITLE_FILE_SUB | cut -d ' ' -f 5`)
-		else
-			SUBTITLE_1_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
-		fi
-
-		if [[ $DEBUG == "1" ]]; then
-			echo "DEBUG SUBTITLE_FILE $SUBTITLE_FILE"
-			echo "DEBUG SUBTITLE_FILE_SUB $SUBTITLE_FILE_SUB"
-			echo "DEBUG SUBTITLE_1_SIZE $SUBTITLE_1_SIZE"
-		fi
- 
-		# Force no default subtitle (or not)
-		case $SUBTITLE_NODEFAULT_FORCE in
-		Y* | y* )
-			MERGE_SUBTITLES_1="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
-			;;
-		* )
-			MERGE_SUBTITLES_1="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
-			;;
-		esac
-		
-		# subtitle track 2
-		if [[ $SUBTITLE_2_LANG == "" ]]; then
+		if [[ $SUBTITLE_LANG == "" ]]; then
 			echo -ne "\n *************************************\n"
-			echo " No second subtitle track choice. Next..." && sleep 1
-	        	echo -ne " *************************************\n"
-			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1"
-			SUBTITLE_2_SIZE="0"
+			echo " No more subtitle track choice, next..." && sleep 1
+			echo -ne " *************************************\n"
+			SUB_COUNTER=0
 		else
-			SUBTITLE_LANG=$SUBTITLE_2_LANG
-			SUBTITLE_NAME="$SUBTITLE_2_NAME"
-			SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_2_FILE_FORCE"
-		
+			SUBTITLE_NAME_VARNAME=\$SUBTITLE_${SUB_COUNTER}_NAME
+			SUBTITLE_NAME=`eval "echo $SUBTITLE_NAME_VARNAME"`
+
+			SUBTITLE_SID_VARNAME=\$SUBTITLE_${SUB_COUNTER}_SID
+			SUBTITLE_SID=`eval "echo $SUBTITLE_SID_VARNAME"`
+
+			SUBTITLE_FILE_FORCE_VARNAME=\$SUBTITLE_${SUB_COUNTER}_FILE_FORCE
+			SUBTITLE_FILE_FORCE=`eval "echo $SUBTITLE_FILE_FORCE_VARNAME"`
+			SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_FILE_FORCE"
+
 			echo -ne "\n *************************************\n"
-			echo " Subtitle 2 track..."
+			echo " Subtitle $SUB_COUNTER track...."
 			# subtitle file (force external or not)
-			if [[ "$SUBTITLE_2_FILE_FORCE" == "" ]]; then
-				if echo $SUBTITLE_2_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_2_SID provided is not an integer ! Exiting....\n"; exit 1; fi
-				SUBTITLE_SID=$SUBTITLE_2_SID
+			if [[ "$SUBTITLE_FILE_FORCE" == "" ]]; then
+				if echo $SUBTITLE_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_${SUB_COUNTER}_SID provided is not an integer ! Exiting....\n"; exit 1; fi
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 				SUBTITLE_FILE="$SUB_FILE.idx"
 				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
+
 				if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 					MPLAYER_CHAPTERS="-chapter $CHAPTERS"
 				else
@@ -604,48 +544,50 @@ do
 				subtitle_rip
 			else
 				# If srt file, check encoding
-				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
+				if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
 				# Copy subtitle file
 				cp -v "$SUBTITLE_FILE_FORCE_PATH" .
 				# If .idx file, copy .sub file too.
-				if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
+				if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
 					SUBTITLE_FILE_SUB=`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`
-					cp -v $SUBTITLE_FILE_SUB .					
+					cp -v $SUBTITLE_FILE_SUB .				
 				fi
-				SUBTITLE_FILE="$SUBTITLE_2_FILE_FORCE"
+				SUBTITLE_FILE="$SUBTITLE_FILE_FORCE"
 			fi
 
-			# subtitle 2 files size
-			if  [[ `echo "$SUBTITLE_2_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
-				SUBTITLE_2_SIZE=$(expr `ls -l $SUBTITLE_FILE | cut -d ' ' -f 5` + `ls -l $SUBTITLE_FILE_SUB | cut -d ' ' -f 5`)
+			# subtitle files size
+			if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
+				SUBTITLE_SIZE=$(expr `ls -l $SUBTITLE_FILE | cut -d ' ' -f 5` + `ls -l $SUBTITLE_FILE_SUB | cut -d ' ' -f 5`)
 			else
-				SUBTITLE_2_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
+				SUBTITLE_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
 			fi
+			TOTAL_SUBTITLE_SIZE=$(expr $TOTAL_SUBTITLE_SIZE + $SUBTITLE_SIZE)
 
 			if [[ $DEBUG == "1" ]]; then
 				echo "DEBUG SUBTITLE_FILE $SUBTITLE_FILE"
 				echo "DEBUG SUBTITLE_FILE_SUB $SUBTITLE_FILE_SUB"
-				echo "DEBUG SUBTITLE_2_SIZE $SUBTITLE_2_SIZE"
+				echo "DEBUG SUBTITLE_SIZE $SUBTITLE_SIZE"
 			fi
-
+ 
 			# Force no default subtitle (or not)
 			case $SUBTITLE_NODEFAULT_FORCE in
 			Y* | y* )
-				MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+				MERGE_SUBTITLE="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
 				;;
 			* )
-				MERGE_SUBTITLES_2="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+				MERGE_SUBTITLE="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
 				;;
 			esac
-			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_1 $MERGE_SUBTITLES_2"
-		fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_SUBTITLE $MERGE_SUBTITLE"
+			MERGE_SUBTITLES_FULL="$MERGE_SUBTITLES_FULL $MERGE_SUBTITLE"
 
-		TOTAL_SUBTITLE_SIZE=$(expr $SUBTITLE_1_SIZE + $SUBTITLE_2_SIZE)
-		if [[ $DEBUG == "1" ]]; then
-			echo "DEBUG SUBTITLE_1_SIZE $SUBTITLE_1_SIZE"
-			echo "DEBUG SUBTITLE_2_SIZE $SUBTITLE_2_SIZE"
-			echo "DEBUG TOTAL_SUBTITLE_SIZE $TOTAL_SUBTITLE_SIZE"
+			let SUB_COUNTER=SUB_COUNTER+1
 		fi
+	done
+
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG MERGE_SUBTITLES_FULL $MERGE_SUBTITLES_FULL"
+		echo "DEBUG TOTAL_SUBTITLE_SIZE $TOTAL_SUBTITLE_SIZE"
 	fi
 
 
