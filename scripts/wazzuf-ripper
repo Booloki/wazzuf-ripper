@@ -66,6 +66,7 @@ OPUS | Opus | opus )
         wazzuf_usage
         ;;
 esac
+if [[ $DEBUG == "1" ]]; then echo "DEBUG CODEC_AUDIO_1 $CODEC_AUDIO_1"; fi
 
 # audio 2 codec choice check
 if [[ ! $AUDIO_2_LANG == "" ]]; then
@@ -97,7 +98,27 @@ if [[ ! $AUDIO_2_LANG == "" ]]; then
 else
 	CODEC_AUDIO_2=""
 fi
+if [[ $DEBUG == "1" ]]; then echo "DEBUG CODEC_AUDIO_2 $CODEC_AUDIO_2"; fi
 
+# others audio track(s) codec
+# max audio tracks arbitrary set to 20
+for number in `seq 3 20`
+do
+	CODEC_AUDIO_VARNAME=CODEC_AUDIO_${number}
+	if [ $DEFAULT_CODEC_AUDIO == "DUMP" ]; then
+		AUDIO_SOURCE_VARNAME="AUDIO_${number}_SOURCE"
+		eval ${CODEC_AUDIO_VARNAME}=${!AUDIO_SOURCE_VARNAME}
+	else
+		eval ${CODEC_AUDIO_VARNAME}=${DEFAULT_CODEC_AUDIO}
+		CODEC_AUDIO_VALUE=${!CODEC_AUDIO_VARNAME}
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG $CODEC_AUDIO_VARNAME $CODEC_AUDIO_VALUE"; fi
+	fi
+done
+if [[ $DEBUG == "1" ]]; then
+	echo "DEBUG CODEC_AUDIO_3 $CODEC_AUDIO_3"
+	echo "DEBUG CODEC_AUDIO_4 $CODEC_AUDIO_4"
+	echo "DEBUG CODEC_AUDIO_5 $CODEC_AUDIO_5"
+fi
 
 # enter working directory
 mkdir -p "$WORKING_PATH_BASE/$TAG_TITLE_NAME"
@@ -593,66 +614,65 @@ do
 
 	## Audio track(s) extract/encode
 	trap "echo -e '\nManual killed script (Ctrl-C) during Audio track(s) extracting/encoding' && exit 1" 2
+	TOTAL_AUDIO_SIZE="0"
+	AUDIO_COUNTER=1
+	while [ ! $AUDIO_COUNTER -eq 0 ]; do
+		AUDIO_LANG_VARNAME=\$AUDIO_${AUDIO_COUNTER}_LANG
+		AUDIO_LANG=`eval "echo $AUDIO_LANG_VARNAME"`
 
-	# audio track 1
-	AUDIO_AID=$AUDIO_1_AID
-	AUDIO_SOURCE=$AUDIO_1_SOURCE
-	AUDIO_LANG=$AUDIO_1_LANG
-	AUDIO_NAME=$AUDIO_1_NAME
-	CODEC_AUDIO=$CODEC_AUDIO_1
-	DTS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.dts"
-	WAV_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.wav"
-	MP3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.mp3"
-	OGG_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ogg"
-	OPUS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.opus"
-	AC3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ac3"
+		if [[ $AUDIO_LANG == "" ]]; then
+			echo -ne "\n *************************************\n"
+			echo " No more audio track choice, next..." && sleep 1
+			echo -ne " *************************************\n"
+			AUDIO_COUNTER=0
+		else
+			AUDIO_NAME_VARNAME=\$AUDIO_${AUDIO_COUNTER}_NAME
+			AUDIO_NAME=`eval "echo $AUDIO_NAME_VARNAME"`
 
-	audio_rip
+			AUDIO_AID_VARNAME=\$AUDIO_${AUDIO_COUNTER}_AID
+			AUDIO_AID=`eval "echo $AUDIO_AID_VARNAME"`
 
-	AUDIO_1_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
+			AUDIO_SOURCE_VARNAME=\$AUDIO_${AUDIO_COUNTER}_SOURCE
+			AUDIO_SOURCE=`eval "echo $AUDIO_SOURCE_VARNAME"`
 
-	# merge with or without audio sync
-	if [[ $AUDIO_1_SYNC == "" ]]; then
-		MERGE_AUDIO_1="--language 0:$AUDIO_1_LANG --track-name 0:$AUDIO_1_NAME $AUDIO_FILE"
-	else	
-		MERGE_AUDIO_1="--language 0:$AUDIO_1_LANG --track-name 0:$AUDIO_1_NAME -y 0:$AUDIO_1_SYNC $AUDIO_FILE"
-	fi
+			AUDIO_SYNC_VARNAME=\$AUDIO_${AUDIO_COUNTER}_SYNC
+			AUDIO_SYNC=`eval "echo $AUDIO_SYNC_VARNAME"`
 
-	# audio track 2
-	if [[ $AUDIO_2_LANG == "" ]]; then
-		echo -ne "\n *************************************\n"
-		echo " No second audio track choice. Next..."  && sleep 1
-        	echo -ne " *************************************\n"
-		AUDIO_2_SIZE="0"
-	else
-		AUDIO_AID=$AUDIO_2_AID
-		AUDIO_SOURCE=$AUDIO_2_SOURCE
-		AUDIO_LANG=$AUDIO_2_LANG
-		AUDIO_NAME=$AUDIO_2_NAME
-		CODEC_AUDIO=$CODEC_AUDIO_2
-		DTS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.dts"
-		WAV_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.wav"
-		MP3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.mp3"
-		OGG_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ogg"
-		OPUS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.opus"
-		AC3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ac3"
+			CODEC_AUDIO_VARNAME=\$CODEC_AUDIO_${AUDIO_COUNTER}
+			CODEC_AUDIO=`eval "echo $CODEC_AUDIO_VARNAME"`
 
-		audio_rip
+			DTS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.dts"
+			WAV_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.wav"
+			MP3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.mp3"
+			OGG_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ogg"
+			OPUS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.opus"
+			AC3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ac3"
 
-		AUDIO_2_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
+			echo -ne "\n *************************************\n"
+			echo " Audio $AUDIO_COUNTER track...."
+			audio_rip
 
-		if [[ $AUDIO_2_SYNC == "" ]]; then
-			MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME $AUDIO_FILE"
-		else	
-			MERGE_AUDIO_2="--language 0:$AUDIO_2_LANG --track-name 0:$AUDIO_2_NAME -y 0:$AUDIO_2_SYNC $AUDIO_FILE"
-		fi					
-	fi
-	MERGE_AUDIO_FULL="$MERGE_AUDIO_1 $MERGE_AUDIO_2"
-	TOTAL_AUDIO_SIZE=$(expr $AUDIO_1_SIZE + $AUDIO_2_SIZE)
+			AUDIO_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG AUDIO_SIZE $AUDIO_SIZE"; fi
+			TOTAL_AUDIO_SIZE=$(expr $TOTAL_AUDIO_SIZE + $AUDIO_SIZE)
+
+			# merge with or without audio sync
+			# TODO problems for track-name with name containing spaces... so compose the command is hard...
+			if [[ $AUDIO_SYNC == "" ]]; then
+				MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:$AUDIO_NAME $AUDIO_FILE"
+			else	
+				MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:$AUDIO_NAME -y 0:$AUDIO_SYNC $AUDIO_FILE"
+			fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_AUDIO $MERGE_AUDIO"; fi
+			MERGE_AUDIO_FULL="$MERGE_AUDIO_FULL $MERGE_AUDIO"
+
+			let AUDIO_COUNTER=AUDIO_COUNTER+1
+		fi
+	done
+	
 	if [[ $DEBUG == "1" ]]; then
-		echo "DEBUG AUDIO_1_SIZE $AUDIO_1_SIZE"
-		echo "DEBUG AUDIO_2_SIZE $AUDIO_2_SIZE"
 		echo "DEBUG TOTAL_AUDIO_SIZE $TOTAL_AUDIO_SIZE"
+		echo "DEBUG MERGE_AUDIO_FULL $MERGE_AUDIO_FULL"
 	fi
 
 

@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-11-25
+* Add multi audio tracks support (up to 20)
 * Add multi (>2) subtitles support
 
 2012-11-24
