@@ -376,15 +376,20 @@ do
 
 		if [ ! -f $VOB_FILE ]; then
 			# extract local working file from DVD
-			case $CHAPTERS_CHOICE_FORCE in
-				y* | Y* )
-					echo -ne "\n *************************************\n"
-					ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
-					;;
-				* )
-					ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE
-					;;
-			esac
+			if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+				echo -ne "\n *************************************\n"
+				ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+			else
+				case $CHAPTERS_CHOICE_FORCE in
+					y* | Y* )
+						echo -ne "\n *************************************\n"
+						ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
+						;;
+					* )
+						ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE
+						;;
+				esac
+			fi
 		else
 			echo -ne "\n *************************************\n"
 			echo " $VOB_FILE file exists. Next..."  && sleep 1
