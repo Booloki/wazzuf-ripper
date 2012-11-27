@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-27
+* Bugfixes: SHOW audio and subtitle merge + mpls files copy
+
 2012-11-25
 * Bugfix: wazzuf-conf-generator m2ts informations
 * Add multi audio tracks support (up to 20)

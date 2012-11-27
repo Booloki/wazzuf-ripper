@@ -469,6 +469,7 @@ do
 		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
 		# chapters playlist management
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/PLAYLIST/*.mpls $SOURCE_DIRECTORY/"; fi
+		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.mpls "$SOURCE_DIRECTORY"/
 		sudo chmod 644 "$SOURCE_DIRECTORY"/*.mpls
 		# others informations (useful for wazzuf-conf-generator)
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/CLIPINF/*.clpi $SOURCE_DIRECTORY/"; fi
@@ -520,6 +521,7 @@ do
 	## subtitle file(s) check/extract/copy
 	trap "echo -e '\nManual killed script (Ctrl-C) during checking/extracting subtitles' && exit 1" 2
 	TOTAL_SUBTITLE_SIZE="0"
+	MERGE_SUBTITLES_FULL=""
 	SUB_COUNTER=1
 	while [ ! $SUB_COUNTER -eq 0 ]; do
 		SUBTITLE_LANG_VARNAME=\$SUBTITLE_${SUB_COUNTER}_LANG
@@ -615,6 +617,7 @@ do
 	## Audio track(s) extract/encode
 	trap "echo -e '\nManual killed script (Ctrl-C) during Audio track(s) extracting/encoding' && exit 1" 2
 	TOTAL_AUDIO_SIZE="0"
+	MERGE_AUDIO_FULL=""
 	AUDIO_COUNTER=1
 	while [ ! $AUDIO_COUNTER -eq 0 ]; do
 		AUDIO_LANG_VARNAME=\$AUDIO_${AUDIO_COUNTER}_LANG
@@ -648,8 +651,7 @@ do
 			OPUS_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.opus"
 			AC3_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.ac3"
 
-			echo -ne "\n *************************************\n"
-			echo " Audio $AUDIO_COUNTER track...."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG AUDIO_COUNTER $AUDIO_COUNTER"; fi
 			audio_rip
 
 			AUDIO_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
