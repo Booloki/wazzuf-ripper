@@ -84,6 +84,7 @@ ISO_BD | ISO_DVD )
 		# Test if "empty"
 		if [[ ! "${ISO_FILE}" == "" ]]; then
 			echo "ISO_FILE=\""${ISO_FILE}"\"" >> $CONF_FILE_TMP
+			echo "M2TS_FILE=\"\"" >> $CONF_FILE_TMP
 		else
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG Iso file empty !" && exit 1; fi
 		fi
@@ -887,30 +888,9 @@ echo "DEFAULT_CODEC_AUDIO="\"${ZENITY_CODEC_AUDIO}"\"" >> $CONF_FILE_TMP
 
 # for others codecs parameters
 echo "" >> $CONF_FILE_TMP
-echo "AUDIO_OGG_QUAL="\"9\""" >> $CONF_FILE_TMP
-echo "AUDIO_MP3_MODE="\"CBR\""" >> $CONF_FILE_TMP
-echo "AUDIO_MP3_CBR="\"192\""" >> $CONF_FILE_TMP
-echo "AUDIO_MP3_VBR="\"0\""" >> $CONF_FILE_TMP
-echo "AUDIO_MP3_VOL="\"1\""" >> $CONF_FILE_TMP
-echo "AUDIO_OPUS_MODE="\"VBR\""" >> $CONF_FILE_TMP
-echo "AUDIO_OPUS_BITRATE="\"192\""" >> $CONF_FILE_TMP
-echo "AUDIO_AC3_QUAL="\"448k\""" >> $CONF_FILE_TMP
-echo "" >> $CONF_FILE_TMP
-echo "TARGET_SIZE="\"\""" >> $CONF_FILE_TMP
-echo "DVDRIP_VIDEO_BITRATE="\"3000\""" >> $CONF_FILE_TMP
-echo "BDRIP_VIDEO_BITRATE="\"8000\""" >> $CONF_FILE_TMP
-echo "" >> $CONF_FILE_TMP
-echo "VIDEO_X264_SUBQ_PASS1="\"1\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_FRAMEREF_PASS1="\"1\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_BFRAMES_PASS1="\"3\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_TRELLIS_PASS1="\"2\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_SUBQ_PASS2="\"7\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_FRAMEREF_PASS2="\"15\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_BFRAMES_PASS2="\"3\""" >> $CONF_FILE_TMP
-echo "VIDEO_X264_TRELLIS_PASS2="\"2\""" >> $CONF_FILE_TMP
-echo "" >> $CONF_FILE_TMP
-echo "VIDEO_XVID_VHQ_PASS1="\"0\""" >> $CONF_FILE_TMP
-echo "VIDEO_XVID_VHQ_PASS2="\"4\""" >> $CONF_FILE_TMP
+# To get the template conf values:
+CONF_FILE_EXAMPLE_LINE=`grep -n "^# Others codecs options" $CONF_FILE_EXAMPLE | cut -d ':' -f 1`
+tail -n +$CONF_FILE_EXAMPLE_LINE $CONF_FILE_EXAMPLE >> $CONF_FILE_TMP
 
 zenity --info --title "$ZEN_TITLE" \
 	--text "Your Wazzuf configuration file has been saved to <b>$CONF_FILE_TMP</b>"

@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-11-29
+* wazzuf-conf-generator: now get other codec parameters from the template configuration file
+
 2012-11-27
 * Bugfix: vob files dumping for physical DVD if SHOW & DVD CHAPTERS organization
 * Bugfixes: SHOW audio and subtitle merge + mpls files copy
