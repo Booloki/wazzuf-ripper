@@ -1,5 +1,46 @@
 ## video encode function
 
+# video_dvd_chapters_extract
+# need 	TITLE_NUMBER
+#	DVDXCHAP_DEVICE
+#	DVDXCHAP_CHAPTERS
+#	WAZZUF_UI
+#
+# return CHAPTERS_FILE_TXT
+video_dvd_chapters_extract () {
+	# Save chapters informations (DVD/ISO_DVD only)
+	if [[ $WAZZUF_UI == "GUI" ]]; then
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ( dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT ) | zenity --progress --pulsate --title \"$ZEN_TITLE\" --text \"Creating $CHAPTERS_FILE_TXT from $SOURCE\" --auto-close"; fi
+		( dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT ) \
+			| zenity --progress --pulsate --title "$ZEN_TITLE" --text "Creating $CHAPTERS_FILE_TXT from $SOURCE" --auto-close --auto-kill
+	else
+		echo -ne "\n *************************************\n"
+		echo " Creating $CHAPTERS_FILE_TXT from $SOURCE..."
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT"; fi
+		dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT
+	fi
+}
+
+# video_vob_dump
+# need 	TITLE_NUMBER
+#	MPLAYER_VOB_DUMP_DEVICE
+#	MPLAYER_VOB_DUMP_CHAPTERS
+#	WAZZUF_UI
+#
+# return VOB_FILE
+video_vob_dump () {
+	if [[ $WAZZUF_UI == "GUI" ]]; then
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ( ionice -c $IONICENESS nice -n $NICENESS mplayer ${MPLAYER_VOB_DUMP_DEVICE} -dumpstream dvd://$TITLE_NUMBER $MPLAYER_VOB_DUMP_CHAPTERS -dumpfile $VOB_FILE 2>/dev/null ) | zenity --progress --pulsate --title \"$ZEN_TITLE\" --text \"Dumping $VOB_FILE from $SOURCE\" --auto-close"; fi
+		( echo 10; ionice -c $IONICENESS nice -n $NICENESS mplayer ${MPLAYER_VOB_DUMP_DEVICE} -dumpstream dvd://$TITLE_NUMBER $MPLAYER_VOB_DUMP_CHAPTERS -dumpfile $VOB_FILE 1>/dev/null 2>/dev/null ) \
+			| zenity --progress --pulsate --title "$ZEN_TITLE" --text "Dumping $VOB_FILE from $SOURCE" --auto-close --auto-kill
+	else
+		echo -ne "\n *************************************\n"
+		echo " Dumping $VOB_FILE from $SOURCE..."
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer ${MPLAYER_VOB_DUMP_DEVICE} -dumpstream dvd://$TITLE_NUMBER $MPLAYER_VOB_DUMP_CHAPTERS -dumpfile $VOB_FILE"; fi
+		ionice -c $IONICENESS nice -n $NICENESS mplayer ${MPLAYER_VOB_DUMP_DEVICE} -dumpstream dvd://$TITLE_NUMBER $MPLAYER_VOB_DUMP_CHAPTERS -dumpfile $VOB_FILE
+	fi
+}
+
 # video_rip
 # need 	SOURCE_FILE
 #	VIDEO_CROP
