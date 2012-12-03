@@ -24,85 +24,38 @@ xml_tagging () {
 	case $VIDEO_TYPE in
 	MOVIE )
 		TEMPLATE_FILE=$TEMPLATE_FILE_MOVIE
-			if [ ! -f $TEMPLATE_FILE ]; then
-				echo -ne "\n *************************************\n"
-				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
-				echo -ne " *************************************\n"
-			else
-				echo -ne "\n *************************************\n"
-				echo " Generate xml tags file with probed informations... "
-				cp -v $TEMPLATE_FILE $TAG_FILE
-
-				xml_tagging_base
-
-				XMLTAG_TITLE="$TITLE_NAME"
-				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
-
-				if  [[ $IMDB_DIRECTOR == "" || $IMDB_DIRECTOR == "N/A" ]]; then
-					XMLTAG_DIRECTOR="$DIRECTOR_NAME"
-				else
-					XMLTAG_DIRECTOR="$IMDB_DIRECTOR"
-				fi				
-				sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
-				echo -ne " *************************************\n"
-			fi
+		XML_TAGGING_SPEC="xml_tagging_movie"
 		;;
 	MUSIC )
 		TEMPLATE_FILE=$TEMPLATE_FILE_MUSIC
-			if [ ! -f $TEMPLATE_FILE ]; then
-				echo -ne "\n *************************************\n"
-				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
-				echo -ne " *************************************\n"
-			else
-				echo -ne "\n *************************************\n"
-				echo " Generate xml tags file with probed informations... "
-				cp -v $TEMPLATE_FILE $TAG_FILE
-
-				xml_tagging_base
-
-				XMLTAG_TITLE="$TITLE_NAME"
-				sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
-
-				XMLTAG_ARTIST="$ARTIST_NAME"
-				sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
-				echo -ne " *************************************\n"
-			fi
+		XML_TAGGING_SPEC="xml_tagging_music"
 		;;
 	SHOW )
 		TEMPLATE_FILE=$TEMPLATE_FILE_SHOW
-			if [ ! -f $TEMPLATE_FILE ]; then
-				echo -ne "\n *************************************\n"
-				echo " $TEMPLATE_FILE file does not exists. Skipping..."  && sleep 1
-				echo -ne " *************************************\n"
-			else
-				echo -ne "\n *************************************\n"
-				echo " Generate xml tags file with probed informations... "
-				cp -v $TEMPLATE_FILE $TAG_FILE
-
-				xml_tagging_base
-
-				XMLTAG_SHOW="$TITLE_NAME"
-				sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
-
-				# Season
-				XMLTAG_SEASON="$SEASON_NUMBER"
-				sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
-
-				# episode number
-				XMLTAG_EPISODE_NUMBER="$EPISODE_NUMBER"
-				sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
-
-				# total episode number (in the season)
-				XMLTAG_EPISODE_TOTAL="$EPISODES_TOTAL_NUMBER"
-				sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
-
-				# episode title
-				XMLTAG_EPISODE_TITLE="$EPISODE_NAME"
-				sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
-				echo -ne " *************************************\n"
-			fi
+		XML_TAGGING_SPEC="xml_tagging_show"
 		;;
 	esac
+
+	if [ ! -f $TEMPLATE_FILE ]; then
+		FILE_NAME=$TEMPLATE_FILE
+		SOURCE_NAME=$TEMPLATES_PATH
+		dont_exists_warn
+	else
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			( echo 10; cp $TEMPLATE_FILE $TAG_FILE
+				echo 20; xml_tagging_base
+				echo 60; $XML_TAGGING_SPEC ) \
+				| zenity --progress --pulsate --title "$ZEN_TITLE" --text "Generate XML tags file" --auto-close
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Generate XML tags file... "
+			cp -v $TEMPLATE_FILE $TAG_FILE
+			xml_tagging_base
+			$XML_TAGGING_SPEC
+			echo -ne " *************************************\n"
+		fi
+	fi
 }
 
 # Common to 3 templates: XMLTAG_DATE_RELEASE XMLTAG_DATE_ENCODED XMLTAG_ENCODED_BY XMLTAG_COMMENT
@@ -115,4 +68,35 @@ xml_tagging_base () {
 	sed -i s%XMLTAG_ENCODED_BY%"$XMLTAG_ENCODED_BY"% $TAG_FILE	
 	# comment
 	sed -i s%XMLTAG_COMMENT%"$XMLTAG_COMMENT"% $TAG_FILE
+}
+
+xml_tagging_movie () {
+	XMLTAG_TITLE="$TITLE_NAME"
+	sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
+	if  [[ $IMDB_DIRECTOR == "" || $IMDB_DIRECTOR == "N/A" ]]; then XMLTAG_DIRECTOR="$DIRECTOR_NAME"; else XMLTAG_DIRECTOR="$IMDB_DIRECTOR"; fi				
+	sed -i s%XMLTAG_DIRECTOR%"$XMLTAG_DIRECTOR"% $TAG_FILE
+}
+
+xml_tagging_music () {
+	XMLTAG_TITLE="$TITLE_NAME"
+	sed -i s%XMLTAG_TITLE%"$XMLTAG_TITLE"% $TAG_FILE
+	XMLTAG_ARTIST="$ARTIST_NAME"
+	sed -i s%XMLTAG_ARTIST%"$XMLTAG_ARTIST"% $TAG_FILE
+}
+
+xml_tagging_show () {
+	XMLTAG_SHOW="$TITLE_NAME"
+	sed -i s%XMLTAG_SHOW%"$XMLTAG_SHOW"% $TAG_FILE
+	# Season
+	XMLTAG_SEASON="$SEASON_NUMBER"
+	sed -i s%XMLTAG_SEASON%"$XMLTAG_SEASON"% $TAG_FILE
+	# episode number
+	XMLTAG_EPISODE_NUMBER="$EPISODE_NUMBER"
+	sed -i s%XMLTAG_EPISODE_NUMBER%"$XMLTAG_EPISODE_NUMBER"% $TAG_FILE
+	# total episode number (in the season)
+	XMLTAG_EPISODE_TOTAL="$EPISODES_TOTAL_NUMBER"
+	sed -i s%XMLTAG_EPISODE_TOTAL%"$XMLTAG_EPISODE_TOTAL"% $TAG_FILE
+	# episode title
+	XMLTAG_EPISODE_TITLE="$EPISODE_NAME"
+	sed -i s%XMLTAG_EPISODE_TITLE%"$XMLTAG_EPISODE_TITLE"% $TAG_FILE
 }

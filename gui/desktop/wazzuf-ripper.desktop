@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Wazzuf Ripper
+Comment=Wazzuf Ripper DVD Blu-Ray rip GUI.
+Icon=/usr/share/wazzuf-ripper/icons/media-optical-video.png
+Type=Application
+Categories=AudioVideo;Video
+Exec=/usr/bin/wazzuf-ripper GUI
+Terminal=false

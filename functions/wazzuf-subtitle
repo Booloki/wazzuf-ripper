@@ -4,53 +4,38 @@
 # BD - sup files
 subtitle_rip () {
 	case $SOURCE in
-	DVD )
-		if [ -f "$SUBTITLE_FILE" ]
-	        then
-			echo -ne "\n *************************************\n"
-	                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
-	                echo -ne " *************************************\n"
+	DVD | ISO_DVD )
+		if [ -f "$SUBTITLE_FILE" ]; then
+			FILE_NAME=$SUBTITLE_FILE
+			file_exists
 	        else
 			check_mencoder
-			echo -ne "\n *************************************\n"
-	                echo " Extracting subtitle to $SUBTITLE_FILE "
-	                echo -ne " *************************************\n"
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno"; fi
-			nice -n $NICENESS mencoder dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
-				-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
-				-o /dev/null -nosound -ovc frameno
-		fi
-		;;
-	ISO_DVD )
-		if [ -f "$SUBTITLE_FILE" ]
-	        then
-			echo -ne "\n *************************************\n"
-	                echo " $SUBTITLE_FILE exists. Next..." && sleep 1
-	                echo -ne " *************************************\n"
-	        else
-			check_mencoder
-			echo -ne "\n *************************************\n"
-	                echo " Extracting subtitle to $SUBTITLE_FILE "
-	                echo -ne " *************************************\n"
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno"; fi
-			nice -n $NICENESS mencoder -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
-				-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
-				-o /dev/null -nosound -ovc frameno
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				nice -n $NICENESS mencoder $MPLAYER_DEVICE dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
+					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
+					-o /dev/null -nosound -ovc frameno 2>/dev/null \
+					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
+					| zenity --progress --auto-close --title="$ZEN_TITLE - subtitle $SUBTITLE_SID extracting"
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo -ne "\n *************************************\n"
+	        	        echo " Extracting subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
+	        	        echo -ne " *************************************\n"
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder $MPLAYER_DEVICE dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno"; fi
+				nice -n $NICENESS mencoder $MPLAYER_DEVICE dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
+					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
+					-o /dev/null -nosound -ovc frameno
+			fi
 		fi
 		;;
 	BD )
-		if [ ! -f "$SUBTITLE_FILE" ]
-	        then
-			# PSG format (.sup) - subtitle extraction impossible with mplayer 1.0rc4-4.5.2
-			echo -ne "\n *************************************\n"
-	                echo " $SUBTITLE_FILE does not exists ! Exiting..."
-	                echo -ne " *************************************\n"
-			exit 1
+		if [ -f "$SUBTITLE_FILE" ]; then
+			FILE_NAME=$SUBTITLE_FILE
+			file_exists
 		else
-			# SUBTITLE_FILE is already OK
-			echo -ne "\n *************************************\n"
-	                echo " $SUBTITLE_FILE subtitles OK. Next..." && sleep 1
-	                echo -ne " *************************************\n"
+			FILE_NAME="$SUBTITLE_FILE subtitle"
+			SOURCE_NAME="${SOURCE_DIRECTORY}"
+			dont_exists_warn
 		fi
 		;;
 	esac
@@ -61,7 +46,13 @@ subtitle_rip () {
 subtitle_srt_check () {
 	SUBTITLE_TYPE=`file "$SUBTITLE_FILE_FORCE_PATH"`
 	if [[ `echo $SUBTITLE_TYPE | grep Unicode` == "" ]]; then
-		echo " Warning. Provided subtitle is not Unicode."
-		echo " $SUBTITLE_TYPE" && sleep 2
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --warning --title "$ZEN_TITLE" \
+				--text "Provided subtitle is not Unicode." \
+				--timeout=2
+		else
+			echo " Warning. Provided subtitle is not Unicode."
+			echo " $SUBTITLE_TYPE" && sleep 2
+		fi
 	fi
 }

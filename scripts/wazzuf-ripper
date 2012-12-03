@@ -17,24 +17,24 @@ checkandsource_wazzuf_files
 # video codec choice check
 case $1 in
 h264 | x264 | H264 | X264 )
-        CODEC_VIDEO="H264"
-        ;;
+	CODEC_VIDEO="H264"
+	;;
 xvi* | Xvi* | XVI* )
-        CODEC_VIDEO="XVID"
-        ;;
+	CODEC_VIDEO="XVID"
+	;;
 dump | DUMP )
-        CODEC_VIDEO="DUMP"
-        ;;
+	CODEC_VIDEO="DUMP"
+	;;
 dump_crop | DUMP_CROP )
-        CODEC_VIDEO="DUMP_CROP"
-        ;;
-"" )
+	CODEC_VIDEO="DUMP_CROP"
+	;;
+"" | GUI )
 	# use default CODEC_VIDEO
 	CODEC_VIDEO=$DEFAULT_CODEC_VIDEO
 	;;
 * )
-        wazzuf_usage
-        ;;
+	wazzuf_usage
+	;;
 esac
 
 # audio 1 codec choice check
@@ -43,25 +43,25 @@ DUMP )
 	CODEC_AUDIO_1=$AUDIO_1_SOURCE
 	;;
 AC3 | AC351 | AC320 )
-        CODEC_AUDIO_1=$2
-        ;;
+	CODEC_AUDIO_1=$2
+	;;
 ogg | vorbis | OGG | VORBIS )
-        CODEC_AUDIO_1="VORBIS"
-        ;;
+	CODEC_AUDIO_1="VORBIS"
+	;;
 mp3 | MP3 | Mp3 )
-        CODEC_AUDIO_1="MP3"
-        ;;
+	CODEC_AUDIO_1="MP3"
+	;;
 OPUS | Opus | opus )
 	CODEC_AUDIO_1="OPUS"
 	;;
-"" )
-        # use default CODEC_AUDIO
+"" | GUI )
+	# use default CODEC_AUDIO
 	if [ $DEFAULT_CODEC_AUDIO == "DUMP" ]; then
 		CODEC_AUDIO_1=$AUDIO_1_SOURCE
 	else
 		CODEC_AUDIO_1=$DEFAULT_CODEC_AUDIO
 	fi
-        ;;
+	;;
 * )
         wazzuf_usage
         ;;
@@ -120,9 +120,33 @@ if [[ $DEBUG == "1" ]]; then
 	echo "DEBUG CODEC_AUDIO_5 $CODEC_AUDIO_5"
 fi
 
+for argument in $1 $2 $3 $4
+do
+	if [[ $argument == "GUI" ]]; then
+		WAZZUF_UI="GUI"
+		ZEN_TITLE="Wazzuf Ripper"
+	fi
+done
+if [[ $DEBUG == "1" ]]; then echo "DEBUG WAZZUF_UI $WAZZUF_UI"; fi
+
 # enter working directory
 mkdir -p "$WORKING_PATH_BASE/$TAG_TITLE_NAME"
 cd $WORKING_PATH_BASE/$TAG_TITLE_NAME
+
+# check VIDEO_TYPE empty or not recognized
+case $VIDEO_TYPE in
+	MOVIE |	SHOW | MUSIC )
+		# VIDEO_TYPE is OK
+		;;
+	"" )
+		MESSSAGE="VIDEO_TYPE (MOVIE, SHOW or MUSIC)"
+		empty_exit
+		;;
+	* )
+		MESSSAGE="VIDEO_TYPE $VIDEO_TYPE"
+		not_recognized_exit
+		;;
+esac
 
 # set organization
 case $SOURCE in
@@ -146,12 +170,6 @@ BD | ISO_BD )
 		CHAPTER_FIRST="1"
 		CHAPTER_LAST="1"
 		;;
-	* )
-		echo -ne "\n *************************************\n"
-		echo " VIDEO_TYPE not set to MOVIE, SHOW or MUSIC ! Exiting..."
-		echo -ne " *************************************\n"
-		exit 1
-		;;
 	esac
 	;;
 M2TS )
@@ -170,16 +188,26 @@ DVD | ISO_DVD )
 		;;
 	SHOW )
 		TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
-		if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
-		if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
+		case $DVD_EPISODES_ORG in
+		CHAPTERS )
 			TITLE_LIST=$DVD_TITLE_NUMBER
 			CHAPTER_FIRST=$DVD_CHAPTER_FIRST
 			CHAPTER_LAST=$DVD_CHAPTER_LAST
-		else
+			;;
+		TITLES )
 			TITLE_LIST="$DVD_TITLE_LIST"
 			CHAPTER_FIRST="1"
-			CHAPTER_LAST="1"		
-		fi
+			CHAPTER_LAST="1"
+			;;
+		"" )
+			MESSSAGE="DVD_EPISODES_ORG"
+			empty_exit
+			;;
+		* )
+			MESSSAGE="DVD_EPISODES_ORG"
+			not_recognized_exit
+			;;
+		esac
 		;;
 	MUSIC )
 		TITLE_LONG="$ARTIST_NAME - $TITLE_NAME"
@@ -187,17 +215,15 @@ DVD | ISO_DVD )
 		CHAPTER_LAST="1"
 		TITLE_LIST=$DVD_TITLE_NUMBER
 		;;
-	* )
-		echo -ne "\n *************************************\n"
-		echo " VIDEO_TYPE not set to MOVIE, SHOW or MUSIC ! Exiting..."
-		echo -ne " *************************************\n"
-		exit 1
-		;;
 	esac
 	;;
+"" )
+	MESSSAGE="SOURCE (DVD, ISO_DVD, BD, ISO_BD or M2TS)"
+	empty_exit
+	;;
 * )
-	echo -ne "\n Media source issue: make sure you filled DVD, ISO_DVD, BD, ISO_BD or M2TS in configuration file.\n"
-	exit 1
+	MESSSAGE="SOURCE $SOURCE"
+	not_recognized_exit
 	;;
 esac
 
@@ -207,9 +233,18 @@ if [[ $DEBUG == "1" ]]; then
 	echo "DEBUG CHAPTER_LAST $CHAPTER_LAST"
 fi
 
-echo -ne "\n *************************************\n"
-echo " Starting $TITLE_LONG $TAG_RIP with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
-echo -ne " *************************************\n"
+if [[ $WAZZUF_UI == "GUI" ]]; then
+	zenity --question --title "$ZEN_TITLE" \
+		--text "Start $VIDEO_TYPE $TAG_RIP : 
+$TITLE_LONG 
+with $CODEC_VIDEO video codec
+and $CODEC_AUDIO_1 $CODEC_AUDIO_2 audio codec(s)"
+	if [ $? = "1" ]; then wazzuf_quit; fi
+else
+	echo -ne "\n *************************************\n"
+	echo " Start $VIDEO_TYPE $TAG_RIP : $TITLE_LONG with $CODEC_VIDEO and $CODEC_AUDIO_1 $CODEC_AUDIO_2"
+	echo -ne " *************************************\n"
+fi
 
 # Check if source is OK
 case $SOURCE in
@@ -233,10 +268,6 @@ DVD )
 ISO_DVD )	
 	check_device ISO_DVD RIP
 	check_ogmtools
-	;;
-* )
-	echo -ne "\n Media source issue: make sure you filled DVD, ISO_DVD, BD, ISO_BD or M2TS in configuration file.\n"
-	exit 1
 	;;
 esac
 
@@ -272,9 +303,16 @@ do
 		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$BASE_WORKING_FILE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
-		echo -ne "\n *************************************\n"
-		echo " Work in progress: $TITLE_NAME ($DATE)"
-		echo -ne " *************************************\n"
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --info --title "$ZEN_TITLE" \
+				--text "Work in progress: $TITLE_NAME ($DATE)" \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Work in progress: $TITLE_NAME ($DATE)"
+			echo -ne " *************************************\n"
+		fi
 		;;
 	MUSIC )
 		BASE_WORKING_FILE=$TAG_TITLE_NAME.$DATE
@@ -288,9 +326,16 @@ do
 		TAG_AUDIO_CODEC=$CODEC_AUDIO_1
 		MERGE_OUTPUT="$BASE_WORKING_FILE.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO_CODEC.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 		MERGE_TITLE=$TITLE_NAME
-		echo -ne "\n *************************************\n"
-		echo " Work in progress: $ARTIST_NAME - $TITLE_NAME ($DATE)"
-		echo -ne " *************************************\n"
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --info --title "$ZEN_TITLE" \
+				--text "Work in progress: $ARTIST_NAME - $TITLE_NAME ($DATE)" \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Work in progress: $ARTIST_NAME - $TITLE_NAME ($DATE)"
+			echo -ne " *************************************\n"
+		fi
 		;;
 	SHOW )
 		SEASON_TYPE="S"
@@ -301,6 +346,7 @@ do
 		else
 			BASE_WORKING_FILE="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.T$TITLE_NUMBER"		
 		fi
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG CHAPTERS $CHAPTERS"; fi
 		VOB_FILE="$BASE_WORKING_FILE.vob"
 		CHAPTERS_FILE_TXT="$BASE_WORKING_FILE-chapters.txt"
 		CHAPTERS_FILE_XML="$BASE_WORKING_FILE-chapters.xml"
@@ -309,11 +355,10 @@ do
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
 		DUMP_CROP_FILE="$BASE_WORKING_FILE.mpeg2"
 
-		if [ ! -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ]
-		then
-			echo -ne "\n *************************************\n"
-			echo " Warning ! $EPISODE_DENOMINATION text file does not exists in $SOURCE_DIRECTORY !" && sleep 2
-			echo -ne " *************************************\n"
+		if [ ! -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ];	then
+			FILE_NAME="$EPISODE_DENOMINATION $EPISODES_FILE (EPISODES_FILE) text"
+			SOURCE_NAME="${SOURCE_DIRECTORY}"
+			dont_exists_warn
 			EPISODE_NAME_FULL=$i
 			EPISODE_NAME=$i
 			EPISODE_NUMBER=$i
@@ -331,164 +376,128 @@ do
 		MERGE_OUTPUT="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
 
 		MERGE_TITLE="$TITLE_LONG - $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
-		echo -ne "\n *************************************\n"
-		echo " Work in progress: $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
-		echo -ne " *************************************\n"
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --info --title "$ZEN_TITLE" \
+				--text "Work in progress: $EPISODE_DENOMINATION $EPISODE_NAME_FULL" \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Work in progress: $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
+			echo -ne " *************************************\n"
+		fi
 		;;
 	esac
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_OUTPUT $MERGE_OUTPUT"; fi
 
+
 	# Retrieve IMdb informations
-	echo -ne "\n *************************************\n"
+	if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
 	if [[ $IMDB_ID == "" ]]; then
-		echo -ne " No IMdb ID provided. Skipping..." && sleep 1
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --warning --title "$ZEN_TITLE" \
+				--text "No IMdb ID provided. Skipping..." \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne " No IMdb ID provided. Skipping..." && sleep 1
+		fi
 	else
 		check_imdb
-		echo -ne " Retrieving IMdb informations..."
-		get_imdb_informations
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			( get_imdb_informations ) \
+			| zenity --info --title "$ZEN_TITLE" \
+				--text "Retrieving IMdb informations..."
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne " Retrieving IMdb informations..."
+			get_imdb_informations
+		fi
 	fi
-	echo -ne "\n *************************************\n"
+	if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
 
 
 	# Extract full working file (.vob or .m2ts)
-	# Save chapters informations (DVD/ISO_DVD only) and set chapters merge informations
-	# dvdxchap doesn't work on vob files... so DVD/ISO_DVD media is mandatory
+	# Save chapters informations and set chapters merge informations
 	check_mplayer
 	trap "echo -e '\nManual killed script (Ctrl-C) during extracting working file' && exit 1" 2
 	case $SOURCE in
-	DVD )
+	DVD | ISO_DVD )
+		# extract local working file + chapters file from DVD or DVD iso
+		if [[ $SOURCE == "DVD" ]]; then
+			MPLAYER_VOB_DUMP_DEVICE=""
+			DVDXCHAP_DEVICE="/dev/dvd"
+		else
+			DVDXCHAP_DEVICE="${SOURCE_DIRECTORY}/${ISO_FILE}"
+			MPLAYER_VOB_DUMP_DEVICE="-dvd-device ${SOURCE_DIRECTORY}/${ISO_FILE}"		
+		fi
 		if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 			MERGE_CHAPTERS=""
+			MPLAYER_VOB_DUMP_CHAPTERS="-chapter $CHAPTERS"
+			FILE_NAME=$VOB_FILE
+			if [ ! -f $FILE_NAME ]; then video_vob_dump; else file_exists; fi
 		else
 			case $CHAPTERS_CHOICE_FORCE in
 				y* | Y* )
-					echo -ne "\n *************************************\n"
-					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER -c $CHAPTERS /dev/dvd > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
+					DVDXCHAP_CHAPTERS="-c $CHAPTERS"
+					FILE_NAME=$CHAPTERS_FILE_TXT
+					if [ ! -f $FILE_NAME ]; then video_dvd_chapters_extract; else file_exists; fi
 					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
+					MPLAYER_VOB_DUMP_CHAPTERS="-chapter $CHAPTERS"
+					FILE_NAME=$VOB_FILE
+					if [ ! -f $FILE_NAME ]; then video_vob_dump; else file_exists; fi
 					;;
 				* )
-					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER /dev/dvd > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
+					DVDXCHAP_CHAPTERS=""
+					FILE_NAME=$CHAPTERS_FILE_TXT
+					if [ ! -f $FILE_NAME ]; then video_dvd_chapters_extract; else file_exists; fi
 					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
+					MPLAYER_VOB_DUMP_CHAPTERS=""
+					FILE_NAME=$VOB_FILE
+					if [ ! -f $FILE_NAME ]; then video_vob_dump; else file_exists; fi
 					;;
 			esac
 		fi
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_CHAPTERS $MERGE_CHAPTERS"; fi
-
-		if [ ! -f $VOB_FILE ]; then
-			# extract local working file from DVD
-			if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
-				echo -ne "\n *************************************\n"
-				ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
-			else
-				case $CHAPTERS_CHOICE_FORCE in
-					y* | Y* )
-						echo -ne "\n *************************************\n"
-						ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
-						;;
-					* )
-						ionice -c $IONICENESS nice -n $NICENESS mplayer -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE
-						;;
-				esac
-			fi
-		else
-			echo -ne "\n *************************************\n"
-			echo " $VOB_FILE file exists. Next..."  && sleep 1
- 			echo -ne " *************************************\n"
-		fi
-
 		SOURCE_FILE=$VOB_FILE
-
-		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
-		else
-			VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
-		fi
-	        ;;
-	ISO_DVD )
-		if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
-			MERGE_CHAPTERS=""
-		else
-			case $CHAPTERS_CHOICE_FORCE in
-				y* | Y* )
-					echo -ne "\n *************************************\n"
-					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER -c $CHAPTERS "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
-					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
-					;;
-				* )
-					if [ ! -f $CHAPTERS_FILE_TXT ]; then echo " Creating $CHAPTERS_FILE_TXT..."; dvdxchap -t $TITLE_NUMBER "$SOURCE_DIRECTORY/$ISO_FILE" > $CHAPTERS_FILE_TXT; else echo " $CHAPTERS_FILE_TXT file exists. Next..."; fi
-					MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_TXT"
-					;;
-			esac
-		fi
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_CHAPTERS $MERGE_CHAPTERS"; fi
-
-		if [ ! -f $VOB_FILE ]; then
-			echo -ne "\n *************************************\n"
-			echo " Extracting $VOB_FILE from $ISO_FILE..."
-			if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device \"$SOURCE_DIRECTORY/$ISO_FILE\" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE"; fi
-				ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
-			else
-				case $CHAPTERS_CHOICE_FORCE in
-					y* | Y* )
-						if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device \"$SOURCE_DIRECTORY/$ISO_FILE\" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE"; fi
-						ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$TITLE_NUMBER -chapter $CHAPTERS -dumpfile $VOB_FILE
-						;;
-					* )
-						if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device \"$SOURCE_DIRECTORY/$ISO_FILE\" -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE"; fi
-						ionice -c $IONICENESS nice -n $NICENESS mplayer -dvd-device "$SOURCE_DIRECTORY/$ISO_FILE" -dumpstream dvd://$TITLE_NUMBER -dumpfile $VOB_FILE
-						;;
-				esac				
-			fi
-			echo -ne " *************************************\n"
-		else
-			echo -ne "\n *************************************\n"
-			echo " $VOB_FILE file exists. Next..."  && sleep 1
-			echo -ne " *************************************\n"
-		fi
-
-		SOURCE_FILE=$VOB_FILE
-
-		if [ "${DVDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
-		else
-			VIDEO_BITRATE=$DVDRIP_VIDEO_BITRATE
-		fi
 	        ;;
 	BD | ISO_BD )
 		# extract/copy local working file(s) from BD
-
 		if [[ $SOURCE == "ISO_BD" ]]; then
 			BD_MOUNT=$ISO_MOUNT_POINT
 			iso_bd_manage mount
 		else
 			BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
 		fi
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			( ionice -c $IONICENESS nice -n $NICENESS rsync -rP --include='*.m2ts' --exclude='*.*' "${BD_MOUNT}"/BDMV/STREAM/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null ) \
+			| zenity --progress --pulsate --auto-kill --auto-close --title="$ZEN_TITLE" --text="Copying all m2ts files from BR."
+			if [ $? = "1" ]; then wazzuf_quit; fi
+			( ionice -c $IONICENESS nice -n $NICENESS rsync -rP --include='*.mpls' --exclude='*.*' "${BD_MOUNT}"/BDMV/PLAYLIST/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null ) \
+			| zenity --progress --pulsate --auto-kill --auto-close --title="$ZEN_TITLE" --text="Copying all mpls files from BR."
+			if [ $? = "1" ]; then wazzuf_quit; fi
+			( ionice -c $IONICENESS nice -n $NICENESS rsync -rP --include='*.clpi' --exclude='*.*' "${BD_MOUNT}"/BDMV/CLIPINF/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null ) \
+			| zenity --progress --pulsate --auto-kill --auto-close --title="$ZEN_TITLE" --text="Copying all clpi files from BR."
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Copying all m2ts/mpls files from BR..."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS cp -vn \"${BD_MOUNT}\"/BDMV/STREAM/*.m2ts \"$SOURCE_DIRECTORY\"/"; fi
+			ionice -c $IONICENESS nice -n $NICENESS cp -vn "${BD_MOUNT}"/BDMV/STREAM/*.m2ts "$SOURCE_DIRECTORY"/
+			# chapters playlist management
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/PLAYLIST/*.mpls $SOURCE_DIRECTORY/"; fi
+			cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.mpls "$SOURCE_DIRECTORY"/
+			# others informations (useful for wazzuf-conf-generator)
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/CLIPINF/*.clpi $SOURCE_DIRECTORY/"; fi
+			cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.clpi "$SOURCE_DIRECTORY"/
+			# file have 444 rights cause read-only source => change in 644
+			sudo chmod 644 "$SOURCE_DIRECTORY"/*.m2ts
+			sudo chmod 644 "$SOURCE_DIRECTORY"/*.mpls
+			sudo chmod 644 "$SOURCE_DIRECTORY"/*.clpi
+		fi
 
-		echo -ne "\n *************************************\n"
-		echo " Copying all m2ts/mpls files from BR..."
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS cp -vn \"${BD_MOUNT}\"/BDMV/STREAM/*.m2ts \"$SOURCE_DIRECTORY\"/"; fi
-		ionice -c $IONICENESS nice -n $NICENESS cp -vn "${BD_MOUNT}"/BDMV/STREAM/*.m2ts "$SOURCE_DIRECTORY"/
-		# file have 444 rights cause read-only source
-		sudo chmod 644 "$SOURCE_DIRECTORY"/*.m2ts
-		SOURCE_FILE="$SOURCE_DIRECTORY/$M2TS_FILE"
-		# chapters playlist management
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/PLAYLIST/*.mpls $SOURCE_DIRECTORY/"; fi
-		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.mpls "$SOURCE_DIRECTORY"/
-		sudo chmod 644 "$SOURCE_DIRECTORY"/*.mpls
-		# others informations (useful for wazzuf-conf-generator)
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG cp -vn ${BD_MOUNT}/BDMV/CLIPINF/*.clpi $SOURCE_DIRECTORY/"; fi
-		cp -vn "${BD_MOUNT}"/BDMV/PLAYLIST/*.clpi "$SOURCE_DIRECTORY"/
-		sudo chmod 644 "$SOURCE_DIRECTORY"/*.clpi
 
 		SOURCE_FILE="$M2TS_FILE"
 		MERGE_CHAPTERS=""
-
-		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
-		else
-			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
-		fi
 
 		if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount; fi
 
@@ -500,27 +509,41 @@ do
 	M2TS )
 		SOURCE_FILE="$M2TS_FILE_PATH"
 
-		if [ "${BDRIP_VIDEO_BITRATE}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-			VIDEO_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
-		else
-			VIDEO_BITRATE=$BDRIP_VIDEO_BITRATE
-		fi
-
 		# chapters management
 		MPLS_FILE="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
-		echo -ne "\n *************************************\n"
+		if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
 		if [ -f $MPLS_FILE ]; then
-			echo " Creating $CHAPTERS_FILE_XML..."
 			check_bdchapters
-			bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				( bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML ) \
+				| zenity --info --title "$ZEN_TITLE" \
+					--text "Creating $CHAPTERS_FILE_XML..."
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo " Creating $CHAPTERS_FILE_XML..."
+				bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML
+			fi
 			MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_XML"
 		else
-			echo " No chapters file to create. Next..."
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				zenity --warning --title "$ZEN_TITLE" \
+					--text "No chapters file to create. Next..." \
+					--timeout=2
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo " No chapters file to create. Next..."
+			fi
 			MERGE_CHAPTERS=""
 		fi
-		echo -ne "\n *************************************\n"
+		if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
 		;;
 	esac
+	get_video_bitrate
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG MERGE_CHAPTERS $MERGE_CHAPTERS"
+		echo "DEBUG SOURCE_FILE $SOURCE_FILE"
+		echo "DEBUG VIDEO_BITRATE $VIDEO_BITRATE"
+	fi
 
 
 	## subtitle file(s) check/extract/copy
@@ -532,10 +555,17 @@ do
 		SUBTITLE_LANG_VARNAME=\$SUBTITLE_${SUB_COUNTER}_LANG
 		SUBTITLE_LANG=`eval "echo $SUBTITLE_LANG_VARNAME"`
 
-		if [[ $SUBTITLE_LANG == "" ]]; then
-			echo -ne "\n *************************************\n"
-			echo " No more subtitle track choice, next..." && sleep 1
-			echo -ne " *************************************\n"
+		if [[ $SUBTITLE_LANG == "" || $SUB_COUNTER -gt 1 ]]; then
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				zenity --info --title "$ZEN_TITLE" \
+					--text "No more subtitle track choice. Next..." \
+					--timeout=2
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo -ne "\n *************************************\n"
+				echo " No more subtitle track choice. Next..." && sleep 1
+				echo -ne " *************************************\n"
+			fi
 			SUB_COUNTER=0
 		else
 			SUBTITLE_NAME_VARNAME=\$SUBTITLE_${SUB_COUNTER}_NAME
@@ -548,15 +578,22 @@ do
 			SUBTITLE_FILE_FORCE=`eval "echo $SUBTITLE_FILE_FORCE_VARNAME"`
 			SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_FILE_FORCE"
 
-			echo -ne "\n *************************************\n"
-			echo " Subtitle $SUB_COUNTER track...."
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG SUB_COUNTER $SUB_COUNTER"; fi
 			# subtitle file (force external or not)
 			if [[ "$SUBTITLE_FILE_FORCE" == "" ]]; then
-				if echo $SUBTITLE_SID | egrep -vq '^[0-9]+$'; then echo -ne "SUBTITLE_${SUB_COUNTER}_SID provided is not an integer ! Exiting....\n"; exit 1; fi
+				# check if provided variable is a number
+				NUMBER_TO_CHECK="$SUBTITLE_SID"
+				MESSAGE="SUBTITLE_${SUB_COUNTER}_SID $SUBTITLE_SID"
+				check_integer
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 				SUBTITLE_FILE="$SUB_FILE.idx"
 				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
 
+				if [[ $SOURCE == "DVD" ]]; then
+					MPLAYER_DEVICE=""
+				else
+					MPLAYER_DEVICE="-dvd-device ${SOURCE_DIRECTORY}/${ISO_FILE}"		
+				fi
 				if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 					MPLAYER_CHAPTERS="-chapter $CHAPTERS"
 				else
@@ -629,9 +666,16 @@ do
 		AUDIO_LANG=`eval "echo $AUDIO_LANG_VARNAME"`
 
 		if [[ $AUDIO_LANG == "" ]]; then
-			echo -ne "\n *************************************\n"
-			echo " No more audio track choice, next..." && sleep 1
-			echo -ne " *************************************\n"
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				zenity --info --title "$ZEN_TITLE" \
+					--text "No more audio track choice, next..." \
+					--timeout=2
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo -ne "\n *************************************\n"
+				echo " No more audio track choice, next..." && sleep 1
+				echo -ne " *************************************\n"
+			fi
 			AUDIO_COUNTER=0
 		else
 			AUDIO_NAME_VARNAME=\$AUDIO_${AUDIO_COUNTER}_NAME
@@ -639,6 +683,9 @@ do
 
 			AUDIO_AID_VARNAME=\$AUDIO_${AUDIO_COUNTER}_AID
 			AUDIO_AID=`eval "echo $AUDIO_AID_VARNAME"`
+			NUMBER_TO_CHECK="$AUDIO_AID"
+			MESSAGE="AUDIO_${AUDIO_COUNTER}_SID $AUDIO_AID"
+			check_integer
 
 			AUDIO_SOURCE_VARNAME=\$AUDIO_${AUDIO_COUNTER}_SOURCE
 			AUDIO_SOURCE=`eval "echo $AUDIO_SOURCE_VARNAME"`
@@ -697,7 +744,14 @@ do
 		else
 			# test if a number
 			if echo "$TARGET_SIZE" | egrep -vq '^[0-9]+$'; then
-				echo -ne "TARGET_SIZE provided is not set to CD, DVD, or an integer ! Exiting....\n"
+				if [[ $WAZZUF_UI == "GUI" ]]; then
+					zenity --error --title "$ZEN_TITLE" \
+						--text "TARGET_SIZE provided is not set to CD, DVD, or an integer ! Exiting." \
+						--timeout=2
+					if [ $? = "1" ]; then wazzuf_quit; fi
+				else
+					echo -ne "Error ! TARGET_SIZE provided is not set to CD, DVD, or an integer ! Exiting.\n"
+				fi
 				exit 1
 			else
 				MAX_TARGET_SIZE=$TARGET_SIZE
@@ -724,14 +778,32 @@ do
 
 			# estimated needed bitrate
 			VIDEO_BITRATE=$(echo "scale=6; tmp = $SOURCE_BITRATE * $MAX_VIDEO_SIZE / $VIDEO_SIZE - 0.5; scale=0; tmp / 1" | bc)
-			echo "Estimated VIDEO_BITRATE for h264 encoding: $VIDEO_BITRATE kb/s."
-			echo "Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit you." && sleep 1
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				zenity --info --title "$ZEN_TITLE" \
+					--text "Estimated VIDEO_BITRATE for h264 encoding: $VIDEO_BITRATE kb/s.
+Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit you." \
+					--timeout=2
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo "Estimated VIDEO_BITRATE for h264 encoding: $VIDEO_BITRATE kb/s."
+				echo "Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit you." && sleep 1
+			fi
 			;;
 		XVID )
 			# If bitrate value is negative, Xvid will use its absolute value as the target size (in kBytes) of the video
 			# and compute the associated bitrate automagically
 			# Convert bytes to kBytes
 			VIDEO_BITRATE="-$(echo "scale=6; tmp = $MAX_VIDEO_SIZE / 1024 ; scale=0; tmp / 1" | bc)"
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				zenity --info --title "$ZEN_TITLE" \
+					--text "Estimated VIDEO_BITRATE for Xvid encoding: $VIDEO_BITRATE kb/s.
+Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit you." \
+					--timeout=2
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				echo "Estimated VIDEO_BITRATE for Xvid encoding: $VIDEO_BITRATE kb/s."
+				echo "Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit you." && sleep 1
+			fi
 			;;
 		esac
 	fi
@@ -740,23 +812,36 @@ do
 	if [[ "$VIDEO_SCALE" == "" ]]; then
 		MENCODER_SCALE=""
 	else
-		# check provided variable is a number
-		if echo "$VIDEO_SCALE" | egrep -vq '^[0-9]+$'; then echo -ne "VIDEO_SCALE provided is not an integer ! Exiting....\n"; exit 1; fi
+		# check if provided variable is a number
+		NUMBER_TO_CHECK="$VIDEO_SCALE"
+		MESSAGE="VIDEO_SCALE $VIDEO_SCALE"
+		check_integer
 		MENCODER_SCALE=",scale=-2:$VIDEO_SCALE"
 	fi
 
 	# check video cropping
-	if [[ $VIDEO_CROP == "" ]]; then echo " Warning: VIDEO_CROP is empty ! Run wazzuf-pre-ripper for crop detection." && sleep 2; fi
+	if [[ $VIDEO_CROP == "" ]]; then
+		# ugly but not a problem for mencoder => warning only
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --warning --title "$ZEN_TITLE" \
+				--text "Warning: VIDEO_CROP is empty ! Run wazzuf-pre-ripper or wazzuf-conf-generator for crop detection." \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo " Warning: VIDEO_CROP is empty ! Run wazzuf-pre-ripper or wazzuf-conf-generator for crop detection." && sleep 2
+		fi
+	fi
 
-	echo -ne "\n *************************************\n"
-	echo " $SOURCE_FILE 2 pass $CODEC_VIDEO encoding"  && sleep 1
+	if [[ ! $WAZZUF_UI == "GUI" ]]; then
+		echo -ne "\n *************************************\n"
+		echo " $SOURCE_FILE 2 pass $CODEC_VIDEO encoding"  && sleep 1
+		echo -ne " *************************************\n"
+	fi
 	if [[ $DEBUG == "1" ]]; then
 		echo "DEBUG VIDEO_BITRATE $VIDEO_BITRATE"
 		echo "DEBUG VIDEO_SCALE $VIDEO_SCALE"
 		echo "DEBUG VIDEO_CROP $VIDEO_CROP"
 	fi
-	echo -ne " *************************************\n"
-
 	video_rip
 
 	if [[ $VIDEO_RATIO_FORCE == "" ]]; then
@@ -768,10 +853,8 @@ do
 			MERGE_VIDEO="--aspect-ratio 0:$VIDEO_RATIO_FORCE $VIDEO_FILE"
 			;;
 		* )
-			echo -ne "\n *************************************\n"
-			echo " $VIDEO_RATIO_FORCE : video aspect ratio not recognized ! Exiting..."
-			echo -ne " *************************************\n"
-			exit 1
+			MESSAGE="Video aspect ratio $VIDEO_RATIO_FORCE (VIDEO_RATIO_FORCE)"
+			not_recognized_exit
 			;;
 		esac
 	fi
@@ -779,16 +862,22 @@ do
 
 	## Cover art
 	# Matroska Cover Art Guidelines http://www.matroska.org/technical/cover_art/index.html
-	if [[ "$SOURCE_DIRECTORY/$COVER" == "" ]]; then
-		echo -ne "\n *************************************\n"
-		echo " No image attachment. Skipping..." && sleep 1
-	        echo -ne " *************************************\n"
+	if [[ "$COVER" == "" ]]; then
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --info --title "$ZEN_TITLE" \
+				--text "No image attachment. Skipping..." \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " No image attachment. Skipping..." && sleep 1
+		        echo -ne " *************************************\n"
+		fi
 		MERGE_COVER=""
 	else
 		if [ ! -f "$SOURCE_DIRECTORY/$COVER" ]; then
-			echo -ne "\n *************************************\n"
-			echo " Warning ! $COVER image file does not exists in $SOURCE_DIRECTORY ! Skipping..." && sleep 2
-	        	echo -ne " *************************************\n"
+			FILE_NAME="$COVER image"
+			SOURCE_NAME="${SOURCE_DIRECTOR}"
 			MERGE_COVER=""		
 		else
 			check_imagemagick
@@ -797,31 +886,45 @@ do
 			# List of officially recognized image MIME types at the IANA homepage http://www.iana.org/assignments/media-types/image/index.html
 			COVER_FORMAT_TEST=`file "$SOURCE_DIRECTORY/$COVER" | cut -d ':' -f 2 | cut -d ' ' -f 2`
 			if [[ $COVER_FORMAT_TEST == "JPEG" ]]; then
-				COVER_FORMAT=jpeg
+				COVER_FORMAT="jpeg"
 				COVER_HEIGHT=`convert "$SOURCE_DIRECTORY/$COVER" -print "%h" /dev/null`
 				COVER_WIDTH=`convert "$SOURCE_DIRECTORY/$COVER" -print "%w" /dev/null`
-				cover_art_convert
+				if [[ $WAZZUF_UI == "GUI" ]]; then
+					( cover_art_convert ) | zenity --progress --title "$ZEN_TITLE" --text "Cover art generation" --auto-close --percentage=0
+					if [ $? = "1" ]; then wazzuf_quit; fi
+				else
+					cover_art_convert
+				fi
+				MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/$COVER_FORMAT --attach-file $COVER_OUTPUT_SIMPLE --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file $COVER_OUTPUT_THUMB"
 			else
 				if [[ $COVER_FORMAT_TEST == "PNG" ]]; then
-					COVER_FORMAT=png
+					COVER_FORMAT="png"
 					COVER_HEIGHT=`file "$SOURCE_DIRECTORY/$COVER" | cut -d "," -f 2 | cut -d " " -f 4`
 					COVER_WIDTH=`file "$SOURCE_DIRECTORY/$COVER" | cut -d "," -f 2 | cut -d " " -f 2`
-					cover_art_convert
+					if [[ $WAZZUF_UI == "GUI" ]]; then
+						( cover_art_convert ) | zenity --progress --title "$ZEN_TITLE" --text "Cover art generation" --auto-close --percentage=0
+						if [ $? = "1" ]; then wazzuf_quit; fi
+					else
+						cover_art_convert
+					fi
+					MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/$COVER_FORMAT --attach-file $COVER_OUTPUT_SIMPLE --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file $COVER_OUTPUT_THUMB"
 				else
-					echo -ne "\n *************************************\n"
-					echo " $COVER file format unrecognized, so no image attachment. Next... " && sleep 2
-			        	echo -ne " *************************************\n"
-					MERGE_COVER=""		
+					MESSSAGE="$COVER image file format"
+					not_recognized_exit	
 				fi
 			fi
 		fi
 	fi
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_COVER $MERGE_COVER"; fi
 
 
-	## xml tags
+	## XML tags
 	# http://matroska.org/technical/specs/tagging/index.html
 	TAG_FILE="$BASE_WORKING_FILE.xml"
-	if [ ! -f $TAG_FILE ]; then
+	if [ -f $TAG_FILE ] && [[ ! $WAZZUF_UI == "GUI" ]]; then
+		FILE_NAME="XML tags"
+		file_exists
+	else
 		# 3 templates:  tags-50-movie-template.xml  tags-50-music-template.xml  tags-50-show-template.xml
 		# in TEMPLATES_PATH
 		TEMPLATE_FILE_MOVIE="$WAZZUF_PATH/$TEMPLATES_PATH/tags-50-movie-template.xml"
@@ -833,57 +936,86 @@ do
 		XMLTAG_ENCODED_BY="$TAG_SIGNATURE"
 		XMLTAG_COMMENT="$COMMENT"
 		XMLTAG_DATE_RELEASE="$DATE"
-		# DATE_TAGGED useless
-
 		xml_tagging
-	else
-		echo -ne "\n *************************************\n"
-		echo " xml tags file exists. Next..."  && sleep 1
-		echo -ne " *************************************\n"		
 	fi
 
 	# second check, if generation problem, and to fill MERGE_XMLTAGS
 	if [ -f $TAG_FILE ]; then
 		MERGE_XMLTAGS="--global-tags $TAG_FILE"
 	else
-		echo -ne "\n *************************************\n"
-		echo " xml tags file generation problem. Skipping..."  && sleep 2
-		echo -ne " *************************************\n"
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --error --title "$ZEN_TITLE" \
+				--text "XML tags file generation problem. Skipping..." \
+				--timeout=2
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " XML tags file generation problem. Skipping..."  && sleep 2
+			echo -ne " *************************************\n"
+		fi
 		MERGE_XMLTAGS=""
 	fi
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_XMLTAGS $MERGE_XMLTAGS"; fi
 
 
 	## merge
 	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merge' && exit 1" 2
-
-	# global merge command
-	echo -ne "\n *************************************\n"
-	echo " Final file merge:"
-	if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title "$MERGE_TITLE" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"; fi
-	echo -ne " *************************************\n"
+	if [[ ! $WAZZUF_UI == "GUI" ]]; then
+		echo -ne "\n *************************************\n"
+		echo " Final file merge:"
+		echo -ne " *************************************\n"
+	fi
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title \"$MERGE_TITLE\" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"; fi
 	check_mkvmerge
-	nice -n $NICENESS mkvmerge \
-		-o $MERGE_OUTPUT --title "$MERGE_TITLE" \
-		$MERGE_VIDEO \
-		$MERGE_AUDIO_FULL \
-		$MERGE_SUBTITLES_FULL \
-		$MERGE_CHAPTERS \
-		$MERGE_COVER \
-		$MERGE_XMLTAGS
+	if [[ $WAZZUF_UI == "GUI" ]]; then
+		( echo 10; nice -n $NICENESS mkvmerge \
+			-o $MERGE_OUTPUT --title "$MERGE_TITLE" \
+			$MERGE_VIDEO \
+			$MERGE_AUDIO_FULL \
+			$MERGE_SUBTITLES_FULL \
+			$MERGE_CHAPTERS \
+			$MERGE_COVER \
+			$MERGE_XMLTAGS 1>/dev/null 2>/dev/null ) \
+			| zenity --progress --pulsate --title="$ZEN_TITLE - Final file merge" --text="Creating $MERGE_OUTPUT" --auto-close --auto-kill
+			if [ $? = "1" ]; then wazzuf_quit; fi
+	else
+		nice -n $NICENESS mkvmerge \
+			-o $MERGE_OUTPUT --title "$MERGE_TITLE" \
+			$MERGE_VIDEO \
+			$MERGE_AUDIO_FULL \
+			$MERGE_SUBTITLES_FULL \
+			$MERGE_CHAPTERS \
+			$MERGE_COVER \
+			$MERGE_XMLTAGS
+	fi
 
 
 ## nfo generator
-echo -ne "\n *************************************\n"
-echo " Generate nfo file..."
-generate_nfo
-echo -ne " *************************************\n"
+if [[ $WAZZUF_UI == "GUI" ]]; then
+	( generate_nfo ) | zenity --progress --pulsate --title "$ZEN_TITLE" --text "Generating nfo file..." --auto-close
+	if [ $? = "1" ]; then wazzuf_quit; fi
+else
+	echo -ne "\n *************************************\n"
+	echo " Generating nfo file..."
+	generate_nfo
+	echo -ne " *************************************\n"
+fi
 
 done
 done
 
 cd ..
-echo -ne "\n *************************************\n"
-echo " $TITLE_LONG $TAG_RIP Finished"
-echo -ne " *************************************\n"
+if [[ $WAZZUF_UI == "GUI" ]]; then
+	# notification
+	zenity --notification\
+		--window-icon="info" \
+		--text="$TITLE_LONG $TAG_RIP finished"
+	# basic information
+	zenity --info --title "$ZEN_TITLE" --text "$TITLE_LONG $TAG_RIP finished"
+else
+	echo -ne "\n *************************************\n"
+	echo " $TITLE_LONG $TAG_RIP finished"
+	echo -ne " *************************************\n"
+fi
 
 exit 0

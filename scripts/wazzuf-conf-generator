@@ -10,11 +10,13 @@ source $GLOBAL_CONF_FILE
 source $FUNCTIONS_CHECK
 checkandsource_wazzuf_files
 
+WAZZUF_UI="GUI"
+
 # global
 ZEN_TITLE="Wazzuf Ripper Conf Generator"
 
 zenity --question --title "$ZEN_TITLE" --text "Do you want to generate a <b>new Wazzuf Ripper configuration file</b> ?" --ok-label "OK" --cancel-label="Quit"
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 
 ## temporary conf file
 CONF_FILE_TMP="$CONF_PATH_BASE/wazzuf-ripper.conf.tmp"
@@ -47,7 +49,7 @@ ZENITY_SOURCE=$(zenity --list --radiolist \
 	FALSE "Blu-Ray iso file" ISO_BD \
 	FALSE "m2ts/ts file" M2TS \
 )
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 echo "SOURCE=\""$ZENITY_SOURCE"\"" >> $CONF_FILE_TMP
 SOURCE="$ZENITY_SOURCE"
 
@@ -59,7 +61,7 @@ zenity --info --title "$ZEN_TITLE" \
 ZENITY_SOURCE_DIRECTORY_BASE="$HOME"
 if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SOURCE_DIRECTORY_BASE $ZENITY_SOURCE_DIRECTORY_BASE"; fi
 ZENITY_SOURCE_DIRECTORY=$(zenity --file-selection --title "$ZEN_TITLE" --filename "$ZENITY_SOURCE_DIRECTORY_BASE"/ --directory)
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SOURCE_DIRECTORY $ZENITY_SOURCE_DIRECTORY"; fi
 echo "SOURCE_DIRECTORY=\""$ZENITY_SOURCE_DIRECTORY"\"" >> $CONF_FILE_TMP
 
@@ -68,7 +70,7 @@ BD | DVD )
 	# device for conf generator only
 	zenity --info --title "$ZEN_TITLE" --text "Please select your <b>Disc Directory</b>. " --ok-label "Next"
 	ZENITY_DISC_DIR=$(zenity --file-selection --title "$ZEN_TITLE" --filename "/media/" --directory)
-	if [ $? = "1" ]; then exit 0; fi
+	if [ $? = "1" ]; then wazzuf_quit; fi
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_DISC_DIR $ZENITY_DISC_DIR"; fi
 	;;
 ISO_BD | ISO_DVD )
@@ -81,21 +83,23 @@ ISO_BD | ISO_DVD )
 		# from full path to filename
 		ISO_FILE="`echo ${ZENITY_ISO_FILE} | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%`"
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG ISO_FILE $ISO_FILE"; fi 
-		# Test if "empty"
-		if [[ ! "${ISO_FILE}" == "" ]]; then
+		if [[ "${ISO_FILE}" == "" ]]; then
+			MESSSAGE="Iso file"
+			empty_exit
+		else
 			echo "ISO_FILE=\""${ISO_FILE}"\"" >> $CONF_FILE_TMP
 			echo "M2TS_FILE=\"\"" >> $CONF_FILE_TMP
-		else
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG Iso file empty !" && exit 1; fi
 		fi
 	else
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG Iso file not in source directory !" && exit 1; fi
+		SOURCE_NAME="source directory"
+		FILE_NAME="Iso"
+		dont_exists_exit
 	fi
 	;;
 M2TS )
 	zenity --info --title "$ZEN_TITLE" --text "Please select your <b>m2ts/ts file</b> (source directory only)." --ok-label "Next"
 	ZENITY_M2TS_FILE=$(zenity --file-selection --title "$ZEN_TITLE" --filename "$ZENITY_SOURCE_DIRECTORY"/)
-	if [ $? = "1" ]; then exit 0; fi
+	if [ $? = "1" ]; then wazzuf_quit; fi
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_M2TS_FILE $ZENITY_M2TS_FILE"; fi 
 	# Test if really in source directory
 	if [[ "`echo "$ZENITY_M2TS_FILE" | grep "${ZENITY_SOURCE_DIRECTORY}" | wc -l`"  == "1" ]]; then
@@ -103,13 +107,16 @@ M2TS )
 		M2TS_FILE="`echo "${ZENITY_M2TS_FILE}" | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%`"
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS_FILE $M2TS_FILE"; fi 
 		# Test if "empty"
-		if [[ ! "${M2TS_FILE}" == "" ]]; then
-			echo "M2TS_FILE=\""${M2TS_FILE}"\"" >> $CONF_FILE_TMP
+		if [[ "${M2TS_FILE}" == "" ]]; then
+			MESSSAGE="m2ts/ts file"
+			empty_exit
 		else
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG No m2ts/ts file choice !" && exit 1; fi
+			echo "M2TS_FILE=\""${M2TS_FILE}"\"" >> $CONF_FILE_TMP
 		fi
 	else
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG m2ts/ts file not in source directory !" && exit 1; fi
+		SOURCE_NAME="source directory"
+		FILE_NAME="m2ts/ts"
+		dont_exists_exit
 	fi
         ;;
 esac
@@ -142,7 +149,7 @@ ZENITY_VIDEO_TYPE=$(zenity --list --radiolist \
 	FALSE "TV show/serie (multiple videos)" SHOW \
 	FALSE "Musical video" MUSIC \
 )
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 echo "VIDEO_TYPE="\"${ZENITY_VIDEO_TYPE}"\"" >> $CONF_FILE_TMP
 
 # zenity: window doesn't come to the center of the screen when using --forms
@@ -153,7 +160,7 @@ ZENITY_INFOS=$(zenity --forms \
     --add-entry="Original title *" \
     --add-entry="Release date" \
     --separator="|")
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 ZENITY_TITLE="`echo "${ZENITY_INFOS}" | cut -d "|" -f1`"
 ZENITY_DATE="`echo "${ZENITY_INFOS}" | cut -d "|" -f2`"
 
@@ -163,8 +170,8 @@ if  [[ ! $ZENITY_TITLE == "" ]]; then
 	# basic TITLE_NAME to TAG_TITLE_NAME convertion
 	echo "TAG_TITLE_NAME="\"`echo $ZENITY_TITLE | sed 's/[!?@#$£%^&*]//g' | sed 's/^\ //g' | sed 's/\ $//g' | sed s/[\ \']/./g`\""" >> $CONF_FILE_TMP
 else
-	if [[ $DEBUG == "1" ]]; then echo "DEBUG /!\\ Error ! No provided title."; fi
-	exit 1
+	MESSSAGE="Title"
+	empty_exit
 fi
 
 # test ZENITY_DATE integer
@@ -235,7 +242,7 @@ ZENITY_TAGS=$(zenity --forms \
     --add-entry="Signature tag" \
     --add-entry="Comment" \
     --separator="|")
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_TAGS $ZENITY_TAGS"; fi
 echo "TAG_RIP=\"`echo "${ZENITY_TAGS}" | cut -d "|" -f1`\"" >> $CONF_FILE_TMP
 echo "TAG_AUDIO=\"`echo "${ZENITY_TAGS}" | cut -d "|" -f2`\"" >> $CONF_FILE_TMP
@@ -270,7 +277,7 @@ SHOW )
 		--add-entry="Season number (ex: 02)" \
 		--add-entry="Total episodes number in the season" \
 		--separator="|")
-	if [ $? = "1" ]; then exit 0; fi	
+	if [ $? = "1" ]; then wazzuf_quit; fi	
 	echo "SEASON_NUMBER=\"`echo "${ZENITY_SHOW}" | cut -d "|" -f1`\"" >> $CONF_FILE_TMP
 	echo "EPISODES_TOTAL_NUMBER=\"`echo "${ZENITY_SHOW}" | cut -d "|" -f2`\"" >> $CONF_FILE_TMP
 
@@ -288,7 +295,7 @@ SHOW )
 		FALSE "Select one (in $ZENITY_SOURCE_DIRECTORY source directory only)" 1 \
 		FALSE "Create one" 2 \
 	)
-	if [ $? = "1" ]; then exit 0; fi
+	if [ $? = "1" ]; then wazzuf_quit; fi
 	case $ZENITY_EPISODES_FILE_CHOICE in
 	0 )
 		echo "EPISODES_FILE=\"\"" >> $CONF_FILE_TMP
@@ -310,7 +317,9 @@ SHOW )
 				echo "EPISODES_FILE="\"$EPISODES_FILE\""" >> $CONF_FILE_TMP
 			fi
 		else
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG Episode file not in source directory !" && exit 1; fi
+			SOURCE_NAME="source directory"
+			FILE_NAME="Episode"
+			dont_exists_exit
 		fi		
 		;;
 	2 )
@@ -381,7 +390,7 @@ DVD | ISO_DVD )
 	        --cancel-label="Cancel" \
 	        --pulsate \
 	        --auto-close
-	if [ $? = "1" ]; then exit 0; fi
+	if [ $? = "1" ]; then wazzuf_quit; fi
 
 	if [[ $ZENITY_VIDEO_TYPE == "SHOW" ]]; then
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG Warning ! Assume DVD_EPISODES_ORG is TITLES !"; fi
@@ -411,7 +420,7 @@ DVD | ISO_DVD )
 				echo "DEBUG DVD_TITLE_IDs ${DVD_TITLE_ID[1]} ${DVD_TITLE_ID[2]} ${DVD_TITLE_ID[3]} ${DVD_TITLE_ID[4]}"
 			fi
 	
-			# For now, don't check Titles with DVD_TITLE_LENGTH < "00:01:00"
+			# Display all Titles but don't check Titles with DVD_TITLE_LENGTH < "00:01:00"
 			ZENITY_TITLES=$(
 				for ((l=1; l <= $i ; l++)); do if [[ "`echo "${DVD_TITLE_LENGTH[l]}" | cut -d ':' -f 1-2`" == "00:00" ]]; then echo FALSE; else echo TRUE; fi ; echo "${DVD_TITLE_ID[l]}"; echo "${DVD_TITLE_LENGTH[l]}"; echo "${DVD_TITLE_CHAPTERS[l]}"; echo "${DVD_TITLE_TRACKS_AUDIO[l]}"; echo "${DVD_TITLE_TRACKS_SUBTITLES[l]} "; done | zenity --list --checklist \
 				--title="$ZEN_TITLE" \
@@ -423,7 +432,7 @@ DVD | ISO_DVD )
 				--separator=' ' \
 				--text="DVD Title(s) choice"
 			)
-			if [ $? = "1" ]; then exit 0; fi
+			if [ $? = "1" ]; then wazzuf_quit; fi
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_TITLES $ZENITY_TITLES"; fi
 
 			DVD_TITLE_LIST="$ZENITY_TITLES"
@@ -530,7 +539,7 @@ M2TS )
 		--separator=' ' \
 		--text="Audio track(s) choice"
 	)
-	if [ $? = "1" ]; then exit 0; fi
+	if [ $? = "1" ]; then wazzuf_quit; fi
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS $ZENITY_AUDIO_TRACKS"; fi
 
 	j=0	
@@ -610,7 +619,7 @@ M2TS )
 			--separator=' ' \
 			--text="Subtitle track(s) choice"
 		)
-		if [ $? = "1" ]; then exit 0; fi
+		if [ $? = "1" ]; then wazzuf_quit; fi
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS $ZENITY_SUBTITLE_TRACKS"; fi
 
 		j=0	
@@ -718,7 +727,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 		--separator=' ' \
 		--text="Audio track(s) choice"
 	)
-	if [ $? = "1" ]; then exit 0; fi
+	if [ $? = "1" ]; then wazzuf_quit; fi
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS $ZENITY_AUDIO_TRACKS"; fi
 
 	j=0	
@@ -809,7 +818,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 			--separator=' ' \
 			--text="Subtitle track(s) choice"
 		)
-		if [ $? = "1" ]; then exit 0; fi
+		if [ $? = "1" ]; then wazzuf_quit; fi
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS $ZENITY_SUBTITLE_TRACKS"; fi
 	
 		j=0	
@@ -864,7 +873,7 @@ ZENITY_CODEC_VIDEO=$(zenity --list --radiolist \
 	FALSE "Dump (faster) (original video track, mpeg source only)" DUMP \
 	FALSE "Dump with crop (mpeg source only)" DUMP_CROP \
 )
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 echo "DEFAULT_CODEC_VIDEO="\"${ZENITY_CODEC_VIDEO}"\"" >> $CONF_FILE_TMP
 
 ZENITY_CODEC_AUDIO=$(zenity --list --radiolist \
@@ -883,7 +892,7 @@ ZENITY_CODEC_AUDIO=$(zenity --list --radiolist \
 	FALSE "Opus (experimental)" OPUS \
 	TRUE "Dump (original audio track)" DUMP \
 )
-if [ $? = "1" ]; then exit 0; fi
+if [ $? = "1" ]; then wazzuf_quit; fi
 echo "DEFAULT_CODEC_AUDIO="\"${ZENITY_CODEC_AUDIO}"\"" >> $CONF_FILE_TMP
 
 # for others codecs parameters
@@ -893,5 +902,7 @@ CONF_FILE_EXAMPLE_LINE=`grep -n "^# Others codecs options" $CONF_FILE_EXAMPLE | 
 tail -n +$CONF_FILE_EXAMPLE_LINE $CONF_FILE_EXAMPLE >> $CONF_FILE_TMP
 
 zenity --info --title "$ZEN_TITLE" \
-	--text "Your Wazzuf configuration file has been saved to <b>$CONF_FILE_TMP</b>"
+	--text "Your Wazzuf configuration file has been saved to <b>$CONF_FILE_TMP</b>
+(If you want to use it with Wazzuf Ripper, it must be $CONF_FILE )"
 
+exit 0

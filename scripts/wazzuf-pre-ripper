@@ -16,6 +16,7 @@ check_avconv
 
 ISO_FILE_PATH="$SOURCE_DIRECTORY/$ISO_FILE"
 M2TS_FILE_PATH="$SOURCE_DIRECTORY/$M2TS_FILE"
+WAZZUF_UI=""
 
 # enter source directory
 if  [[ "$SOURCE_DIRECTORY" == "" ]]; then
@@ -108,7 +109,10 @@ DVD )
 	echo -ne "*************************************\n"
 	grep "^Disc Title" DVD-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
-	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
+	if [[ $DVD_EPISODES_ORG == "" ]]; then
+		MESSSAGE="DVD_EPISODES_ORG"
+		empty_exit
+	fi
 	if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
 		for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 		do
@@ -187,7 +191,10 @@ ISO_DVD )
 	echo "Tested iso: $ISO_FILE_PATH"
 	grep "^Disc Title" ISO-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" ISO-lsdvd.info | sed s/'Longest track: '//`
-	if [[ $DVD_EPISODES_ORG == "" ]]; then echo " DVD_EPISODES_ORG is empty ! Exiting..." && exit 1; fi
+	if [[ $DVD_EPISODES_ORG == "" ]]; then
+		MESSSAGE="DVD_EPISODES_ORG"
+		empty_exit
+	fi
 	if  [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
 		for DVD_TITLE_NUMBER in $DVD_TITLE_LIST
 		do

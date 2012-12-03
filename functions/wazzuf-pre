@@ -14,7 +14,7 @@ cropdetect(){
 				--cancel-label="Cancel" \
 				--pulsate \
 				--auto-close
-			if [ $? = "1" ]; then exit 0; fi
+			if [ $? = "1" ]; then wazzuf_quit; fi
 			;;
 		M2TS )
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer "$M2TS_FILE_PATH" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
@@ -24,7 +24,7 @@ cropdetect(){
 				--cancel-label="Cancel" \
 				--pulsate \
 				--auto-close
-			if [ $? = "1" ]; then exit 0; fi
+			if [ $? = "1" ]; then wazzuf_quit; fi
 			;;
 		DVD )
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
@@ -34,7 +34,7 @@ cropdetect(){
 				--cancel-label="Cancel" \
 				--pulsate \
 				--auto-close
-			if [ $? = "1" ]; then exit 0; fi
+			if [ $? = "1" ]; then wazzuf_quit; fi
 			;;
 		ISO_DVD )
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/	cropdetect.out"; fi
@@ -44,7 +44,7 @@ cropdetect(){
 				--cancel-label="Cancel" \
 				--pulsate \
 				--auto-close
-			if [ $? = "1" ]; then exit 0; fi
+			if [ $? = "1" ]; then wazzuf_quit; fi
 			;;
 		esac
 		;;

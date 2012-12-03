@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-12-03
+* Add GUI option to wazzuf-ripper, so lots of code modification (v5)
+
 2012-11-29
 * wazzuf-conf-generator: now get other codec parameters from the template configuration file
 

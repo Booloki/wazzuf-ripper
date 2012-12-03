@@ -55,7 +55,13 @@ check_device () {
 		if [[ ${1} == "ISO_DVD" ]]; then WORKING_FILES=".vob"; else WORKING_FILES=".m2ts"; fi
 		;;
 	* )
-		echo "Unexpected error: No device to check !"
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --eror --title "$ZEN_TITLE" \
+				--text "Unexpected error: No device to check !" \
+				--timeout=2
+		else
+			echo "Unexpected error: No device to check !"
+		fi
 		;;
 	esac
 
@@ -91,211 +97,151 @@ check_device () {
 			;;
 		esac
 	else
-		echo -ne "\n *************************************\n"
-		echo -ne " $DEVICE_NAME found.\n"
-		echo -ne " *************************************\n"
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG $DEVICE_NAME found."; fi
 	fi
 }
 
-# mount/umount BD iso file
-iso_bd_manage () {
-	case ${1} in
-	mount )
-		# check if ISO_BD not already mounted
-		if [[ `mount | grep udf | grep "$ISO_MOUNT_POINT" | wc -l` == "1" ]]; then
-			echo "$ISO_MOUNT_POINT mount point already used"
-			exit 1
+# check if value is an integer
+# need  NUMBER_TO_CHECK
+#	MESSAGE
+#	WAZZUF_UI
+#
+# return nothing
+check_integer () {
+	if echo "$NUMBER_TO_CHECK" | egrep -vq '^[0-9]+$'; then
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			zenity --error --title "$ZEN_TITLE" \
+				--text "$MESSAGE is not an integer ! Exiting."
 		else
-			if [[ ${2} == "GUI" ]]; then
-				# useless ?
-				gksudo --description Wazzuf-Ripper "mkdir -p $ISO_MOUNT_POINT"
-				# mounted read-only to avoid warning
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG gksudo --description Wazzuf-Ripper \"mount -r -o loop $ISO_FILE_PATH ${ISO_MOUNT_POINT}\"";fi
-				gksudo --description Wazzuf-Ripper "mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT"
-			else
-				echo "Mount ISO_BD to $ISO_MOUNT_POINT"
-				sudo mkdir -p $ISO_MOUNT_POINT
-				# mounted read-only to avoid warning
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT";fi
-				sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT
-			fi
+			echo -ne " Error ! $MESSAGE is not an integer ! Exiting.\n"
 		fi
-		;;
-	umount )
-		if [[ ${2} == "GUI" ]]; then
-			gksudo --description Wazzuf-Ripper "umount $ISO_MOUNT_POINT"
-		else
-			echo "Umount ISO_BD"
-			sudo umount $ISO_MOUNT_POINT
-		fi
-		;;
-	esac
+		exit 1
+	fi
 }
 
-# check imdb-cli
+# check if missing softwares
 check_imdb () {
 	if [ ! -x /usr/bin/imdbtool ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install imdb-cli ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="imdb-cli"
+		soft_to_install_exit
 	fi
 }
 
 check_nice () {
 	if [ ! -x "/usr/bin/nice" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install nice (coreutils) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="nice (coreutils)"
+		soft_to_install_exit
 	fi
 }
 
 check_ionice () {
 	if [ ! -x "/usr/bin/ionice" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install ionice (util-linux) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="ionice (util-linux)"
+		soft_to_install_exit
 	fi
 }
 
 check_ogmtools () {
 	if [ ! -x "/usr/bin/dvdxchap" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install dvdxchap (ogmtools) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="dvdxchap (ogmtools)"
+		soft_to_install_exit
 	fi
 }
 
 check_bdchapters () {
 	if [ ! -x "/usr/bin/bdchapters" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install bdchapters ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="bdchapters"
+		soft_to_install_exit
 	fi
 }
 
 check_lsdvd () {
 	if [ ! -x "/usr/bin/lsdvd" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install lsdvd ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="lsdvd"
+		soft_to_install_exit
 	fi
 }
 
 check_mediainfo () {
 	if [ ! -x "/usr/bin/mediainfo" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install mediainfo ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="mediainfo"
+		soft_to_install_exit
 	fi
 }
 
 check_avconv () {
 	if [ ! -x "/usr/bin/avconv" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install avconv (libav-tools) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="avconv (libav-tools)"
+		soft_to_install_exit
 	fi
 }
 
 check_7z () {
 	if [ ! -x "/usr/bin/7z" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install 7z (p7zip-full) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="7z (p7zip-full)"
+		soft_to_install_exit
 	fi
 }
 
 check_genisoimage () {
 	if [ ! -x "/usr/bin/genisoimage" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install genisoimage ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="genisoimage"
+		soft_to_install_exit
 	fi
 }
 
 check_mplayer () {
 	if [ ! -x "/usr/bin/mplayer" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install mplayer ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="mplayer"
+		soft_to_install_exit
 	fi
 }
 
 check_mencoder () {
 	if [ ! -x "/usr/bin/mencoder" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install mencoder ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="mencoder"
+		soft_to_install_exit
 	fi
 }
 
 check_cvlc () {
 	if [ ! -x "/usr/bin/cvlc" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install cvlc (vlc) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="cvlc (vlc)"
+		soft_to_install_exit
 	fi
 }
 
 check_oggenc () {
 	if [ ! -x "/usr/bin/oggenc" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install oggenc (vorbis-tools) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="oggenc (vorbis-tools)"
+		soft_to_install_exit
 	fi	
 }
 
 check_lame () {
 	if [ ! -x "/usr/bin/lame" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install lame ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="lame"
+		soft_to_install_exit
 	fi
 }
 
 check_opusenc () {
         if [ ! -x "/usr/bin/opusenc" ]; then
-                echo -ne "\n *************************************\n"
-                echo -ne " Please install opusenc (opus-tools) ! Exiting... \n"
-                echo -ne " *************************************\n"
-                exit 1
+		SOFT_NAME="opusenc (opus-tools)"
+		soft_to_install_exit
         fi
 }
 
 check_imagemagick () {
 	if [ ! -x "/usr/bin/convert" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install convert (imagemagick) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="convert (imagemagick)"
+		soft_to_install_exit
 	fi
 }
 
 check_mkvmerge () {
 	if [ ! -x "/usr/bin/mkvmerge" ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install mkvmerge (mkvtoolnix) ! Exiting... \n"
-		echo -ne " *************************************\n"
-		exit 1
+		SOFT_NAME="mkvmerge (mkvtoolnix)"
+		soft_to_install_exit
 	fi
-}
-
-wazzuf_usage () {
-	echo -ne "\n Usage : $0 [ Video Codec ] [ Audio 1 Codec ] [ Audio 2 Codec ]\n"
-	exit 1
 }
