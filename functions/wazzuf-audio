@@ -38,7 +38,7 @@ audio_rip () {
 		AUDIO_SOURCE_FILE=$WAV_FILE
 		;;
 	"" )
-		MESSSAGE="Audio format $AUDIO_SOURCE (AUDIO_X_SOURCE)"
+		MESSAGE="Audio format $AUDIO_SOURCE (AUDIO_X_SOURCE)"
 		empty_exit
 		;;
 	* )

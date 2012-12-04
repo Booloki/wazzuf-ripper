@@ -110,7 +110,7 @@ DVD )
 	grep "^Disc Title" DVD-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`
 	if [[ $DVD_EPISODES_ORG == "" ]]; then
-		MESSSAGE="DVD_EPISODES_ORG"
+		MESSAGE="DVD_EPISODES_ORG"
 		empty_exit
 	fi
 	if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then
@@ -194,7 +194,7 @@ ISO_DVD )
 	grep "^Disc Title" ISO-lsdvd.info
 	DVD_TITLE_NUMBER=`grep "^Longest track:" ISO-lsdvd.info | sed s/'Longest track: '//`
 	if [[ $DVD_EPISODES_ORG == "" ]]; then
-		MESSSAGE="DVD_EPISODES_ORG"
+		MESSAGE="DVD_EPISODES_ORG"
 		empty_exit
 	fi
 	if  [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "TITLES" ]]; then

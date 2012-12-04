@@ -139,11 +139,11 @@ case $VIDEO_TYPE in
 		# VIDEO_TYPE is OK
 		;;
 	"" )
-		MESSSAGE="VIDEO_TYPE (MOVIE, SHOW or MUSIC)"
+		MESSAGE="VIDEO_TYPE (MOVIE, SHOW or MUSIC)"
 		empty_exit
 		;;
 	* )
-		MESSSAGE="VIDEO_TYPE $VIDEO_TYPE"
+		MESSAGE="VIDEO_TYPE $VIDEO_TYPE"
 		not_recognized_exit
 		;;
 esac
@@ -200,11 +200,11 @@ DVD | ISO_DVD )
 			CHAPTER_LAST="1"
 			;;
 		"" )
-			MESSSAGE="DVD_EPISODES_ORG"
+			MESSAGE="DVD_EPISODES_ORG"
 			empty_exit
 			;;
 		* )
-			MESSSAGE="DVD_EPISODES_ORG"
+			MESSAGE="DVD_EPISODES_ORG"
 			not_recognized_exit
 			;;
 		esac
@@ -218,11 +218,11 @@ DVD | ISO_DVD )
 	esac
 	;;
 "" )
-	MESSSAGE="SOURCE (DVD, ISO_DVD, BD, ISO_BD or M2TS)"
+	MESSAGE="SOURCE (DVD, ISO_DVD, BD, ISO_BD or M2TS)"
 	empty_exit
 	;;
 * )
-	MESSSAGE="SOURCE $SOURCE"
+	MESSAGE="SOURCE $SOURCE"
 	not_recognized_exit
 	;;
 esac
@@ -684,7 +684,7 @@ do
 			AUDIO_AID_VARNAME=\$AUDIO_${AUDIO_COUNTER}_AID
 			AUDIO_AID=`eval "echo $AUDIO_AID_VARNAME"`
 			NUMBER_TO_CHECK="$AUDIO_AID"
-			MESSAGE="AUDIO_${AUDIO_COUNTER}_SID $AUDIO_AID"
+			MESSAGE="AUDIO_${AUDIO_COUNTER}_AID $AUDIO_AID"
 			check_integer
 
 			AUDIO_SOURCE_VARNAME=\$AUDIO_${AUDIO_COUNTER}_SOURCE
@@ -885,6 +885,7 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 			# "The pictures should only use the JPEG and PNG picture formats", Matroska Cover Art Guidelines
 			# List of officially recognized image MIME types at the IANA homepage http://www.iana.org/assignments/media-types/image/index.html
 			COVER_FORMAT_TEST=`file "$SOURCE_DIRECTORY/$COVER" | cut -d ':' -f 2 | cut -d ' ' -f 2`
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG COVER_FORMAT_TEST $COVER_FORMAT_TEST"; fi
 			if [[ $COVER_FORMAT_TEST == "JPEG" ]]; then
 				COVER_FORMAT="jpeg"
 				COVER_HEIGHT=`convert "$SOURCE_DIRECTORY/$COVER" -print "%h" /dev/null`
@@ -909,7 +910,7 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 					fi
 					MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/$COVER_FORMAT --attach-file $COVER_OUTPUT_SIMPLE --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file $COVER_OUTPUT_THUMB"
 				else
-					MESSSAGE="$COVER image file format"
+					MESSAGE="$COVER image file format"
 					not_recognized_exit	
 				fi
 			fi

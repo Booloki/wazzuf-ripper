@@ -84,7 +84,7 @@ ISO_BD | ISO_DVD )
 		ISO_FILE="`echo ${ZENITY_ISO_FILE} | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%`"
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG ISO_FILE $ISO_FILE"; fi 
 		if [[ "${ISO_FILE}" == "" ]]; then
-			MESSSAGE="Iso file"
+			MESSAGE="Iso file"
 			empty_exit
 		else
 			echo "ISO_FILE=\""${ISO_FILE}"\"" >> $CONF_FILE_TMP
@@ -108,7 +108,7 @@ M2TS )
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS_FILE $M2TS_FILE"; fi 
 		# Test if "empty"
 		if [[ "${M2TS_FILE}" == "" ]]; then
-			MESSSAGE="m2ts/ts file"
+			MESSAGE="m2ts/ts file"
 			empty_exit
 		else
 			echo "M2TS_FILE=\""${M2TS_FILE}"\"" >> $CONF_FILE_TMP
@@ -170,7 +170,7 @@ if  [[ ! $ZENITY_TITLE == "" ]]; then
 	# basic TITLE_NAME to TAG_TITLE_NAME convertion
 	echo "TAG_TITLE_NAME="\"`echo $ZENITY_TITLE | sed 's/[!?@#$£%^&*]//g' | sed 's/^\ //g' | sed 's/\ $//g' | sed s/[\ \']/./g`\""" >> $CONF_FILE_TMP
 else
-	MESSSAGE="Title"
+	MESSAGE="Title"
 	empty_exit
 fi
 
