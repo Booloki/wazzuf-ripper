@@ -425,8 +425,8 @@ do
 	DVD | ISO_DVD )
 		# extract local working file + chapters file from DVD or DVD iso
 		if [[ $SOURCE == "DVD" ]]; then
-			MPLAYER_VOB_DUMP_DEVICE=""
-			DVDXCHAP_DEVICE="/dev/dvd"
+			MPLAYER_VOB_DUMP_DEVICE="-dvd-device $DEVICE_PATH_BASE"
+			DVDXCHAP_DEVICE="$DEVICE_PATH_BASE"
 		else
 			DVDXCHAP_DEVICE="${SOURCE_DIRECTORY}/${ISO_FILE}"
 			MPLAYER_VOB_DUMP_DEVICE="-dvd-device ${SOURCE_DIRECTORY}/${ISO_FILE}"		
@@ -590,7 +590,7 @@ do
 				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
 
 				if [[ $SOURCE == "DVD" ]]; then
-					MPLAYER_DEVICE=""
+					MPLAYER_DEVICE="-dvd-device $DEVICE_PATH_BASE"
 				else
 					MPLAYER_DEVICE="-dvd-device ${SOURCE_DIRECTORY}/${ISO_FILE}"		
 				fi

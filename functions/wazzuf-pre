@@ -26,19 +26,9 @@ cropdetect(){
 				--auto-close
 			if [ $? = "1" ]; then wazzuf_quit; fi
 			;;
-		DVD )
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			( echo 10; mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
-				--title="$ZEN_TITLE" \
-				--text="Crop detection in progress" \
-				--cancel-label="Cancel" \
-				--pulsate \
-				--auto-close
-			if [ $? = "1" ]; then wazzuf_quit; fi
-			;;
-		ISO_DVD )
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/	cropdetect.out"; fi
-			( echo 10; mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
+		DVD | ISO_DVD)
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer dvd://$DVD_TITLE_NUMBER -dvd-device "$DVD_SOURCE" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+			( echo 10; mplayer dvd://$DVD_TITLE_NUMBER -dvd-device "$DVD_SOURCE" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
 				--title="$ZEN_TITLE" \
 				--text="Crop detection in progress" \
 				--cancel-label="Cancel" \
@@ -61,14 +51,9 @@ cropdetect(){
 			mplayer "$M2TS_FILE_PATH" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 			wait
 			;;
-		DVD )
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			mplayer dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
-			wait
-			;;
-		ISO_DVD )
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/	cropdetect.out"; fi
-			mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
+		DVD | ISO_DVD )
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG mplayer dvd://$DVD_TITLE_NUMBER -dvd-device "$DVD_SOURCE" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/	cropdetect.out"; fi
+			mplayer -dvd-device "$ISO_FILE_PATH" dvd://$DVD_TITLE_NUMBER -dvd-device "$DVD_SOURCE" -vf cropdetect -nosound -vo null -frames $CROP_FRAMES -sstep 1 -nocache &> /tmp/cropdetect.out
 			wait
 			;;
 		esac

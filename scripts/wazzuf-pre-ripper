@@ -82,7 +82,7 @@ M2TS )
 	avconv-decode M2TS-avconv.info
 	;;
 DVD )
-	DVD_PATH="/dev/dvd"
+	DVD_PATH="$DEVICE_PATH_BASE"
 	check_device DVD PRE
 	check_lsdvd
 	echo -ne "*************************************\n"
@@ -119,6 +119,7 @@ DVD )
 			echo "######### Title: $DVD_TITLE_NUMBER #########"
 			lsdvd -t $DVD_TITLE_NUMBER -acsv $DVD_PATH 2>/dev/null | grep -E "Subtitle|Audio|VTS" > DVD-lsdvd-T$DVD_TITLE_NUMBER.info
 			echo `grep "Title: " DVD-lsdvd-T$DVD_TITLE_NUMBER.info | cut -d "," -f 2`
+			DVD_SOURCE="$DVD_PATH"
 			cropdetect
 			echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 			grep VTS DVD-lsdvd-T$DVD_TITLE_NUMBER.info
@@ -127,6 +128,7 @@ DVD )
 	else
 		echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
 		echo `grep "Title: $DVD_TITLE_NUMBER" DVD-lsdvd.info | cut -d "," -f 2`
+		DVD_SOURCE="$DVD_PATH"
 		cropdetect
 		echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 
@@ -201,6 +203,7 @@ ISO_DVD )
 			echo "######### Title: $DVD_TITLE_NUMBER #########"
 			lsdvd -t $DVD_TITLE_NUMBER -acsv "$ISO_FILE_PATH" 2>/dev/null | grep -E "Subtitle|Audio|VTS" > ISO-lsdvd-T$DVD_TITLE_NUMBER.info
 			echo `grep "Title: " ISO-lsdvd-T$DVD_TITLE_NUMBER.info | cut -d "," -f 2`
+			DVD_SOURCE="$ISO_FILE_PATH"
 			cropdetect
 			echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 			grep VTS ISO-lsdvd-T$DVD_TITLE_NUMBER.info
