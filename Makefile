@@ -12,11 +12,11 @@ bindir = $(exec_prefix)/bin
 libdir = $(exec_prefix)/lib/wazzuf-ripper
 docdir = $(datarootdir)/doc/wazzuf-ripper
 datadir = $(datarootdir)/wazzuf-ripper
+iconsdir = $(datarootdir)/pixmaps
 desktopdir = $(datarootdir)/applications
 manpagesdir1= $(datarootdir)/man/man1
 manpagesdir4= $(datarootdir)/man/man4
 templatesdir = $(datadir)/tag-templates
-iconsdir = $(datadir)/icons
 
 installdirs: 
 	$(MKINSTALLDIRS) \

@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=Wazzuf Conf Generator
 Comment=Generate a new Wazzuf Ripper configuration file.
-Icon=/usr/share/wazzuf-ripper/icons/media-optical-video.png
+Icon=wazzuf-ripper.svg
 Type=Application
 Categories=AudioVideo;Video
 Exec=/usr/bin/wazzuf-conf-generator
