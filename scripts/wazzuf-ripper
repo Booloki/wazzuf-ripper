@@ -407,7 +407,8 @@ do
 		if [[ $WAZZUF_UI == "GUI" ]]; then
 			( get_imdb_informations ) \
 			| zenity --info --title "$ZEN_TITLE" \
-				--text "Retrieving IMdb informations..."
+				--text "Retrieving IMdb informations..." \
+				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
 			echo -ne " Retrieving IMdb informations..."
