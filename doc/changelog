@@ -4,7 +4,8 @@
 # Changelog file
 
 2012-12-06
-* Change application icon 
+* Change application icon
+* Bugfix: episode number if DVD_EPISODES_ORG is TITLES without episode file
 
 2012-12-04
 * Bugfix: change DVD device path to /dev/cdrom because /dev/dvd is not working on distributions without udev, e.g. Arch Linux)
