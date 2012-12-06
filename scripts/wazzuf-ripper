@@ -1015,10 +1015,6 @@ done
 
 cd ..
 if [[ $WAZZUF_UI == "GUI" ]]; then
-	# notification
-	zenity --notification\
-		--window-icon="info" \
-		--text="$TITLE_LONG $TAG_RIP finished"
 	# basic information
 	zenity --info --title "$ZEN_TITLE" --text "$TITLE_LONG $TAG_RIP finished"
 else
