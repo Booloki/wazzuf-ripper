@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-12-08
+* Bugfix: icon in Unity env
+
 2012-12-06
 * Change application icon
 * Bugfix: episode number if DVD_EPISODES_ORG is TITLES without episode file
