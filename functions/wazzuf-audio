@@ -60,13 +60,13 @@ audio_rip () {
 				echo -ne "\n *************************************\n"
 				echo " Dumping $AUDIO_SOURCE_FILE..."
 			fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE"; fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE 2>&1 ) \
+				( ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE 2>&1 ) \
 					| zenity --progress --pulsate --title "$ZEN_TITLE" --text "Dumping $AUDIO_SOURCE_FILE" --auto-close
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
+				ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 			fi
 		fi
 		;;
@@ -80,13 +80,13 @@ audio_rip () {
 				echo -ne "\n *************************************\n"
 				echo " Dumping $WAV_FILE..."
 			fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null"; fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null 2>/dev/null ) \
+				( ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null 2>/dev/null ) \
 					| zenity --progress --title="$ZEN_TITLE" --text="Extracting $WAV_FILE" --auto-close --auto-kill --pulsate
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				ionice -c $IONICENESS nice -n $NICENESS mplayer $SOURCE_FILE -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null
+				ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null
 			fi
 		fi
 		;;
@@ -150,7 +150,7 @@ audio_rip () {
 		if [ -f $AUDIO_FILE ]; then
 			FILE_NAME=$AUDIO_FILE
 			file_exists
-        else
+		else
 			check_oggenc
 			if [[ ! $WAZZUF_UI == "GUI" ]]; then
 				echo -ne "\n *************************************\n"

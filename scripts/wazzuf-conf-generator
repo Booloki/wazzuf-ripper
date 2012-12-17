@@ -467,13 +467,13 @@ M2TS )
 	# extract informations from associated mpls or clpi file
 	MPLS_FILE_PATH="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
 	check_mediainfo
-	if [ -f $MPLS_FILE_PATH ]; then
+	if [ -f "$MPLS_FILE_PATH" ]; then
 		mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "$MPLS_FILE_PATH" 1>/dev/null
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from mpls file"; fi
 	else
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG no associated mpls file found"; fi
 		CLPI_FILE_PATH="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!clpi!'`"
-		if [ -f $CLPI_FILE_PATH ]; then
+		if [ -f "$CLPI_FILE_PATH" ]; then
 			mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "$CLPI_FILE_PATH" 1>/dev/null
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from clpi file"; fi
 		else
@@ -509,7 +509,7 @@ M2TS )
 			ID=$(($ID_HEX))
 			M2TS_AUDIO_ID[$i]=$ID
 
-			if [[ -f $MPLS_FILE_PATH || -f $CLPI_FILE_PATH ]]; then
+			if [[ -f "$MPLS_FILE_PATH" || -f "$CLPI_FILE_PATH" ]]; then
 				M2TS_AUDIO_LANG[$i]="`grep -A 6 $ID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
 			else
 				if [[ "`echo ${line}  | cut -d ':' -f1 | cut -d ']' -f 2`" == "" ]]; then
@@ -593,7 +593,7 @@ M2TS )
 				M2TS_SUB_ID[$i]=$SID
 				# no language display...
 				# unless corresponding mpls/clpi (+ xml extraction)
-				if [[ -f $MPLS_FILE_PATH || -f $CLPI_FILE_PATH ]]; then
+				if [[ -f "$MPLS_FILE_PATH" || -f "$CLPI_FILE_PATH" ]]; then
 					M2TS_SUB_LANG[$i]="`grep -A 3 $SID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
 					# should be always PGS
 					M2TS_SUB_FORMAT[$i]="`grep -A 3 $SID M2TS-mediainfo.info | grep "Format" | cut -d ':' -f2 | sed 's/ //'`"

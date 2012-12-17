@@ -506,7 +506,7 @@ do
 		if [[ $WAZZUF_UI == "GUI" ]]; then
 			zenity --info --title "$ZEN_TITLE" \
 				--text "Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,
-or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper." \
+or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 		else
 			echo -ne "\n *************************************\n"
 			echo -ne " Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,\n"
@@ -521,7 +521,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper." \
 		# chapters management
 		MPLS_FILE="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
 		if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
-		if [ -f $MPLS_FILE ]; then
+		if [ -f "$MPLS_FILE" ]; then
 			check_bdchapters
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				( bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML ) \
