@@ -569,6 +569,12 @@ M2TS )
 				"dca(DTS)" | "dca(DTS-HDMA)" )
 					echo "AUDIO_${j}_SOURCE=\"DTS\"" >> $CONF_FILE_TMP
 					;;
+				pcm_bluray )
+					echo "AUDIO_${j}_SOURCE=\"PCM-BR\"" >> $CONF_FILE_TMP
+					;;
+				truehd )
+					echo "AUDIO_${j}_SOURCE=\"THD\"" >> $CONF_FILE_TMP
+					;;
 				* )
 					echo "AUDIO_${j}_SOURCE=\"$ZENITY_AUDIO_TRACK_SOURCE\"" >> $CONF_FILE_TMP
 					;;

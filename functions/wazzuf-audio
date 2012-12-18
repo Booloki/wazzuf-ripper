@@ -34,7 +34,10 @@ audio_rip () {
 	AC3 )
 		AUDIO_SOURCE_FILE=$AC3_FILE
 		;;
-	PCM )
+	THD )
+		AUDIO_SOURCE_FILE=$THD_FILE
+		;;
+	PCM | PCM-BR )
 		AUDIO_SOURCE_FILE=$WAV_FILE
 		;;
 	"" )
@@ -49,7 +52,7 @@ audio_rip () {
 
 	# extract audio from local working file
 	case $CODEC_AUDIO in
-	DTS | AC3 )
+	DTS | AC3 | THD )
 		# extract AC3/DTS (dump)
 		if [ -f $AUDIO_SOURCE_FILE ]
 		then
@@ -67,6 +70,28 @@ audio_rip () {
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
 				ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
+			fi
+		fi
+		;;
+	PCM-BR )
+		# extract pcm_bluray audio track to wave file
+		if [ -f $WAV_FILE ]; then
+			FILE_NAME=$AUDIO_SOURCE_FILE
+			file_exists
+		else
+			if [[ ! $WAZZUF_UI == "GUI" ]]; then
+				echo -ne "\n *************************************\n"
+				echo " Dumping $WAV_FILE..."
+			fi
+			# get pcm_bluray source map
+			SOURCE_PCM_BLURAY_ID=`avconv -i "$SOURCE_FILE" 2>&1 | grep pcm_bluray | cut -d ':' -f1 | cut -d '[' -f 1 | cut -d '.' -f 2`
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS avconv -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE"; fi
+			if [[ $WAZZUF_UI == "GUI" ]]; then
+				( ionice -c $IONICENESS nice -n $NICENESS avconv -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE ) \
+					| zenity --progress --title="$ZEN_TITLE" --text="Extracting $WAV_FILE" --auto-close --auto-kill --pulsate
+				if [ $? = "1" ]; then wazzuf_quit; fi
+			else
+				ionice -c $IONICENESS nice -n $NICENESS avconv -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE
 			fi
 		fi
 		;;
@@ -97,8 +122,20 @@ audio_rip () {
 	esac
 
 	case $CODEC_AUDIO in
-	PCM )
+	PCM | PCM-BR )
 		AUDIO_FILE=$WAV_FILE
+       		if [ -f $AUDIO_FILE ]
+       		then
+			FILE_NAME=$AUDIO_FILE
+			file_exists
+		else
+			FILE_NAME="$AUDIO_FILE"
+			SOURCE_NAME="working directory"
+			dont_exists_exit
+		fi
+		;;
+	THD )
+		AUDIO_FILE=$THD_FILE
        		if [ -f $AUDIO_FILE ]
        		then
 			FILE_NAME=$AUDIO_FILE

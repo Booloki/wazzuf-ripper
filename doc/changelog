@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2012-12-18
+* BR: Add support for Dolby TrueHD and Bluray PCM audio tracks
+
 2012-12-17
 * Bugfix: SOURCE_DIRECTORY with spaces error
 * wazzuf-ripper: local working file(s) copy from BD improvements.
