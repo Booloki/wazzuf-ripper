@@ -4,6 +4,7 @@
 # Changelog file
 
 2012-12-18
+* Bugfix: Multi subtitles support
 * Bugfix: Remove cover art generation GUI to fix merge issue
 * Bugfix: BD chapters file creation GUI
 * BR: Add support for Dolby TrueHD and Bluray PCM audio tracks

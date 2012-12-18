@@ -414,11 +414,11 @@ do
 		if [[ $WAZZUF_UI == "GUI" ]]; then
 			( get_imdb_informations ) \
 			| zenity --info --title "$ZEN_TITLE" \
-				--text "Retrieving IMdb informations..." \
+				--text "Retrieving IMdb informations...\n" \
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne " Retrieving IMdb informations..."
+			echo -ne " Retrieving IMdb informations...\n"
 			get_imdb_informations
 		fi
 	fi
@@ -564,7 +564,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 		SUBTITLE_LANG_VARNAME=\$SUBTITLE_${SUB_COUNTER}_LANG
 		SUBTITLE_LANG=`eval "echo $SUBTITLE_LANG_VARNAME"`
 
-		if [[ $SUBTITLE_LANG == "" || $SUB_COUNTER -gt 1 ]]; then
+		if [[ $SUBTITLE_LANG == "" || $SUB_COUNTER -lt 1 ]]; then
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				zenity --info --title "$ZEN_TITLE" \
 					--text "No more subtitle track choice. Next..." \
@@ -620,11 +620,19 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 				# If srt file, check encoding
 				if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".srt$"` == "" ]]; then subtitle_srt_check; fi
 				# Copy subtitle file
-				cp -v "$SUBTITLE_FILE_FORCE_PATH" .
+				if [[ $WAZZUF_UI == "GUI" ]]; then
+					cp "$SUBTITLE_FILE_FORCE_PATH" .
+				else
+					cp -v "$SUBTITLE_FILE_FORCE_PATH" .
+				fi
 				# If .idx file, copy .sub file too.
 				if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
 					SUBTITLE_FILE_SUB=`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`
-					cp -v $SUBTITLE_FILE_SUB .				
+					if [[ $WAZZUF_UI == "GUI" ]]; then
+						cp $SUBTITLE_FILE_SUB .
+					else
+						cp -v $SUBTITLE_FILE_SUB .
+					fi
 				fi
 				SUBTITLE_FILE="$SUBTITLE_FILE_FORCE"
 			fi
