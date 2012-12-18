@@ -55,12 +55,11 @@ cover_art_convert () {
 	fi
 
 	if [[ $DEBUG == "1" ]]; then
-		# /!\ redirected to stderr or zenity error :/
-		echo "DEBUG COVER_FORMAT $COVER_FORMAT" 1>&2
-		echo "DEBUG COVER_OUTPUT_SIMPLE $COVER_OUTPUT_SIMPLE" 1>&2
-		echo "DEBUG COVER_DIMENSION_SIMPLE $COVER_DIMENSION_SIMPLE" 1>&2
-		echo "DEBUG COVER_OUTPUT_THUMB $COVER_OUTPUT_THUMB" 1>&2
-		echo "DEBUG COVER_DIMENSION_THUMB $COVER_DIMENSION_THUMB" 1>&2
+		echo "DEBUG COVER_FORMAT $COVER_FORMAT"
+		echo "DEBUG COVER_OUTPUT_SIMPLE $COVER_OUTPUT_SIMPLE"
+		echo "DEBUG COVER_DIMENSION_SIMPLE $COVER_DIMENSION_SIMPLE"
+		echo "DEBUG COVER_OUTPUT_THUMB $COVER_OUTPUT_THUMB"
+		echo "DEBUG COVER_DIMENSION_THUMB $COVER_DIMENSION_THUMB"
 	fi
 
 	# cover creation
@@ -73,7 +72,6 @@ cover_art_convert () {
 		if [[ $COVER_DIMENSION == "" ]]; then
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				cp "$COVER_SOURCE_PATH" $COVER_OUTPUT
-				echo "40"
 			else
 				echo -ne "\n *************************************\n"
 				echo " Copying cover art..."
@@ -83,7 +81,6 @@ cover_art_convert () {
 		else
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				cover_art_resize
-				echo "40"
 			else
 				echo -ne "\n *************************************\n"
 				echo " Resizing cover art..."
@@ -102,7 +99,6 @@ cover_art_convert () {
 		COVER_OUTPUT=$COVER_OUTPUT_THUMB
 		if [[ $WAZZUF_UI == "GUI" ]]; then
 			cover_art_resize
-			echo "90"
 		else
 			echo -ne "\n *************************************\n"
 			echo " Cover art thumbnail generation..."

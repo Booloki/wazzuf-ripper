@@ -900,24 +900,22 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 				COVER_FORMAT="jpeg"
 				COVER_HEIGHT=`convert "$SOURCE_DIRECTORY/$COVER" -print "%h" /dev/null`
 				COVER_WIDTH=`convert "$SOURCE_DIRECTORY/$COVER" -print "%w" /dev/null`
-				if [[ $WAZZUF_UI == "GUI" ]]; then
-					( cover_art_convert ) | zenity --progress --title "$ZEN_TITLE" --text "Cover art generation" --auto-close --percentage=0
-					if [ $? = "1" ]; then wazzuf_quit; fi
-				else
-					cover_art_convert
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG COVER_HEIGHT $COVER_HEIGHT"
+					echo "DEBUG COVER_WIDTH $COVER_WIDTH"
 				fi
+				cover_art_convert
 				MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/$COVER_FORMAT --attach-file $COVER_OUTPUT_SIMPLE --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file $COVER_OUTPUT_THUMB"
 			else
 				if [[ $COVER_FORMAT_TEST == "PNG" ]]; then
 					COVER_FORMAT="png"
 					COVER_HEIGHT=`file "$SOURCE_DIRECTORY/$COVER" | cut -d "," -f 2 | cut -d " " -f 4`
 					COVER_WIDTH=`file "$SOURCE_DIRECTORY/$COVER" | cut -d "," -f 2 | cut -d " " -f 2`
-					if [[ $WAZZUF_UI == "GUI" ]]; then
-						( cover_art_convert ) | zenity --progress --title "$ZEN_TITLE" --text "Cover art generation" --auto-close --percentage=0
-						if [ $? = "1" ]; then wazzuf_quit; fi
-					else
-						cover_art_convert
+					if [[ $DEBUG == "1" ]]; then
+						echo "DEBUG COVER_HEIGHT $COVER_HEIGHT"
+						echo "DEBUG COVER_WIDTH $COVER_WIDTH"
 					fi
+					cover_art_convert
 					MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/$COVER_FORMAT --attach-file $COVER_OUTPUT_SIMPLE --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file $COVER_OUTPUT_THUMB"
 				else
 					MESSAGE="$COVER image file format"
