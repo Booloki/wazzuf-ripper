@@ -11,7 +11,7 @@ subtitle_rip () {
 	        else
 			check_mencoder
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				nice -n $NICENESS mencoder $MPLAYER_DEVICE dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
+				nice -n $NICENESS mencoder -dvd-device "$MPLAYER_DEVICE" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
 					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
 					-o /dev/null -nosound -ovc frameno 2>/dev/null \
 					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
@@ -21,8 +21,8 @@ subtitle_rip () {
 				echo -ne "\n *************************************\n"
 	        	        echo " Extracting subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
 	        	        echo -ne " *************************************\n"
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder $MPLAYER_DEVICE dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno"; fi
-				nice -n $NICENESS mencoder $MPLAYER_DEVICE dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder -dvd-device \"$MPLAYER_DEVICE\" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno"; fi
+				nice -n $NICENESS mencoder -dvd-device "$MPLAYER_DEVICE" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
 					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
 					-o /dev/null -nosound -ovc frameno
 			fi

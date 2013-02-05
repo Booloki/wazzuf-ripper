@@ -599,9 +599,9 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
 
 				if [[ $SOURCE == "DVD" ]]; then
-					MPLAYER_DEVICE="-dvd-device $DEVICE_PATH_BASE"
+					MPLAYER_DEVICE="$DEVICE_PATH_BASE"
 				else
-					MPLAYER_DEVICE="-dvd-device ${SOURCE_DIRECTORY}/${ISO_FILE}"		
+					MPLAYER_DEVICE="${SOURCE_DIRECTORY}/${ISO_FILE}"		
 				fi
 				if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 					MPLAYER_CHAPTERS="-chapter $CHAPTERS"
