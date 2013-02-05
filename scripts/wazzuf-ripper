@@ -433,11 +433,11 @@ do
 	DVD | ISO_DVD )
 		# extract local working file + chapters file from DVD or DVD iso
 		if [[ $SOURCE == "DVD" ]]; then
-			MPLAYER_VOB_DUMP_DEVICE="-dvd-device $DEVICE_PATH_BASE"
 			DVDXCHAP_DEVICE="$DEVICE_PATH_BASE"
+			MPLAYER_VOB_DUMP_DEVICE="$DEVICE_PATH_BASE"
 		else
 			DVDXCHAP_DEVICE="${SOURCE_DIRECTORY}/${ISO_FILE}"
-			MPLAYER_VOB_DUMP_DEVICE="-dvd-device ${SOURCE_DIRECTORY}/${ISO_FILE}"		
+			MPLAYER_VOB_DUMP_DEVICE="${SOURCE_DIRECTORY}/${ISO_FILE}"		
 		fi
 		if [[ $VIDEO_TYPE == "SHOW" && $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 			MERGE_CHAPTERS=""

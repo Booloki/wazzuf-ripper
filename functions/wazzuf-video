@@ -10,14 +10,14 @@
 video_dvd_chapters_extract () {
 	# Save chapters informations (DVD/ISO_DVD only)
 	if [[ $WAZZUF_UI == "GUI" ]]; then
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG ( dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT ) | zenity --progress --pulsate --title \"$ZEN_TITLE\" --text \"Creating $CHAPTERS_FILE_TXT from $SOURCE\" --auto-close"; fi
-		( dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT ) \
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ( dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS \"$DVDXCHAP_DEVICE\" > $CHAPTERS_FILE_TXT ) | zenity --progress --pulsate --title \"$ZEN_TITLE\" --text \"Creating $CHAPTERS_FILE_TXT from $SOURCE\" --auto-close"; fi
+		( dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS "$DVDXCHAP_DEVICE" > $CHAPTERS_FILE_TXT ) \
 			| zenity --progress --pulsate --title "$ZEN_TITLE" --text "Creating $CHAPTERS_FILE_TXT from $SOURCE" --auto-close --auto-kill
 	else
 		echo -ne "\n *************************************\n"
 		echo " Creating $CHAPTERS_FILE_TXT from $SOURCE..."
-		if [[ $DEBUG == "1" ]]; then echo "DEBUG dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT"; fi
-		dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS $DVDXCHAP_DEVICE > $CHAPTERS_FILE_TXT
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS \"$DVDXCHAP_DEVICE\" > $CHAPTERS_FILE_TXT"; fi
+		dvdxchap -t $TITLE_NUMBER $DVDXCHAP_CHAPTERS "$DVDXCHAP_DEVICE" > $CHAPTERS_FILE_TXT
 	fi
 }
 
