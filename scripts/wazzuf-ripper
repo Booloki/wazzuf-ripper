@@ -523,6 +523,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 		if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
 		if [ -f "$MPLS_FILE" ]; then
 			check_bdchapters
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				( echo 10; bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML 1>/dev/null ) \
 				| zenity --progress --pulsate --auto-close --title "$ZEN_TITLE" \

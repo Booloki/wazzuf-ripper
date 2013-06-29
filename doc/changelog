@@ -3,6 +3,11 @@
 # booloki@lokizone.net
 # Changelog file
 
+2013-06-29
+* More verbose thinks
+* Add md5sum to nfo file
+* vob extract with -dvd-device
+
 2013-02-05
 * Copyright date modification
 * Bugfix: ISO_DVD with spaces error
