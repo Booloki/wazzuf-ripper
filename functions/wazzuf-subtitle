@@ -41,18 +41,49 @@ subtitle_rip () {
 	esac
 }
 
-# check srt files encoding
-# Warning only
+# Check srt files encoding and provide character-set to encode
+# Or Warning if charset unrecognized
+# return MERGE_SUBTITLE_CHARSET
 subtitle_srt_check () {
 	SUBTITLE_TYPE=`file "$SUBTITLE_FILE_FORCE_PATH"`
+	SUBTITLE_MIME=`file -b --mime-encoding "$SUBTITLE_FILE_FORCE_PATH"`
 	if [[ `echo $SUBTITLE_TYPE | grep Unicode` == "" ]]; then
-		if [[ $WAZZUF_UI == "GUI" ]]; then
-			zenity --warning --title "$ZEN_TITLE" \
-				--text "Provided subtitle is not Unicode." \
-				--timeout=2
-		else
-			echo " Warning. Provided subtitle is not Unicode."
-			echo " $SUBTITLE_TYPE" && sleep 2
-		fi
+		case $SUBTITLE_MIME in
+			iso-8859-1 )
+				SUBTITLE_CHARSET="ISO-8859-1"
+				MERGE_SUBTITLE_CHARSET="--sub-charset 0:$SUBTITLE_CHARSET"
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG SUBTITLE_MIME $SUBTITLE_MIME"
+					echo "DEBUG SUBTITLE_CHARSET $SUBTITLE_CHARSET"
+				fi
+				;;
+			unknown-8bit )
+				SUBTITLE_CHARSET="WINDOWS-1252"
+				MERGE_SUBTITLE_CHARSET="--sub-charset 0:$SUBTITLE_CHARSET"
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG SUBTITLE_MIME $SUBTITLE_MIME"
+					echo "DEBUG SUBTITLE_CHARSET $SUBTITLE_CHARSET"
+				fi
+				;;
+			* )
+				# unrecognized charset
+				SUBTITLE_CHARSET=""
+				MERGE_SUBTITLE_CHARSET=""
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG SUBTITLE_MIME $SUBTITLE_MIME"
+					echo "DEBUG SUBTITLE_CHARSET TODO"
+				fi
+				if [[ $WAZZUF_UI == "GUI" ]]; then
+					zenity --warning --title "$ZEN_TITLE" \
+						--text "Provided subtitle is not Unicode and unrecognized." \
+						--timeout=2
+				else
+					echo " Warning. Provided subtitle is not Unicode and unrecognized."
+					echo " $SUBTITLE_TYPE" && sleep 2
+				fi
+				;;
+		esac
+	else
+		MERGE_SUBTITLE_CHARSET=""
 	fi
 }

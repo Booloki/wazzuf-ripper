@@ -588,13 +588,20 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			SUBTITLE_FILE_FORCE=`eval "echo $SUBTITLE_FILE_FORCE_VARNAME"`
 			SUBTITLE_FILE_FORCE_PATH="$SOURCE_DIRECTORY/$SUBTITLE_FILE_FORCE"
 
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG SUB_COUNTER $SUB_COUNTER"; fi
+			if [[ $DEBUG == "1" ]]; then
+				echo ""
+				echo "DEBUG SUB_COUNTER $SUB_COUNTER"
+				echo "DEBUG SUBTITLE_NAME $SUBTITLE_NAME"
+				echo "DEBUG SUBTITLE_SID $SUBTITLE_SID"
+				echo "DEBUG SUBTITLE_FILE_FORCE_VARNAME $SUBTITLE_FILE_FORCE_VARNAME"
+				echo "DEBUG SUBTITLE_FILE_FORCE $SUBTITLE_FILE_FORCE"
+				echo "DEBUG SUBTITLE_FILE_FORCE_PATH $SUBTITLE_FILE_FORCE_PATH"
+			fi
 			# subtitle file (force external or not)
 			if [[ "$SUBTITLE_FILE_FORCE" == "" ]]; then
 				# check if provided variable is a number
 				NUMBER_TO_CHECK="$SUBTITLE_SID"
 				MESSAGE="SUBTITLE_${SUB_COUNTER}_SID $SUBTITLE_SID"
-				check_integer
 				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 				SUBTITLE_FILE="$SUB_FILE.idx"
 				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
@@ -655,10 +662,10 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			# Force no default subtitle (or not)
 			case $SUBTITLE_NODEFAULT_FORCE in
 			Y* | y* )
-				MERGE_SUBTITLE="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+				MERGE_SUBTITLE="--language 0:$SUBTITLE_LANG --default-track 0:0 --track-name 0:$SUBTITLE_NAME $MERGE_SUBTITLE_CHARSET $SUBTITLE_FILE"
 				;;
 			* )
-				MERGE_SUBTITLE="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $SUBTITLE_FILE"
+				MERGE_SUBTITLE="--language 0:$SUBTITLE_LANG --track-name 0:$SUBTITLE_NAME $MERGE_SUBTITLE_CHARSET $SUBTITLE_FILE"
 				;;
 			esac
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_SUBTITLE $MERGE_SUBTITLE"; fi

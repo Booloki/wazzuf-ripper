@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2013-07-14
+* Add external subtitle(s) for DVDRIP with srt file(s) charset check/encode
+
 2013-06-29
 * More verbose thinks
 * Add md5sum to nfo file
