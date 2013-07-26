@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+
+2013-07-26
+* imdb functions: don't try to download IMDb poster if there's not + debug
+
 2013-07-14
 * Add external subtitle(s) for DVDRIP with srt file(s) charset check/encode
 
