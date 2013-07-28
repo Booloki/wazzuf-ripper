@@ -383,7 +383,26 @@ This one will be use for cropping detection." --ok-label "Next"
 DVD | ISO_DVD )
 	check_lsdvd
 	DVD_PATH="$ZENITY_DISC_DIR"
-	if [[ $SOURCE == "DVD" ]]; then DVD_SOURCE="$DVD_PATH"; else DVD_SOURCE="$ISO_FILE_PATH"; fi
+
+	if [[ $SOURCE == "DVD" ]]; then
+		DVD_MOUNT_PATH=$DVD_PATH
+		# Propose to copy DVD to local iso file
+		zenity --question --title "$ZEN_TITLE" --text "Do you want to <b>make a local iso</b> file of your DVD ?" --ok-label "Yes" --cancel-label="No"
+		if [ $? = "0" ]; then
+			if [[ "$ISO_FILE" == "" ]]; then
+				ISO_FILE="$TITLE_NAME-DVD-`date +%d-%H.%M`.iso"
+				sed -i "s/^SOURCE=\"DVD\"$/SOURCE=\"DVD\"\nISO_FILE=\"${ISO_FILE}\"/" $CONF_FILE_TMP
+			fi
+			copy-dvd2iso
+			# Change SOURCE="DVD" to "ISO_DVD" in configuration file
+			sed -i 's/^SOURCE="DVD"$/SOURCE="ISO_DVD"/' $CONF_FILE_TMP
+		fi
+		DVD_SOURCE="$DVD_PATH"
+	else
+		DVD_SOURCE="$ISO_FILE_PATH"
+	fi
+
+	# does zenity really works ??
 	( lsdvd -acsv "$DVD_SOURCE" 2>/dev/null > DVD-lsdvd.info ) | zenity --progress \
 	        --title="$ZEN_TITLE" \
 	        --text="DVD analyse" \

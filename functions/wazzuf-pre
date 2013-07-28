@@ -85,11 +85,23 @@ lsdvd-decode(){
 	done  < ${1}
 }
 
-## copy DVD to iso file
+
+## copy DVD to local iso file
+# need  ISO_FILE
+#	DVD_MOUNT_PATH
 copy-dvd2iso (){
-		check_genisoimage
+	check_genisoimage
+	if [[ $WAZZUF_UI == "GUI" ]]; then
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH""; fi
+		( genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH" 2>&1 \
+			| sed -u 's/.* \(.*[0-9]\)\.\([0-9]\+%\)\(.*\)/\1\n# iso file creation in progress\t\t\1.\2/' )\
+			| zenity --progress \
+			--title="$ZEN_TITLE" \
+			--auto-close
+	else
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH""; fi
 		genisoimage -allow-limited-size -dvd-video -o "$ISO_FILE" "$DVD_MOUNT_PATH"
+	fi
 }
 
 ## get BD longest Title
