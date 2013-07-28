@@ -6,6 +6,7 @@
 
 2013-07-28
 * wazzuf-conf-generator: Add copy DVD to iso (GUI)
+* Stop if insufficient disk space (merge only)
 
 2013-07-26
 * imdb functions: don't try to download IMDb poster if there's not + debug

@@ -990,7 +990,23 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 		echo " Final file merge:"
 		echo -ne " *************************************\n"
 	fi
-	if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title \"$MERGE_TITLE\" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"; fi
+
+	TOTAL_TRACKS_SIZE=$(expr $TOTAL_AUDIO_SIZE + $TOTAL_SUBTITLE_SIZE + $TOTAL_IMAGE_SIZE + $VIDEO_SIZE )
+	LOCAL_AVAILABLE_DISK_SIZE=$(expr `df -k . | awk '/[0-9]%/{print $(NF-2)}'` \* 1024 )
+
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG TOTAL_TRACKS_SIZE $TOTAL_TRACKS_SIZE"
+		echo "DEBUG LOCAL_AVAILABLE_DISK_SIZE $LOCAL_AVAILABLE_DISK_SIZE"
+		echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title \"$MERGE_TITLE\" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"
+	else
+		MERGE_VERBOSE=""
+	fi
+
+	if [[ "$TOTAL_TRACKS_SIZE" -gt "$LOCAL_AVAILABLE_DISK_SIZE" ]]; then
+		MESSAGE="`pwd`"
+		disk_full_quit
+	fi
+
 	check_mkvmerge
 	if [[ $WAZZUF_UI == "GUI" ]]; then
 		( echo 10; nice -n $NICENESS mkvmerge \

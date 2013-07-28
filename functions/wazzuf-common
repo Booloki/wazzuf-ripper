@@ -156,3 +156,20 @@ wazzuf_quit () {
 	exit 0
 }
 
+# wazzuf_disk_full
+# need  MESSAGE
+#	WAZZUF_UI
+#
+# return nothing
+disk_full_quit () {
+	if [[ $WAZZUF_UI == "GUI" ]]; then
+		zenity --info --title "$ZEN_TITLE" \
+			--text "Insufficient disk space in $MESSAGE ! Exiting."
+	else
+		echo -ne "\n *************************************\n"
+		echo -ne " Error: Insufficient disk space in $MESSAGE ! Exiting. \n"
+		echo -ne " *************************************\n"
+	fi
+	exit 1
+}
+
