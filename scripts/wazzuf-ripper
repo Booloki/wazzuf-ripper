@@ -362,8 +362,14 @@ do
 				EPISODE_NAME_FULL=`head -n $TITLE_NUMBER "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
 			fi
 			EPISODE_NAME=`echo $EPISODE_NAME_FULL | cut -d '-' -f 2-10 | sed s/\ //`
-			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`
-			EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
+			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`			
+			# EPISODE_TYPE removed if BONUS and not an épisode
+			if [[ "$EPISODE_NAME_FULL" == *BONUS* ]]; then
+				echo DING
+				EPISODE_TAG=$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
+			else
+				EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
+			fi
 		else
 			FILE_NAME="$EPISODE_DENOMINATION $EPISODES_FILE (EPISODES_FILE) text"
 			SOURCE_NAME="${SOURCE_DIRECTORY}"
@@ -381,7 +387,10 @@ do
 			EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER
 		fi
 		MERGE_OUTPUT="$TAG_TITLE_NAME.$SEASON_TYPE$SEASON_NUMBER.$EPISODE_TAG.$TAG_RIP.$CODEC_VIDEO.$TAG_AUDIO.$TAG_SIGNATURE.mkv"
-
+		#.$CODEC_AUDIO
+		if [[ "$EPISODE_NAME_FULL" == *BONUS* ]]; then
+			EPISODE_DENOMINATION=""
+		fi
 		MERGE_TITLE="$TITLE_LONG - $EPISODE_DENOMINATION $EPISODE_NAME_FULL"
 		if [[ $WAZZUF_UI == "GUI" ]]; then
 			zenity --info --title "$ZEN_TITLE" \
@@ -729,7 +738,11 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			THD_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.thd"
 			WAV_FILE="$BASE_WORKING_FILE.$AUDIO_AID-$AUDIO_LANG.wav"
 
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG AUDIO_COUNTER $AUDIO_COUNTER"; fi
+			if [[ $DEBUG == "1" ]]; then
+				echo "DEBUG AUDIO_COUNTER $AUDIO_COUNTER"
+				echo "DEBUG AUDIO_NAME $AUDIO_NAME"
+			fi
+
 			audio_rip
 
 			AUDIO_SIZE=`ls -l $AUDIO_FILE | cut -d ' ' -f 5`
@@ -737,7 +750,6 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			TOTAL_AUDIO_SIZE=$(expr $TOTAL_AUDIO_SIZE + $AUDIO_SIZE)
 
 			# merge with or without audio sync
-			# TODO problems for track-name with name containing spaces... so compose the command is hard...
 			if [[ $AUDIO_SYNC == "" ]]; then
 				MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:$AUDIO_NAME $AUDIO_FILE"
 			else	
@@ -869,6 +881,8 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 		echo "DEBUG VIDEO_CROP $VIDEO_CROP"
 	fi
 	video_rip
+	VIDEO_SIZE=`ls -l ${VIDEO_FILE}  | cut -d ' ' -f 5`
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG VIDEO_SIZE $VIDEO_SIZE"; fi
 
 	if [[ $VIDEO_RATIO_FORCE == "" ]]; then
 		MERGE_VIDEO="$VIDEO_FILE"
@@ -998,8 +1012,6 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 		echo "DEBUG TOTAL_TRACKS_SIZE $TOTAL_TRACKS_SIZE"
 		echo "DEBUG LOCAL_AVAILABLE_DISK_SIZE $LOCAL_AVAILABLE_DISK_SIZE"
 		echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title \"$MERGE_TITLE\" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"
-	else
-		MERGE_VERBOSE=""
 	fi
 
 	if [[ "$TOTAL_TRACKS_SIZE" -gt "$LOCAL_AVAILABLE_DISK_SIZE" ]]; then
