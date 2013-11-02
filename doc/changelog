@@ -5,6 +5,7 @@
 
 2013-10-02
 * Add CONV_PROJECT choice between avconv (Debian/Ubuntu) and ffmpeg (others). cf wazzuf-ripper-global.conf
+* wazzuf-conf-generator: VIDEO_CROP value checks
 
 2013-08-04
 * Remove E character in output filename and update .nfo if VIDEO_TYPE is SHOW and 'BONUS' string in episode.txt corresponding line.

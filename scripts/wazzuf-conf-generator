@@ -366,6 +366,13 @@ BD | ISO_BD )
 	        --pulsate \
 	        --auto-close
 
+	if [[ `grep "Error calculating media key. Missing right processing key" BD-mplayer.err` ]]; then 
+		zenity --error --title "$ZEN_TITLE" \
+			--text "AACS Key Error. Exiting !" \
+			--timeout=2
+		wazzuf_quit
+	fi
+
 	bd_get_longest_title
 	BD_LONGEST_TITLE_CHAPTERS="`grep ^ID_BLURAY_TITLE_$BD_LONGEST_TITLE_NUMBER BD-mplayer.info | grep _CHAPTERS | cut -d '=' -f 2`"
 	BD_TOTAL_TITLES="`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f 2`"
@@ -739,8 +746,14 @@ Need to be .srt, .sup, or .idx (+ .sub with same name) file." --ok-label "Yes" -
 	;;
 ISO_BD | BD )
 	cropdetect GUI
-	zenity --info --title "$ZEN_TITLE" --text "The BD video crop has been set to $VIDEO_CROP" --ok-label "Next"
-	echo "VIDEO_CROP="\"$VIDEO_CROP\""" >> $CONF_FILE_TMP
+	# VIDEO_CROP value check
+	if [[ $VIDEO_CROP == "" ]]; then
+		zenity --info --title "$ZEN_TITLE" --text "The BD video crop has not been found." --ok-label "Next"
+		echo "VIDEO_CROP="\"\"" # not found" >> $CONF_FILE_TMP
+	else
+		zenity --info --title "$ZEN_TITLE" --text "The BD video crop has been set to $VIDEO_CROP" --ok-label "Next"
+		echo "VIDEO_CROP="\"$VIDEO_CROP\""" >> $CONF_FILE_TMP
+	fi
 
 	if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount GUI; fi
 	;;
@@ -756,12 +769,23 @@ DVD | ISO_DVD )
 		done
 		# default VIDEO_CROP: the "biggest"
 		echo "VIDEO_CROP="\"`grep ^#VIDEO_CROP_TITLE_ $CONF_FILE_TMP | cut -d '"' -f 2 | sort -n | tail -1`\""" >> $CONF_FILE_TMP
-		zenity --info --title "$ZEN_TITLE" --text "The DVD video crop has been set to $VIDEO_CROP .
+		# VIDEO_CROP value check
+		if [[ $VIDEO_CROP == "" ]]; then
+			zenity --info --title "$ZEN_TITLE" --text "The DVD video crop has not been found." --ok-label "Next"
+		else
+			zenity --info --title "$ZEN_TITLE" --text "The DVD video crop has been set to $VIDEO_CROP .
 This is the biggest one. Crop detection for all choosen Titles are in conf file too." --ok-label "Next"
+		fi
 	else
 		cropdetect GUI
-		zenity --info --title "$ZEN_TITLE" --text "The DVD video crop has been set to $VIDEO_CROP" --ok-label "Next"
-		echo "VIDEO_CROP="\"$VIDEO_CROP\""" >> $CONF_FILE_TMP
+		# VIDEO_CROP value check
+		if [[ $VIDEO_CROP == "" ]]; then
+			zenity --info --title "$ZEN_TITLE" --text "The DVD video crop has not been found." --ok-label "Next"
+			echo "VIDEO_CROP="\"\"" # not found" >> $CONF_FILE_TMP
+		else
+			zenity --info --title "$ZEN_TITLE" --text "The DVD video crop has been set to $VIDEO_CROP" --ok-label "Next"
+			echo "VIDEO_CROP="\"$VIDEO_CROP\""" >> $CONF_FILE_TMP
+		fi
 
 		lsdvd -t $DVD_TITLE_NUMBER -acsv "$DVD_SOURCE" 2>/dev/null | grep "Audio:" > DVD-lsdvd-T$DVD_TITLE_NUMBER-audio.info
 	fi

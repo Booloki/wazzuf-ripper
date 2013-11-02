@@ -750,12 +750,12 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 
 			# merge with or without audio sync
 			if [[ $AUDIO_SYNC == "" ]]; then
-				MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:$AUDIO_NAME $AUDIO_FILE"
+				MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:${AUDIO_NAME} ${AUDIO_FILE}"
 			else	
 				MERGE_AUDIO="--language 0:$AUDIO_LANG --track-name 0:$AUDIO_NAME -y 0:$AUDIO_SYNC $AUDIO_FILE"
 			fi
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG MERGE_AUDIO $MERGE_AUDIO"; fi
-			MERGE_AUDIO_FULL="$MERGE_AUDIO_FULL $MERGE_AUDIO"
+			MERGE_AUDIO_FULL="${MERGE_AUDIO_FULL} ${MERGE_AUDIO}"
 
 			let AUDIO_COUNTER=AUDIO_COUNTER+1
 		fi
