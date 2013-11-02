@@ -207,9 +207,8 @@ video_rip () {
 				echo -ne " **********************************************************\n"
 			fi
 			# cvlc works if VIDEO_CROP is empty
-			SIZE_ORIGIN=`avconv -i "${SOURCE_FILE}" 2>&1 | grep 'Video: mpeg' | cut -d ',' -f 3 | cut -d ' ' -f 2`
-			WIDTH_ORIG=`echo $SIZE_ORIGIN | cut -d 'x' -f1`
-			HEIGHT_ORIG=`echo $SIZE_ORIGIN | cut -d 'x' -f2`
+			WIDTH_ORIG=`mediainfo --Inform="Video;%Width%" "${SOURCE_FILE}"`
+			HEIGHT_ORIG=`mediainfo --Inform="Video;%Height%" "${SOURCE_FILE}"`
 			VIDEO_CROP_W=`echo $VIDEO_CROP | cut -d ':' -f 1`
 			VIDEO_CROP_H=`echo $VIDEO_CROP | cut -d ':' -f 2`
 			VIDEO_CROP_X=`echo $VIDEO_CROP | cut -d ':' -f 3`
