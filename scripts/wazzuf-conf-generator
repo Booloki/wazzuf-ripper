@@ -359,7 +359,7 @@ BD | ISO_BD )
 		BD_MOUNT="`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`"
 	fi
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG BD_MOUNT ${BD_MOUNT}"; fi
-	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify br:// -bluray-device "$BD_MOUNT" 2>/dev/null > BD-mplayer.info ) | zenity --progress \
+	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify br:// -bluray-device "$BD_MOUNT" 2> BD-mplayer.err > BD-mplayer.info ) | zenity --progress \
 	        --title="$ZEN_TITLE" \
 	        --text="BD analyse" \
 	        --cancel-label="Cancel" \
@@ -476,7 +476,7 @@ This one will be use for cropping detection." --ok-label "Next"
 	fi
 	;;
 M2TS )
-	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify "$M2TS_FILE_PATH" 2>/dev/null > M2TS-mplayer.info; avconv -i "$M2TS_FILE_PATH" 2> M2TS-avconv.info ) | zenity --progress \
+	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify "$M2TS_FILE_PATH" 2>/dev/null > M2TS-mplayer.info; $CONV_PROJECT -i "$M2TS_FILE_PATH" 2> M2TS-$CONV_PROJECT.info ) | zenity --progress \
 	        --title="$ZEN_TITLE" \
 	        --text="M2TS analyse" \
 	        --cancel-label="Cancel" \
@@ -516,35 +516,74 @@ M2TS )
 	zenity --info --title "$ZEN_TITLE" --text "The m2ts/ts video crop has been set to $VIDEO_CROP" --ok-label "Next"
 	echo "VIDEO_CROP="\"$VIDEO_CROP\""" >> $CONF_FILE_TMP
 
-	grep 'Audio: ' M2TS-avconv.info > M2TS-avconv-audio.info
+	# Audio
+	if [[ `grep "Invalid data found" M2TS-$CONV_PROJECT.info`  == "" ]]; then
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS-$CONV_PROJECT.info seems valid."; fi
+		grep 'Audio: ' M2TS-$CONV_PROJECT.info > M2TS-$CONV_PROJECT-audio.info
 
- 	# Audio
-	i=0
-	while read line
-	do
-		i=`expr $i + 1`
-		ID_HEX="`echo "${line}" | cut -d '[' -f 2 | cut -d ']' -f 1`"
-		if [[ ! $ID_HEX == "" ]]; then
-			ID=$(($ID_HEX))
-			M2TS_AUDIO_ID[$i]=$ID
-
-			if [[ -f "$MPLS_FILE_PATH" || -f "$CLPI_FILE_PATH" ]]; then
-				M2TS_AUDIO_LANG[$i]="`grep -A 6 $ID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
-			else
-				if [[ "`echo ${line}  | cut -d ':' -f1 | cut -d ']' -f 2`" == "" ]]; then
-					M2TS_AUDIO_LANG[$i]="unknown"
+		i=0
+		while read line
+		do
+			i=`expr $i + 1`
+			ID_HEX="`echo "${line}" | cut -d '[' -f 2 | cut -d ']' -f 1`"
+			if [[ ! $ID_HEX == "" ]]; then
+				ID=$(($ID_HEX))
+				M2TS_AUDIO_ID[$i]=$ID
+	
+				if [[ -f "$MPLS_FILE_PATH" || -f "$CLPI_FILE_PATH" ]]; then
+					M2TS_AUDIO_LANG[$i]="`grep -A 7 $ID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
 				else
-					M2TS_AUDIO_LANG[$i]="`echo ${line} | cut -d '(' -f 2 | cut -d ')' -f 1`"
+
+					if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
+						M2TS_AUDIO_LANG[$i]="unknown"
+					elif [[ $CONV_PROJECT == "avconv" ]]; then
+						if [[ "`echo ${line}  | cut -d ':' -f1 | cut -d ']' -f 2`" == "" ]]; then
+							M2TS_AUDIO_LANG[$i]="unknown"
+						else
+							M2TS_AUDIO_LANG[$i]="`echo ${line} | cut -d '(' -f 2 | cut -d ')' -f 1`"
+						fi
+					fi
+				fi
+	
+				if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
+					M2TS_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f4 | sed s/\ //g`"
+				elif [[ $CONV_PROJECT == "avconv" ]]; then
+					M2TS_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f3 | sed s/\ //g`"
+				fi
+				M2TS_AUDIO_CHANNELS[$i]="`echo ${line} | cut -d ',' -f3 | sed s/\ //g`"
+				M2TS_AUDIO_BITRATE[$i]="`echo ${line} | cut -d ',' -f5 | sed s/\ //g`"
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
+					echo "DEBUG M2TS_AUDIO_LANG[$i] ${M2TS_AUDIO_LANG[$i]}"
+					echo "DEBUG M2TS_AUDIO_FORMAT[$i] ${M2TS_AUDIO_FORMAT[$i]}"
+					echo "DEBUG M2TS_AUDIO_CHANNELS[$i] ${M2TS_AUDIO_CHANNELS[$i]}"
+					echo "DEBUG M2TS_AUDIO_BITRATE[$i] ${M2TS_AUDIO_BITRATE[$i]}"
 				fi
 			fi
-
-			M2TS_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f3 | sed s/\ //g`"
-			M2TS_AUDIO_CHANNELS[$i]="`echo ${line} | cut -d ',' -f3 | sed s/\ //g`"
-			M2TS_AUDIO_BITRATE[$i]="`echo ${line} | cut -d ',' -f5 | sed s/\ //g`"
-		fi
-	done < M2TS-avconv-audio.info
+		done < M2TS-$CONV_PROJECT-audio.info
+	else
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG WARNING! M2TS-$CONV_PROJECT.info is invalid !"; fi
+		grep -A 7 'Audio #' M2TS-mediainfo.info > M2TS-mediainfo-audio.info
+		M2TS_AUDIO_TRACKS_TOTAL=`grep "ID/String" M2TS-mediainfo-audio.info | wc -l`
+		for ((i=1; i <= $M2TS_AUDIO_TRACKS_TOTAL ; i++)); do
+			ID=`grep "ID/String" M2TS-mediainfo-audio.info | head -n $i | tail -n 1 | cut -d ':' -f2 | sed 's/ //' | cut -d ' ' -f1`
+			M2TS_AUDIO_ID[$i]=$ID
+			M2TS_AUDIO_LANG[$i]="`grep -A 7 $ID M2TS-mediainfo-audio.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
+			M2TS_AUDIO_FORMAT[$i]="`grep -A 4 $ID M2TS-mediainfo-audio.info | grep "Format " | cut -d ':' -f2 | sed 's/ //'`"
+			M2TS_AUDIO_CHANNELS[$i]="N/A"
+			M2TS_AUDIO_BITRATE[$i]="N/A"
+			if [[ $DEBUG == "1" ]]; then
+				echo "DEBUG M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
+				echo "DEBUG M2TS_AUDIO_LANG[$i] ${M2TS_AUDIO_LANG[$i]}"
+				echo "DEBUG M2TS_AUDIO_FORMAT[$i] ${M2TS_AUDIO_FORMAT[$i]}"
+				echo "DEBUG M2TS_AUDIO_CHANNELS[$i] ${M2TS_AUDIO_CHANNELS[$i]}"
+				echo "DEBUG M2TS_AUDIO_BITRATE[$i] ${M2TS_AUDIO_BITRATE[$i]}"
+			fi
+		done
+		i=`expr $i - 1`
+	fi
 	if [[ $DEBUG == "1" ]]; then
-		echo "DEBUG M2TS_AUDIO_X_[1] ${M2TS_AUDIO_ID[1]} ${M2TS_AUDIO_LANG[1]} ${M2TS_AUDIO_FORMAT[1]} ${M2TS_AUDIO_CHANNELS[1]} ${M2TS_AUDIO_BITRATE[1]}"
+		echo "DEBUG i $i"
 	fi
 
 	ZENITY_AUDIO_TRACKS=$(
@@ -582,16 +621,16 @@ M2TS )
 
 				ZENITY_AUDIO_TRACK_SOURCE="`echo ${M2TS_AUDIO_FORMAT[$k]} | cut -d '|' -f3`"
 				case $ZENITY_AUDIO_TRACK_SOURCE in
-				ac3 )
+				ac3* | AC-3 )
 					echo "AUDIO_${j}_SOURCE=\"AC3\"" >> $CONF_FILE_TMP
 					;;
-				"dca(DTS)" | "dca(DTS-HDMA)" )
+				"dca(DTS)" | "dca(DTS-HDMA)" | "DTS" | dts* )
 					echo "AUDIO_${j}_SOURCE=\"DTS\"" >> $CONF_FILE_TMP
 					;;
-				pcm_bluray )
+				pcm_bluray* | PCM )
 					echo "AUDIO_${j}_SOURCE=\"PCM-BR\"" >> $CONF_FILE_TMP
 					;;
-				truehd )
+				truehd | TrueHD )
 					echo "AUDIO_${j}_SOURCE=\"THD\"" >> $CONF_FILE_TMP
 					;;
 				* )
@@ -605,9 +644,9 @@ M2TS )
 	done
 
 	# subtitles
-	grep 'Subtitle: ' M2TS-avconv.info > M2TS-avconv-sub.info
+	grep ': Subtitle: ' M2TS-$CONV_PROJECT.info > M2TS-$CONV_PROJECT-sub.info
 
-	if [ "`cat M2TS-avconv-sub.info | wc -l`" -ge "1" ]; then
+	if [ "`cat M2TS-$CONV_PROJECT-sub.info | wc -l`" -ge "1" ]; then
 		i=0
 		while read line
 		do
@@ -625,10 +664,14 @@ M2TS )
 				else
 					M2TS_SUB_LANG[$i]="unknown"
 					# should be always pgssub
-					M2TS_SUB_FORMAT[$i]="`echo ${line} | grep -o '.\{6\}$'`"
+					if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
+						M2TS_SUB_FORMAT[$i]="`echo ${line} | awk '{print $4}'`"
+					elif [[ $CONV_PROJECT == "avconv" ]]; then
+						M2TS_SUB_FORMAT[$i]="`echo ${line} | grep -o '.\{6\}$'`"
+					fi
 				fi
 			fi
-		done < M2TS-avconv-sub.info
+		done < M2TS-$CONV_PROJECT-sub.info
 		if [[ $DEBUG == "1" ]]; then
 			echo "DEBUG M2TS_SUB_ID[X] ${M2TS_SUB_ID[1]} ${M2TS_SUB_ID[2]} ${M2TS_SUB_ID[3]} ${M2TS_SUB_ID[4]}"
 		fi

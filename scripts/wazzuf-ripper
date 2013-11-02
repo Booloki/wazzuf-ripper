@@ -365,7 +365,6 @@ do
 			EPISODE_NUMBER=`echo $EPISODE_NAME_FULL | cut -d '-' -f 1 | sed s/\ //`			
 			# EPISODE_TYPE removed if BONUS and not an épisode
 			if [[ "$EPISODE_NAME_FULL" == *BONUS* ]]; then
-				echo DING
 				EPISODE_TAG=$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
 			else
 				EPISODE_TAG=$EPISODE_TYPE$EPISODE_NUMBER.`echo $EPISODE_NAME | sed s/\ /./g`
@@ -656,9 +655,9 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 
 			# subtitle files size
 			if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
-				SUBTITLE_SIZE=$(expr `ls -l $SUBTITLE_FILE | cut -d ' ' -f 5` + `ls -l $SUBTITLE_FILE_SUB | cut -d ' ' -f 5`)
+				SUBTITLE_SIZE=$(expr `ls -l "$SUBTITLE_FILE" | cut -d ' ' -f 5` + `ls -l "$SUBTITLE_FILE_SUB" | cut -d ' ' -f 5`)
 			else
-				SUBTITLE_SIZE=`ls -l $SUBTITLE_FILE | cut -d ' ' -f 5`
+				SUBTITLE_SIZE=`ls -l "$SUBTITLE_FILE" | cut -d ' ' -f 5`
 			fi
 			TOTAL_SUBTITLE_SIZE=$(expr $TOTAL_SUBTITLE_SIZE + $SUBTITLE_SIZE)
 
@@ -812,7 +811,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			# global source bitrate (kb/s)
 			SOURCE_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep "bitrate: " | cut -d ' ' -f 8`
 			# global source size (bytes)
-			VIDEO_SIZE=`ls -l ${SOURCE_FILE}  | cut -d ' ' -f 5`
+			VIDEO_SIZE=`mediainfo --Inform="Video;%StreamSize%" "${SOURCE_FILE}"  | sed 's/ //g' | sed 's/MiB//g'`
 
 			# estimated needed bitrate
 			VIDEO_BITRATE=$(echo "scale=6; tmp = $SOURCE_BITRATE * $MAX_VIDEO_SIZE / $VIDEO_SIZE - 0.5; scale=0; tmp / 1" | bc)

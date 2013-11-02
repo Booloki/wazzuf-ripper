@@ -3,8 +3,11 @@
 # booloki@lokizone.net
 # Changelog file
 
+2013-10-02
+* Add CONV_PROJECT choice between avconv (Debian/Ubuntu) and ffmpeg (others). cf wazzuf-ripper-global.conf
+
 2013-08-04
-* Remove E character in output filename and update .nfo if VIDEO_TYPE is SHOW and string 'BONUS' in episode.txt corresponding line.
+* Remove E character in output filename and update .nfo if VIDEO_TYPE is SHOW and 'BONUS' string in episode.txt corresponding line.
 
 2013-07-28
 * wazzuf-conf-generator: Add copy DVD to iso (GUI)

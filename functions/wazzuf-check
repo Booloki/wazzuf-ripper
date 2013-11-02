@@ -56,7 +56,7 @@ check_device () {
 		;;
 	* )
 		if [[ $WAZZUF_UI == "GUI" ]]; then
-			zenity --eror --title "$ZEN_TITLE" \
+			zenity --error --title "$ZEN_TITLE" \
 				--text "Unexpected error: No device to check !" \
 				--timeout=2
 		else
@@ -172,6 +172,13 @@ check_mediainfo () {
 check_avconv () {
 	if [ ! -x "/usr/bin/avconv" ]; then
 		SOFT_NAME="avconv (libav-tools)"
+		soft_to_install_exit
+	fi
+}
+
+check_ffmpeg () {
+	if [ ! -x "/usr/bin/ffmpeg" ]; then
+		SOFT_NAME="ffmpeg"
 		soft_to_install_exit
 	fi
 }

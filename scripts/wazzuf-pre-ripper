@@ -12,7 +12,11 @@ checkandsource_wazzuf_conf
 checkandsource_wazzuf_files
 
 check_mplayer
-check_avconv
+if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
+	check_ffmpeg
+elif [[ $CONV_PROJECT == "avconv" ]]; then
+	check_avconv
+fi
 
 ISO_FILE_PATH="$SOURCE_DIRECTORY/$ISO_FILE"
 M2TS_FILE_PATH="$SOURCE_DIRECTORY/$M2TS_FILE"
@@ -68,9 +72,9 @@ M2TS )
 	echo "-> see M2TS-mplayer.info"
 
 	echo -ne " *************************************\n"
-	echo " avconv informations"
-	avconv -i "$M2TS_FILE_PATH" 2> M2TS-avconv.info
-	echo "-> see M2TS-avconv.info"
+	echo " $CONV_PROJECT informations"
+	$CONV_PROJECT -i "$M2TS_FILE_PATH" 2> M2TS-$CONV_PROJECT.info
+	echo "-> see M2TS-$CONV_PROJECT.info"
 
 	echo -ne " *************************************\n"
 	echo M2TS_FILE_PATH=\"$M2TS_FILE_PATH\"
@@ -79,7 +83,7 @@ M2TS )
 
 	echo -ne "*************************************\n"
 	echo "All tracks:"
-	avconv-decode M2TS-avconv.info
+	avconv-decode M2TS-$CONV_PROJECT.info
 	;;
 DVD )
 	DVD_PATH="$DEVICE_PATH_BASE"
@@ -96,9 +100,9 @@ DVD )
 	echo "-> see DVD-player.info"
 
 	echo -ne "*************************************\n"
-	echo " avconv informations"
-	avconv -i $DVD_PATH 2> DVD-avconv.info
-	echo "-> see DVD-avconv.info"
+	echo " $CONV_PROJECT informations"
+	$CONV_PROJECT -i $DVD_PATH 2> DVD-$CONV_PROJECT.info
+	echo "-> see DVD-$CONV_PROJECT.info"
 
 	check_7z
 	echo -ne "*************************************\n"
@@ -179,9 +183,9 @@ ISO_DVD )
 	echo "-> see ISO-mplayer.info"
 
 	echo -ne "*************************************\n"
-	echo " avconv informations"
-	avconv -i "$ISO_FILE_PATH" 2> ISO-avconv.info
-	echo "-> see ISO-avconv.info"
+	echo " $CONV_PROJECT informations"
+	$CONV_PROJECT -i "$ISO_FILE_PATH" 2> ISO-$CONV_PROJECT.info
+	echo "-> see ISO-$CONV_PROJECT.info"
 
 	check_7z
 	echo -ne "*************************************\n"
