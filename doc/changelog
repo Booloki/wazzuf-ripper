@@ -5,6 +5,7 @@
 
 2014-02-24
 * Date change (current year)
+* get_video_bitrate: change from avconv to mediainfo
 
 2013-10-02
 * Add CONV_PROJECT choice between avconv (Debian/Ubuntu) and ffmpeg (others). cf wazzuf-ripper-global.conf

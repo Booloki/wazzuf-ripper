@@ -244,7 +244,7 @@ video_rip () {
 #	BDRIP_VIDEO_BITRATE
 #	CODEC_VIDEO
 #
-# return VOB_FILE
+# return VIDEO_BITRATE
 get_video_bitrate () {
 	case $SOURCE in
 	DVD | ISO_DVD )
@@ -255,7 +255,7 @@ get_video_bitrate () {
 		;;
 	esac
 	if [ "${VIDEO_BITRATE_WANTED}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-		VIDEO_BITRATE=`avconv -i "${SOURCE_FILE}" 2>&1 | grep 'Video: ' | sed 's!^.*\s\([0-9]\+\)\skb/s.*!\1!'`
+		VIDEO_BITRATE=`mediainfo --Inform="Video;%OverallBitRate/String%" ${SOURCE_FILE} | sed 's/ //g' | sed 's/Kbps//g'`
 	else
 		VIDEO_BITRATE=${VIDEO_BITRATE_WANTED}
 	fi
