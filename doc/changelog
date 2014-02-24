@@ -3,10 +3,14 @@
 # booloki@lokizone.net
 # Changelog file
 
+2014-02-24
+* Date change (current year)
+
 2013-10-02
 * Add CONV_PROJECT choice between avconv (Debian/Ubuntu) and ffmpeg (others). cf wazzuf-ripper-global.conf
 * wazzuf-conf-generator: VIDEO_CROP value checks
 * wazzuf-video: replace size detection from avconv to mediainfo
+* wazzuf-conf-generator: change CONV_PROJECT request to mediainfo
 
 2013-08-04
 * Remove E character in output filename and update .nfo if VIDEO_TYPE is SHOW and 'BONUS' string in episode.txt corresponding line.
