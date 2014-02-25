@@ -5,6 +5,8 @@
 
 2014-02-25
 * Check if mp3 bitrate is not > audio source bitrate and add get_audio_bitrate function
+* get_video_bitrate: add unit check
+* Change global source bitrate detection from avconv to mediainfo
 
 2014-02-24
 * Date change (current year)

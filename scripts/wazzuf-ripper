@@ -809,7 +809,19 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 		case $CODEC_VIDEO in
 		H264 )
 			# global source bitrate (kb/s)
-			SOURCE_BITRATE=`avconv -i ${SOURCE_FILE} 2>&1 | grep "bitrate: " | cut -d ' ' -f 8`
+			SOURCE_BITRATE_STRING=`mediainfo --Inform="General;%OverallBitRate/String%" ${SOURCE_FILE}`
+			# Could be in Mbps or Kbps
+			if [[ $SOURCE_BITRATE_STRING == *Kbps* ]]
+			then
+				SOURCE_BITRATE=`echo $SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Kbps//g'`
+			elif  [[ $SOURCE_BITRATE_STRING == *Mbps* ]]
+			then
+				SOURCE_BITRATE=`echo $SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Mbps/000/g'`
+			else
+				# error
+				MESSAGE="Source bitrate $SOURCE_BITRATE_STRING (SOURCE_BITRATE_STRING)"
+				not_recognized_exit
+			fi
 			# global source size (bytes)
 			VIDEO_SIZE=`mediainfo --Inform="Video;%StreamSize%" "${SOURCE_FILE}"  | sed 's/ //g' | sed 's/MiB//g'`
 
