@@ -209,6 +209,7 @@ video_rip () {
 			# cvlc works if VIDEO_CROP is empty
 			WIDTH_ORIG=`mediainfo --Inform="Video;%Width%" "${SOURCE_FILE}"`
 			HEIGHT_ORIG=`mediainfo --Inform="Video;%Height%" "${SOURCE_FILE}"`
+
 			VIDEO_CROP_W=`echo $VIDEO_CROP | cut -d ':' -f 1`
 			VIDEO_CROP_H=`echo $VIDEO_CROP | cut -d ':' -f 2`
 			VIDEO_CROP_X=`echo $VIDEO_CROP | cut -d ':' -f 3`
@@ -255,7 +256,19 @@ get_video_bitrate () {
 		;;
 	esac
 	if [ "${VIDEO_BITRATE_WANTED}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-		VIDEO_BITRATE=`mediainfo --Inform="Video;%OverallBitRate/String%" ${SOURCE_FILE} | sed 's/ //g' | sed 's/Kbps//g'`
+		VIDEO_BITRATE_STRING=`mediainfo --Inform="Video;%OverallBitRate/String%" ${SOURCE_FILE}`
+		# Could be in Mbps or Kbps...
+		if [[ $VIDEO_BITRATE_STRING == *Kbps* ]]
+		then
+			VIDEO_BITRATE=`echo $VIDEO_BITRATE_STRING | sed 's/ //g' | sed 's/Kbps//g'`
+		elif  [[ $VIDEO_BITRATE_STRING == *Mbps* ]]
+		then
+			VIDEO_BITRATE=`echo $VIDEO_BITRATE_STRING | sed 's/ //g' | sed 's/Mbps/000/g'`
+		else
+			# error
+			MESSAGE="Video bitrate $VIDEO_BITRATE_STRING (VIDEO_BITRATE_STRING)"
+			not_recognized_exit
+		fi
 	else
 		VIDEO_BITRATE=${VIDEO_BITRATE_WANTED}
 	fi
