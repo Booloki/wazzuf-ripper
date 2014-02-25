@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2014-02-25
+* Check if mp3 bitrate is not > audio source bitrate and add get_audio_bitrate function
+
 2014-02-24
 * Date change (current year)
 * get_video_bitrate: change from avconv to mediainfo

@@ -30,15 +30,19 @@ audio_rip () {
         case $AUDIO_SOURCE in
 	DTS )
 		AUDIO_SOURCE_FILE=$DTS_FILE
+		get_audio_bitrate
 		;;
 	AC3 )
 		AUDIO_SOURCE_FILE=$AC3_FILE
+		get_audio_bitrate
 		;;
 	THD )
 		AUDIO_SOURCE_FILE=$THD_FILE
+		get_audio_bitrate
 		;;
 	PCM | PCM-BR )
 		AUDIO_SOURCE_FILE=$WAV_FILE
+		get_audio_bitrate
 		;;
 	"" )
 		MESSAGE="Audio format $AUDIO_SOURCE (AUDIO_X_SOURCE)"
@@ -49,6 +53,10 @@ audio_rip () {
 		not_recognized_exit
 		;;
 	esac
+	if [[ $DEBUG == "1" ]]; then
+		echo "DEBUG AUDIO_SOURCE_FILE $AUDIO_SOURCE_FILE"
+		echo "DEBUG AUDIO_SOURCE_BITRATE $AUDIO_SOURCE_BITRATE"
+	fi
 
 	# extract audio from local working file
 	case $CODEC_AUDIO in
@@ -215,6 +223,11 @@ audio_rip () {
 			# lame mode choice
 			case $AUDIO_MP3_MODE in
 			        CBR | cbr )
+						# Check if mp3 bitrate is not > audio source bitrate
+						if [[ ! "$AUDIO_SOURCE_BITRATE" == "" && "$AUDIO_MP3_CBR" -gt "$AUDIO_SOURCE_BITRATE" ]]; then
+							echo "Warning: changing MP3 bitrate from $AUDIO_MP3_CBR to $AUDIO_SOURCE_BITRATE kbps!"
+							AUDIO_MP3_CBR="$AUDIO_SOURCE_BITRATE"
+						fi
 						AUDIO_MP3_MODE_OPTION="-b $AUDIO_MP3_CBR"
 						;;
 			        VBR | vbr )
@@ -282,4 +295,25 @@ audio_rip () {
 		fi
 		;;
 	esac
+}
+
+# get_audio_bitrate
+# need 	SOURCE_FILE
+#	AUDIO_AID
+#
+# return AUDIO_SOURCE_BITRATE
+get_audio_bitrate () {
+	AUDIO_SOURCE_BITRATE_STRING=`mediainfo --Inform="Audio;%ID/String%:%BitRate/String%\n" ${SOURCE_FILE} | grep $AUDIO_AID | cut -d':' -f2`
+	# Could be in Mbps or Kbps...
+	if [[ $AUDIO_SOURCE_BITRATE_STRING == *Kbps* ]]
+	then
+		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Kbps//g'`
+	elif  [[ $AUDIO_SOURCE_BITRATE_STRING == *Mbps* ]]
+	then
+		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Mbps/000/g'`
+	else
+		# error
+		MESSAGE="Audio bitrate $AUDIO_SOURCE_BITRATE_STRING (AUDIO_SOURCE_BITRATE_STRING)"
+		not_recognized_exit
+	fi
 }
