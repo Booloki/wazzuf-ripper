@@ -538,27 +538,24 @@ M2TS )
 				M2TS_AUDIO_ID[$i]=$ID
 	
 				if [[ -f "$MPLS_FILE_PATH" || -f "$CLPI_FILE_PATH" ]]; then
-					M2TS_AUDIO_LANG[$i]="`grep -A 7 $ID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
+					if [[ $DEBUG == "1" ]]; then
+						echo "DEBUG Available MPLS or CLPI file found."
+					fi
+					M2TS_AUDIO_LANG[$i]="`mediainfo --Inform="Audio;%ID%%Language/String%\n" "$MPLS_FILE_PATH" | grep $ID | sed s/$ID//`"
 				else
-
-					if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
+					if [[ $DEBUG == "1" ]]; then
+						echo "DEBUG No available MPLS or CLPI file found."
+					fi
+					M2TS_AUDIO_LANG[$i]="`mediainfo --Inform="Audio;%ID%%Language%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
+					if [[ "${M2TS_AUDIO_LANG[$i]}" == "" ]]; then
 						M2TS_AUDIO_LANG[$i]="unknown"
-					elif [[ $CONV_PROJECT == "avconv" ]]; then
-						if [[ "`echo ${line}  | cut -d ':' -f1 | cut -d ']' -f 2`" == "" ]]; then
-							M2TS_AUDIO_LANG[$i]="unknown"
-						else
-							M2TS_AUDIO_LANG[$i]="`echo ${line} | cut -d '(' -f 2 | cut -d ')' -f 1`"
-						fi
 					fi
 				fi
-	
-				if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
-					M2TS_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f4 | sed s/\ //g`"
-				elif [[ $CONV_PROJECT == "avconv" ]]; then
-					M2TS_AUDIO_FORMAT[$i]="`echo ${line} | cut -d ',' -f1 | cut -d ':' -f3 | sed s/\ //g`"
-				fi
-				M2TS_AUDIO_CHANNELS[$i]="`echo ${line} | cut -d ',' -f3 | sed s/\ //g`"
-				M2TS_AUDIO_BITRATE[$i]="`echo ${line} | cut -d ',' -f5 | sed s/\ //g`"
+
+				M2TS_AUDIO_FORMAT[$i]="`mediainfo --Inform="Audio;%ID%%Format%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
+				M2TS_AUDIO_CHANNELS[$i]="`mediainfo --Inform="Audio;%ID%%Channel(s)%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
+				M2TS_AUDIO_BITRATE[$i]="`mediainfo --Inform="Audio;%ID%%BitRate%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID// | head -c -4`"
+
 				if [[ $DEBUG == "1" ]]; then
 					echo "DEBUG M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
 					echo "DEBUG M2TS_AUDIO_LANG[$i] ${M2TS_AUDIO_LANG[$i]}"
@@ -570,15 +567,15 @@ M2TS )
 		done < M2TS-$CONV_PROJECT-audio.info
 	else
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG WARNING! M2TS-$CONV_PROJECT.info is invalid !"; fi
+
 		grep -A 7 'Audio #' M2TS-mediainfo.info > M2TS-mediainfo-audio.info
 		M2TS_AUDIO_TRACKS_TOTAL=`grep "ID/String" M2TS-mediainfo-audio.info | wc -l`
 		for ((i=1; i <= $M2TS_AUDIO_TRACKS_TOTAL ; i++)); do
 			ID=`grep "ID/String" M2TS-mediainfo-audio.info | head -n $i | tail -n 1 | cut -d ':' -f2 | sed 's/ //' | cut -d ' ' -f1`
 			M2TS_AUDIO_ID[$i]=$ID
-			M2TS_AUDIO_LANG[$i]="`grep -A 7 $ID M2TS-mediainfo-audio.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
-			M2TS_AUDIO_FORMAT[$i]="`grep -A 4 $ID M2TS-mediainfo-audio.info | grep "Format " | cut -d ':' -f2 | sed 's/ //'`"
-			M2TS_AUDIO_CHANNELS[$i]="N/A"
-			M2TS_AUDIO_BITRATE[$i]="N/A"
+			M2TS_AUDIO_LANG[$i]="`mediainfo --Inform="Audio;%ID%%Language/String%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
+			M2TS_AUDIO_FORMAT[$i]="`mediainfo --Inform="Audio;%ID%%Format%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
+
 			if [[ $DEBUG == "1" ]]; then
 				echo "DEBUG M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
 				echo "DEBUG M2TS_AUDIO_LANG[$i] ${M2TS_AUDIO_LANG[$i]}"
@@ -665,17 +662,19 @@ M2TS )
 				# no language display...
 				# unless corresponding mpls/clpi (+ xml extraction)
 				if [[ -f "$MPLS_FILE_PATH" || -f "$CLPI_FILE_PATH" ]]; then
+					if [[ $DEBUG == "1" ]]; then
+						echo "DEBUG Available MPLS or CLPI file found."
+					fi
 					M2TS_SUB_LANG[$i]="`grep -A 3 $SID M2TS-mediainfo.info | grep "Language/String" | cut -d ':' -f2 | sed 's/ //'`"
 					# should be always PGS
 					M2TS_SUB_FORMAT[$i]="`grep -A 3 $SID M2TS-mediainfo.info | grep "Format" | cut -d ':' -f2 | sed 's/ //'`"
 				else
-					M2TS_SUB_LANG[$i]="unknown"
-					# should be always pgssub
-					if [[ $CONV_PROJECT == "ffmpeg" ]] ; then
-						M2TS_SUB_FORMAT[$i]="`echo ${line} | awk '{print $4}'`"
-					elif [[ $CONV_PROJECT == "avconv" ]]; then
-						M2TS_SUB_FORMAT[$i]="`echo ${line} | grep -o '.\{6\}$'`"
+					if [[ $DEBUG == "1" ]]; then
+						echo "DEBUG No available MPLS or CLPI file found."
 					fi
+					M2TS_SUB_LANG[$i]="unknown"
+					# Should be always pgssub
+					M2TS_SUB_FORMAT[$i]="`mediainfo --Inform="Text;%ID%%Format%\n" "$M2TS_FILE_PATH" | grep $SID | sed s/$SID//`"
 				fi
 			fi
 		done < M2TS-$CONV_PROJECT-sub.info
