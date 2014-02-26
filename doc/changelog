@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2014-02-26
+* Set CONV_PROJECT default to avconv for deb packaging
+
 2014-02-25
 * wazzuf-conf-generator: better mediainfo use/analyse
 * Check if mp3 bitrate is not > audio source bitrate and add get_audio_bitrate function
