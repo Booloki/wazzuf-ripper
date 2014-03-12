@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2014-03-12
+* wazzuf-audio: add CONV_PROJECT for AC3 encoding
+
 2014-02-26
 * Set CONV_PROJECT default to avconv for deb packaging
 

@@ -174,18 +174,17 @@ audio_rip () {
 			file_exists
 		else
 			# DTS to AC3 (5.1)
-			check_avconv
 			if [[ ! $WAZZUF_UI == "GUI" ]]; then
 				echo -ne "\n *************************************\n"
 				echo " Convert $AUDIO_SOURCE_FILE to $AUDIO_FILE..."
 			fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS avconv -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE"; fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS $CONV_PROJECT -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( nice -n $NICENESS avconv -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE ) \
+				( nice -n $NICENESS $CONV_PROJECT -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE ) \
 					| zenity --progress --title="$ZEN_TITLE" --text="Encoding $AUDIO_FILE" --auto-close --auto-kill --pulsate
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				nice -n $NICENESS avconv -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
+				nice -n $NICENESS $CONV_PROJECT -threads $AUDIO_AC3_THREADS -i $AUDIO_SOURCE_FILE -acodec ac3 -ab $AUDIO_AC3_QUAL -y $AUDIO_FILE
 			fi
 		fi
 		;;
