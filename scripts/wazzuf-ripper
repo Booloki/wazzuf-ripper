@@ -607,12 +607,16 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			fi
 			# subtitle file (force external or not)
 			if [[ "$SUBTITLE_FILE_FORCE" == "" ]]; then
-				# check if provided variable is a number
-				NUMBER_TO_CHECK="$SUBTITLE_SID"
-				MESSAGE="SUBTITLE_${SUB_COUNTER}_SID $SUBTITLE_SID"
-				SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
-				SUBTITLE_FILE="$SUB_FILE.idx"
-				SUBTITLE_FILE_SUB="$SUB_FILE.sub"
+
+				if [[ $SOURCE == "M2TS" ]]; then
+					# default name (could not be changed with tsMuxeR...): 00800.track_4608.sup
+					M2TS_FILE_WE="`echo "$M2TS_FILE" | sed s/.m2ts//`"
+					SUBTITLE_FILE="$M2TS_FILE_WE.track_$SUBTITLE_SID.sup"
+				else
+					SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
+					SUBTITLE_FILE="$SUB_FILE.idx"
+					SUBTITLE_FILE_SUB="$SUB_FILE.sub"
+				fi
 
 				if [[ $SOURCE == "DVD" ]]; then
 					MPLAYER_DEVICE="$DEVICE_PATH_BASE"
@@ -643,7 +647,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 				fi
 				# If .idx file, copy .sub file too.
 				if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then
-					SUBTITLE_FILE_SUB=`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`
+					SUBTITLE_FILE_SUB="`echo "$SUBTITLE_FILE_FORCE_PATH" | sed s/idx$/sub/`"
 					if [[ $WAZZUF_UI == "GUI" ]]; then
 						cp $SUBTITLE_FILE_SUB .
 					else
@@ -654,7 +658,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			fi
 
 			# subtitle files size
-			if  [[ `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
+			if  [[ ! `echo "$SUBTITLE_FILE_FORCE" | grep -vE ".idx$"` == "" ]]; then 
 				SUBTITLE_SIZE=$(expr `ls -l "$SUBTITLE_FILE" | cut -d ' ' -f 5` + `ls -l "$SUBTITLE_FILE_SUB" | cut -d ' ' -f 5`)
 			else
 				SUBTITLE_SIZE=`ls -l "$SUBTITLE_FILE" | cut -d ' ' -f 5`
@@ -928,7 +932,7 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 	else
 		if [ ! -f "$SOURCE_DIRECTORY/$COVER" ]; then
 			FILE_NAME="$COVER image"
-			SOURCE_NAME="${SOURCE_DIRECTOR}"
+			SOURCE_NAME="${SOURCE_DIRECTORY}"
 			MERGE_COVER=""		
 		else
 			check_imagemagick

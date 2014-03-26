@@ -38,6 +38,28 @@ subtitle_rip () {
 			dont_exists_warn
 		fi
 		;;
+	M2TS )
+		if [ -f "$SUBTITLE_FILE" ]; then
+			FILE_NAME=$SUBTITLE_FILE
+			file_exists
+		else
+			# PSG format (.sup) - subtitle extraction
+			# Demux PSG files with tsMuxeR
+			check_tsmuxer
+
+			# Meta file creation
+			TSMUXER_METAFILE="tsmuxer.meta"
+			echo "MUXOPT --no-pcr-on-video-pid --new-audio-pes --demux --vbr --vbv-len=500" > $TSMUXER_METAFILE
+			SOURCE_FILE="$M2TS_FILE_PATH"
+			echo "S_HDMV/PGS, \"$SOURCE_FILE\",bottom-offset=24,font-border=2,text-align=center,video-width=1920,video-height=1080,fps=23.976, track=$SUBTITLE_SID, lang=$SUBTITLE_LANG" >> $TSMUXER_METAFILE
+
+			# tsMuxeR demuxing
+			echo -ne "\n ***********************************************\n"
+			echo " Demuxing subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
+			echo -ne " ***********************************************\n"
+			tsMuxeR $TSMUXER_METAFILE .
+		fi
+		;;
 	esac
 }
 

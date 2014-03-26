@@ -701,6 +701,7 @@ M2TS )
 		do
 			j=`expr $j + 1`
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG j -> $j - ZENITY_SUBTITLE_TRACK $ZENITY_SUBTITLE_TRACK"; fi
+			# loop on original lines number (i)
 			for ((k=1; k <= $i ; k++))
 			do
 				if [[ ${M2TS_SUB_ID[$k]} == $ZENITY_SUBTITLE_TRACK ]]; then
@@ -708,27 +709,10 @@ M2TS )
 					echo "" >> $CONF_FILE_TMP
 
 					if [[ ${M2TS_SUB_FORMAT[$k]} == "pgssub" ||  ${M2TS_SUB_FORMAT[$k]} == "PGS" ]]; then
-						# ask file
-						zenity --question --title "$ZEN_TITLE" --text "Wazzuf Ripper can not extract PGS subtitles for now.
-Do you want to load a <b>previously extrated subtitles file</b> (in $ZENITY_SOURCE_DIRECTORY source directory only) ?
-Need to be .srt, .sup, or .idx (+ .sub with same name) file." --ok-label "Yes" --cancel-label="No"
-						if [ $? = "0" ]; then
-							ZENITY_EXT_SUB_PATH=$(zenity --file-selection --title "$ZEN_TITLE" --filename "$ZENITY_SOURCE_DIRECTORY/")
-							ZENITY_EXT_SUB="`echo ${ZENITY_EXT_SUB_PATH} | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%`"
-							if [[ ${M2TS_SUB_LANG[$k]} == "unknown" ]]; then
-								echo "SUBTITLE_${j}_LANG=\"und\"" >> $CONF_FILE_TMP
-							else
-								echo "SUBTITLE_${j}_LANG=\"${M2TS_SUB_LANG[$k]}\"" >> $CONF_FILE_TMP
-							fi
-							echo "SUBTITLE_${j}_SID=\"\"" >> $CONF_FILE_TMP
-							echo "SUBTITLE_${j}_NAME=\"`echo ${M2TS_SUB_ID[$k]}`\"" >> $CONF_FILE_TMP
-							echo "SUBTITLE_${j}_FILE_FORCE=\""${ZENITY_EXT_SUB}"\"" >> $CONF_FILE_TMP
-						else
-							echo "SUBTITLE_${j}_LANG=\"\"" >> $CONF_FILE_TMP
-							echo "SUBTITLE_${j}_SID=\"\"" >> $CONF_FILE_TMP
-							echo "SUBTITLE_${j}_NAME=\"`echo "${M2TS_SUB_ID[$k]}-${M2TS_SUB_LANG[$k]}"`\"" >> $CONF_FILE_TMP
-							echo "SUBTITLE_${j}_FILE_FORCE=\"\"" >> $CONF_FILE_TMP
-						fi
+						echo "SUBTITLE_${j}_LANG=\"`echo ${M2TS_SUB_LANG[$k]}`\"" >> $CONF_FILE_TMP
+						echo "SUBTITLE_${j}_SID=\"`echo ${M2TS_SUB_ID[$k]}`\"" >> $CONF_FILE_TMP
+						echo "SUBTITLE_${j}_NAME=\"`echo "${M2TS_SUB_ID[$k]}-${M2TS_SUB_LANG[$k]}"`\"" >> $CONF_FILE_TMP
+						echo "SUBTITLE_${j}_FILE_FORCE=\"\"" >> $CONF_FILE_TMP
 					else
 						if [[ ${M2TS_SUB_LANG[$k]} == "unknown" ]]; then
 							echo "SUBTITLE_${j}_LANG=\"und\"" >> $CONF_FILE_TMP
