@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+2014-03-26
+* Add automatic BD subtitles (PGS) demuxing with tsMuxeR (new dependancy)
+* Add CONV_PROJECT detection for the not Debian-based distributions
+
 2014-03-12
 * wazzuf-audio: add CONV_PROJECT for AC3 encoding
 
