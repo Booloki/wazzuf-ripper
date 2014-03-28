@@ -36,7 +36,9 @@ if [[ $CONV_PROJECT == "avconv" ]] && [ ! -x "/usr/bin/avconv" ] && [ -x "/usr/b
 	echo "# Dirty ffmpeg/libav hack" >> $CONF_FILE_TMP
 	echo "# You should manually set CONV_PROJECT=\"ffmpeg\" in /etc/wazzuf-ripper/wazzuf-ripper-global.conf !" >> $CONF_FILE_TMP
 	echo "CONV_PROJECT=\"ffmpeg\"" >> $CONF_FILE_TMP
-	
+
+	# apply parameter
+	CONV_PROJECT="ffmpeg"
 fi
 
 ## MEDIA INFORMATIONS
@@ -694,7 +696,7 @@ M2TS )
 		fi
 
 		ZENITY_SUBTITLE_TRACKS=$(
-			for ((l=1; l <= $i ; l++)); do echo FALSE; echo "${M2TS_SUB_ID[l]}"; echo "${M2TS_SUB_LANG[l]}"; echo "${M2TS_SUB_FORMAT[l]} "; done | zenity --list --checklist \
+			for ((l=1; l <= $i ; l++)); do echo TRUE; echo "${M2TS_SUB_ID[l]}"; echo "${M2TS_SUB_LANG[l]}"; echo "${M2TS_SUB_FORMAT[l]} "; done | zenity --list --checklist \
 			--title="$ZEN_TITLE" \
 			--ok-label "Next" --cancel-label "Quit" \
 			--width "330" \
