@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+2014-04-01
+* Add optional video screenshots generation
+* NFO file generation is now optional
+
 2014-03-28
 * wazzuf-conf-generator: Set CONV_PROJECT for the not Debian-based distributions
 

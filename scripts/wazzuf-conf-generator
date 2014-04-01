@@ -939,6 +939,44 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
         ;;
 esac
 
+## OTHER OPTIONS
+echo "" >> $CONF_FILE_TMP
+echo "" >> $CONF_FILE_TMP
+echo "## OTHER OPTIONS" >> $CONF_FILE_TMP
+echo "" >> $CONF_FILE_TMP
+
+ZENITY_OTHERS=$(zenity --list --checklist \
+        --title="$ZEN_TITLE" \
+        --ok-label "Next" --cancel-label "Quit" \
+        --width "300" \
+        --height "200" \
+        --column="Choice" --column="Option" --column="OPTION_VAR" \
+        --print-column="3" \
+        --hide-column="3" \
+        --separator=' ' \
+        --text="Other options choice" \
+        TRUE "NFO file creation" NFO \
+        FALSE "Video screenshots creation" SCREENSHOTS \
+        FALSE "Debug" DEBUG \
+)
+if [ $? = "1" ]; then wazzuf_quit; fi
+if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_OTHERS $ZENITY_OTHERS"; fi
+
+for ZENITY_OTHER in ${ZENITY_OTHERS}
+do
+	case $ZENITY_OTHER in
+		NFO )
+			echo "CREATE_NFO=\"1\"" >> $CONF_FILE_TMP
+			;;
+		SCREENSHOTS )
+			echo "CREATE_SCREENSHOTS=\"1\"" >> $CONF_FILE_TMP
+			;;
+		DEBUG )
+			echo "DEBUG=\"1\"" >> $CONF_FILE_TMP
+			;;
+	esac
+done
+
 ## CODECS OPTIONS
 echo "" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP

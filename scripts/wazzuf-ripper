@@ -1058,16 +1058,56 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 	fi
 
 
-## nfo generator
-if [[ $WAZZUF_UI == "GUI" ]]; then
-	( generate_nfo ) | zenity --progress --pulsate --title "$ZEN_TITLE" --text "Generating nfo file..." --auto-close
-	if [ $? = "1" ]; then wazzuf_quit; fi
-else
-	echo -ne "\n *************************************\n"
-	echo " Generating nfo file..."
-	generate_nfo
-	echo -ne " *************************************\n"
-fi
+	## nfo generator
+	if [[ $CREATE_NFO == "1" ]]; then
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			( generate_nfo ) | zenity --progress --pulsate --title "$ZEN_TITLE" --text "Generating nfo file..." --auto-close
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Generating nfo file..."
+			generate_nfo
+			echo -ne " *************************************\n"
+		fi
+	fi
+
+
+	## Videos screenshots
+	if [[ $CREATE_SCREENSHOTS == "1" ]]; then
+		OUTPUT_DURATION_MS=`mediainfo --Inform="General;%Duration%" $MERGE_OUTPUT`
+		OUTPUT_DURATION_M=$(expr $OUTPUT_DURATION_MS / 60 / 1000)
+		# Begin screenshots at 1 minute to avoid blank/black first screenshot
+		TIMER=1
+		while [ $TIMER -lt $OUTPUT_DURATION_M ]; do
+			TIMER_LIST="$TIMER_LIST $TIMER"
+			TIMER=$(expr $TIMER + $SCREENSHOT_BASETIME)
+		done
+		SCREENSHOT_BASENAME="`echo $MERGE_OUTPUT | sed 's/.mkv$//'`"
+
+		if [[ $DEBUG == "1" ]]; then
+			echo "DEBUG OUTPUT_DURATION_MS $OUTPUT_DURATION_MS"
+			echo "DEBUG OUTPUT_DURATION_M $OUTPUT_DURATION_M"
+			echo "DEBUG SCREENSHOT_BASETIME $SCREENSHOT_BASETIME"
+			echo "DEBUG TIMER_LIST $TIMER_LIST"
+			echo "DEBUG SCREENSHOT_BASENAME $SCREENSHOT_BASENAME"
+		fi
+
+		if [[ $WAZZUF_UI == "GUI" ]]; then
+			( for SCREENSHOT_TIMER in $TIMER_LIST; do
+				mplayer -really-quiet -nolirc -nosound -ss $SCREENSHOT_TIMER:00 -frames 1 -vo png:z=9 $MERGE_OUTPUT
+				mv 00000001.png $SCREENSHOT_BASENAME-$SCREENSHOT_TIMER.png
+			done ) | zenity --progress --pulsate --title "$ZEN_TITLE" --text "Taking some screenshots..." --auto-close
+			if [ $? = "1" ]; then wazzuf_quit; fi
+		else
+			echo -ne "\n *************************************\n"
+			echo " Taking some screenshots..."
+			for SCREENSHOT_TIMER in $TIMER_LIST; do
+				mplayer -really-quiet -nolirc -nosound -ss $SCREENSHOT_TIMER:00 -frames 1 -vo png:z=9 $MERGE_OUTPUT
+				mv 00000001.png $SCREENSHOT_BASENAME-$SCREENSHOT_TIMER.png
+			done
+			echo -ne " *************************************\n"
+		fi
+	fi
 
 done
 done
