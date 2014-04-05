@@ -91,15 +91,15 @@ audio_rip () {
 				echo -ne "\n *************************************\n"
 				echo " Dumping $WAV_FILE..."
 			fi
-			# get pcm_bluray source map
-			SOURCE_PCM_BLURAY_ID=`avconv -i "$SOURCE_FILE" 2>&1 | grep pcm_bluray | cut -d ':' -f1 | cut -d '[' -f 1 | cut -d '.' -f 2`
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS avconv -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE"; fi
+			# get PCM source map
+			SOURCE_PCM_BLURAY_ID=`mediainfo '--Inform=Audio;%MenuID% %Format%\n' "$SOURCE_FILE" | grep PCM | cut -d ' ' -f1`
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS $CONV_PROJECT -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( ionice -c $IONICENESS nice -n $NICENESS avconv -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE ) \
+				( ionice -c $IONICENESS nice -n $NICENESS $CONV_PROJECT -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE ) \
 					| zenity --progress --title="$ZEN_TITLE" --text="Extracting $WAV_FILE" --auto-close --auto-kill --pulsate
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				ionice -c $IONICENESS nice -n $NICENESS avconv -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE
+				ionice -c $IONICENESS nice -n $NICENESS $CONV_PROJECT -i "$SOURCE_FILE" -map 0:$SOURCE_PCM_BLURAY_ID $WAV_FILE
 			fi
 		fi
 		;;
