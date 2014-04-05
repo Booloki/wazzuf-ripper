@@ -9,6 +9,7 @@
 * wazzuf-audio: add CONV_PROJECT for Blu-ray PCM encoding
 * wazzuf-audio: check if opus bitrate is not > audio source bitrate
 * Add --nolirc option to mplayer to avoid warning messages
+* Bugfix: get_audio_bitrate now works for DTS-MA tracks
 
 2014-04-01
 * Add optional video screenshots generation
