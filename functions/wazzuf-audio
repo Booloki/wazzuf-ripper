@@ -262,6 +262,13 @@ audio_rip () {
 			file_exists
 		else
 			check_opusenc
+
+			# check if opus bitrate is not > audio source bitrate
+			if [[ ! "$AUDIO_SOURCE_BITRATE" == "" && "$AUDIO_OPUS_BITRATE" -gt "$AUDIO_SOURCE_BITRATE" ]]; then
+				echo "Warning: changing Opus bitrate from $AUDIO_OPUS_BITRATE to $AUDIO_SOURCE_BITRATE kbps!"
+				AUDIO_OPUS_BITRATE="$AUDIO_SOURCE_BITRATE"
+			fi
+
 			# opusenc mode choice
 			case $AUDIO_OPUS_MODE in
 			HCBR | hcbr )
