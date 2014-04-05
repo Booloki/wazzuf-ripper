@@ -8,6 +8,7 @@
 * New available video codec: HEVC (libx265) (ffmpeg >= 2.2)
 * wazzuf-audio: add CONV_PROJECT for Blu-ray PCM encoding
 * wazzuf-audio: check if opus bitrate is not > audio source bitrate
+* Add --nolirc option to mplayer to avoid warning messages
 
 2014-04-01
 * Add optional video screenshots generation

@@ -71,13 +71,13 @@ audio_rip () {
 				echo -ne "\n *************************************\n"
 				echo " Dumping $AUDIO_SOURCE_FILE..."
 			fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE"; fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE 2>&1 ) \
+				( ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE 2>&1 ) \
 					| zenity --progress --pulsate --title "$ZEN_TITLE" --text "Dumping $AUDIO_SOURCE_FILE" --auto-close
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
+				ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc "$SOURCE_FILE" -aid $AUDIO_AID -dumpaudio -dumpfile $AUDIO_SOURCE_FILE
 			fi
 		fi
 		;;
@@ -113,13 +113,13 @@ audio_rip () {
 				echo -ne "\n *************************************\n"
 				echo " Dumping $WAV_FILE..."
 			fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null"; fi
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null 2>/dev/null ) \
+				( ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null 2>/dev/null ) \
 					| zenity --progress --title="$ZEN_TITLE" --text="Extracting $WAV_FILE" --auto-close --auto-kill --pulsate
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				ionice -c $IONICENESS nice -n $NICENESS mplayer "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null
+				ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc "$SOURCE_FILE" -aid $AUDIO_AID -ao pcm:waveheader:fast:file=$WAV_FILE -vc dummy -vo null
 			fi
 		fi
 		;;
@@ -310,13 +310,13 @@ audio_rip () {
 # return AUDIO_SOURCE_BITRATE
 get_audio_bitrate () {
 	AUDIO_SOURCE_BITRATE_STRING=`mediainfo --Inform="Audio;%ID/String%:%BitRate/String%\n" ${SOURCE_FILE} | grep $AUDIO_AID | cut -d':' -f2`
-	# Could be in Mbps or Kbps...
+	# Could be in Mbps or Kbps... Or even "Unknown / 1 509 Kbps" for some DTS-MA tracks
 	if [[ $AUDIO_SOURCE_BITRATE_STRING == *Kbps* ]]
 	then
-		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Kbps//g'`
+		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Kbps//g' | sed 's|Unknown/||'`
 	elif  [[ $AUDIO_SOURCE_BITRATE_STRING == *Mbps* ]]
 	then
-		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Mbps/000/g'`
+		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Mbps/000/g' | sed 's|Unknown/||'`
 	else
 		# error
 		MESSAGE="Audio bitrate $AUDIO_SOURCE_BITRATE_STRING (AUDIO_SOURCE_BITRATE_STRING)"
