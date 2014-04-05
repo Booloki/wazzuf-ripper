@@ -70,6 +70,8 @@ video_rip () {
 			FILE_NAME=$VIDEO_FILE
 			file_exists
 		else
+
+			# h264 first pass encoding
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder "$SOURCE_FILE" -o $VIDEO_FILE $VIDEO_SKIP -vf pp=ci,crop=$VIDEO_CROP$MENCODER_SCALE -ovc x264 -x264encopts bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS1:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS1:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS1:trellis=$VIDEO_X264_TRELLIS_PASS1:threads=$VIDEO_X264_THREADS:pass=1:log=1 -nosound -nosub"; fi
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				nice -n $NICENESS mencoder "$SOURCE_FILE" -o $VIDEO_FILE \
@@ -110,6 +112,28 @@ video_rip () {
 					bitrate=$VIDEO_BITRATE:frameref=$VIDEO_X264_FRAMEREF_PASS2:mixed_refs:bframes=$VIDEO_X264_BFRAMES_PASS2:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$VIDEO_X264_SUBQ_PASS2:trellis=$VIDEO_X264_TRELLIS_PASS2:threads=$VIDEO_X264_THREADS:pass=2:log=1 \
 					-nosound -nosub
 			fi
+		fi
+		;;
+	HEVC )
+		# HEVC / x265
+		# Experimental
+
+		VIDEO_FILE=$HEVC_FILE
+
+		if [ -f $VIDEO_FILE ]
+		then
+			FILE_NAME=$VIDEO_FILE
+			file_exists
+		else
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS $CONV_PROJECT -threads $VIDEO_HEVC_THREADS -analyzeduration 999999999 -probesize 999999999 -i "$SOURCE_FILE" -an -sn -filter:v "crop=$VIDEO_CROP" -c:v libx265 -preset $VIDEO_X265_PRESET -x265-params crf=$VIDEO_X265_CRF $VIDEO_FILE"; fi
+			nice -n $NICENESS $CONV_PROJECT \
+				-threads $VIDEO_HEVC_THREADS \
+				-analyzeduration 999999999 -probesize 999999999 \
+				-i "$SOURCE_FILE" \
+				-an -sn \
+				-filter:v "crop=$VIDEO_CROP" \
+				-c:v libx265 -preset $VIDEO_X265_PRESET -x265-params crf=$VIDEO_X265_CRF \
+				$VIDEO_FILE
 		fi
 		;;
 	XVID )	
@@ -255,6 +279,7 @@ get_video_bitrate () {
 		VIDEO_BITRATE_WANTED=${BDRIP_VIDEO_BITRATE}
 		;;
 	esac
+
 	if [ "${VIDEO_BITRATE_WANTED}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
 		VIDEO_BITRATE_STRING=`mediainfo --Inform="Video;%OverallBitRate/String%" ${SOURCE_FILE}`
 		# Could be in Mbps or Kbps...

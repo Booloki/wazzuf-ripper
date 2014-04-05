@@ -12,8 +12,14 @@ checkandsource_wazzuf_files
 
 WAZZUF_UI="GUI"
 
-# global
+# Zenity variables
 ZEN_TITLE="Wazzuf Ripper Conf Generator"
+# Zenity list height composing
+# Base height: 95
+ZEN_HEIGHT_BASE="95"
+# Each new component (line or header): 25
+ZEN_HEIGHT_COMPONENT="25"
+
 
 zenity --question --title "$ZEN_TITLE" --text "Do you want to generate a <b>new Wazzuf Ripper configuration file</b> ?" --ok-label "OK" --cancel-label="Quit"
 if [ $? = "1" ]; then wazzuf_quit; fi
@@ -47,10 +53,14 @@ echo "" >> $CONF_FILE_TMP
 echo "## MEDIA INFORMATIONS" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+ZENITY_SOURCE_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* 5)"
+ZENITY_SOURCE_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_SOURCE_HEIGHT_COMPONENTS)"
+if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SOURCE_HEIGHT $ZENITY_SOURCE_HEIGHT"; fi
+
 ZENITY_SOURCE=$(zenity --list --radiolist \
 	--title="$ZEN_TITLE" \
 	--ok-label "Next" --cancel-label "Quit" \
-	--height "220" \
+	--height $ZENITY_SOURCE_HEIGHT \
 	--column="radiobutton" --column="Media" --column="ID" \
 	--print-column="3" \
 	--hide-column="3" \
@@ -68,7 +78,7 @@ SOURCE="$ZENITY_SOURCE"
 
 zenity --info --title "$ZEN_TITLE" \
 	--ok-label "Next" \
-	--height "100" \
+	--height "145" \
 	--text "Please select your <b>source directory</b>
 (m2ts/ts, iso, external subtitles, cover image, episodes list,...)."
 ZENITY_SOURCE_DIRECTORY_BASE="$HOME"
@@ -150,8 +160,14 @@ echo "" >> $CONF_FILE_TMP
 echo "## TAGGING" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+ZENITY_VIDEO_TYPE_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* 3)"
+ZENITY_VIDEO_TYPE_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_VIDEO_TYPE_HEIGHT_COMPONENTS)"
+if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_VIDEO_TYPE_HEIGHT $ZENITY_VIDEO_TYPE_HEIGHT"; fi
+
 ZENITY_VIDEO_TYPE=$(zenity --list --radiolist \
 	--title="$ZEN_TITLE" \
+	--width "260" \
+	--height $ZENITY_VIDEO_TYPE_HEIGHT \
 	--ok-label "Next" --cancel-label "Quit" \
 	--column="radiobutton" --column="Type" --column="ID" \
 	--print-column="3" \
@@ -294,9 +310,13 @@ SHOW )
 	echo "SEASON_NUMBER=\"`echo "${ZENITY_SHOW}" | cut -d "|" -f1`\"" >> $CONF_FILE_TMP
 	echo "EPISODES_TOTAL_NUMBER=\"`echo "${ZENITY_SHOW}" | cut -d "|" -f2`\"" >> $CONF_FILE_TMP
 
+	ZENITY_EPISODES_FILE_CHOICE_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* 3)"
+	ZENITY_EPISODES_FILE_CHOICE_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_EPISODES_FILE_CHOICE_HEIGHT_COMPONENTS)"
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_EPISODES_FILE_CHOICE_HEIGHT $ZENITY_EPISODES_FILE_CHOICE_HEIGHT"; fi
+
 	ZENITY_EPISODES_FILE_CHOICE=$(zenity --list --radiolist \
 		--title="$ZEN_TITLE" \
-		--height "200" \
+		--height $ZENITY_EPISODES_FILE_CHOICE_HEIGHT \
 		--width "500" \
 		--ok-label "Next" --cancel-label "Quit" \
 		--column="button" --column="description" --column="choice" \
@@ -464,8 +484,8 @@ DVD | ISO_DVD )
 				for ((l=1; l <= $i ; l++)); do if [[ "`echo "${DVD_TITLE_LENGTH[l]}" | cut -d ':' -f 1-2`" == "00:00" ]]; then echo FALSE; else echo TRUE; fi ; echo "${DVD_TITLE_ID[l]}"; echo "${DVD_TITLE_LENGTH[l]}"; echo "${DVD_TITLE_CHAPTERS[l]}"; echo "${DVD_TITLE_TRACKS_AUDIO[l]}"; echo "${DVD_TITLE_TRACKS_SUBTITLES[l]} "; done | zenity --list --checklist \
 				--title="$ZEN_TITLE" \
 				--ok-label "Next" --cancel-label "Quit" \
-				--width "600" \
-				--height "400" \
+				--width "550" \
+				--height $ZENITY_TITLES_HEIGHT \
 				--column="Choice" --column="Title" --column="Lenght" --column="Chapters" --column="Audio tracks" --column="Subtitle tracks" \
 				--print-column="2" \
 				--separator=' ' \
@@ -555,6 +575,14 @@ M2TS )
 						echo "DEBUG Available MPLS or CLPI file found."
 					fi
 					M2TS_AUDIO_LANG[$i]="`mediainfo --Inform="Audio;%ID%%Language/String%\n" "$MPLS_FILE_PATH" | grep $ID | sed s/$ID//`"
+
+					if [[ "${M2TS_AUDIO_LANG[$i]}" == "" && -f "$CLPI_FILE_PATH" ]]; then
+						M2TS_AUDIO_LANG[$i]="`mediainfo --Inform="Audio;%ID%%Language/String%\n" "$CLPI_FILE_PATH" | grep $ID | sed s/$ID//`"
+					fi
+
+					if [[ "${M2TS_AUDIO_LANG[$i]}" == "" ]]; then
+						M2TS_AUDIO_LANG[$i]="unknown"
+					fi
 				else
 					if [[ $DEBUG == "1" ]]; then
 						echo "DEBUG No available MPLS or CLPI file found."
@@ -565,9 +593,26 @@ M2TS )
 					fi
 				fi
 
-				M2TS_AUDIO_FORMAT[$i]="`mediainfo --Inform="Audio;%ID%%Format%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
-				M2TS_AUDIO_CHANNELS[$i]="`mediainfo --Inform="Audio;%ID%%Channel(s)%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID//`"
-				M2TS_AUDIO_BITRATE[$i]="`mediainfo --Inform="Audio;%ID%%BitRate%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID// | head -c -4`"
+				M2TS_AUDIO_FORMAT[$i]=$(mediainfo --Inform="Audio;%ID%%Format%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID// | tee >( zenity --progress \
+				        --title="$ZEN_TITLE" \
+				        --text="Audio analyze - Track $i Format" \
+				        --cancel-label="Cancel" \
+				        --pulsate \
+				        --auto-close))
+
+				M2TS_AUDIO_CHANNELS[$i]=$(mediainfo --Inform="Audio;%ID%%Channel(s)%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID// | tee >( zenity --progress \
+				        --title="$ZEN_TITLE" \
+				        --text="Audio analyze - Track $i Channel" \
+				        --cancel-label="Cancel" \
+				        --pulsate \
+				        --auto-close))
+
+				M2TS_AUDIO_BITRATE[$i]=$(mediainfo --Inform="Audio;%ID%%BitRate%\n" "$M2TS_FILE_PATH" | grep $ID | sed s/$ID// | head -c -4 | tee >( zenity --progress \
+				        --title="$ZEN_TITLE" \
+				        --text="Audio analyze - Track $i BitRate" \
+				        --cancel-label="Cancel" \
+				        --pulsate \
+				        --auto-close))
 
 				if [[ $DEBUG == "1" ]]; then
 					echo "DEBUG M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
@@ -603,12 +648,18 @@ M2TS )
 		echo "DEBUG i $i"
 	fi
 
+	# Add checklist header to component number
+	ZENITY_AUDIO_TRACKS_COMPONENTS="$(expr $i + 1)"
+	ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* $ZENITY_AUDIO_TRACKS_COMPONENTS)"
+	ZENITY_AUDIO_TRACKS_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS)"
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS_HEIGHT $ZENITY_AUDIO_TRACKS_HEIGHT"; fi
+
 	ZENITY_AUDIO_TRACKS=$(
 		for ((l=1; l <= $i ; l++)); do echo TRUE; echo "${M2TS_AUDIO_ID[l]}"; echo "${M2TS_AUDIO_LANG[l]}"; echo "${M2TS_AUDIO_FORMAT[l]}"; echo "${M2TS_AUDIO_CHANNELS[l]}"; echo "${M2TS_AUDIO_BITRATE[l]}"; done | zenity --list --checklist \
 		--title="$ZEN_TITLE" \
 		--ok-label "Next" --cancel-label "Quit" \
 		--width "520" \
-		--height "300" \
+		--height $ZENITY_AUDIO_TRACKS_HEIGHT \
 		--column="Choice" --column="AID" --column="Language" --column="Format" --column="Channels" --column="Bitrate" \
 		--print-column="2" \
 		--separator=' ' \
@@ -695,12 +746,18 @@ M2TS )
 			echo "DEBUG M2TS_SUB_ID[X] ${M2TS_SUB_ID[1]} ${M2TS_SUB_ID[2]} ${M2TS_SUB_ID[3]} ${M2TS_SUB_ID[4]}"
 		fi
 
+		# Add checklist header to component number
+		ZENITY_SUBTITLE_TRACKS_COMPONENTS="$(expr $i + 1)"
+		ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* $ZENITY_SUBTITLE_TRACKS_COMPONENTS)"
+		ZENITY_SUBTITLE_TRACKS_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS)"
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS_HEIGHT $ZENITY_SUBTITLE_TRACKS_HEIGHT"; fi
+
 		ZENITY_SUBTITLE_TRACKS=$(
 			for ((l=1; l <= $i ; l++)); do echo TRUE; echo "${M2TS_SUB_ID[l]}"; echo "${M2TS_SUB_LANG[l]}"; echo "${M2TS_SUB_FORMAT[l]} "; done | zenity --list --checklist \
 			--title="$ZEN_TITLE" \
 			--ok-label "Next" --cancel-label "Quit" \
 			--width "330" \
-			--height "300" \
+			--height $ZENITY_SUBTITLE_TRACKS_HEIGHT \
 			--column="Choice" --column="SID" --column="Language" --column="Format" \
 			--print-column="2" \
 			--separator=' ' \
@@ -804,12 +861,18 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 		echo "DEBUG DVD_AUDIO_ID_[X] ${DVD_AUDIO_ID[1]} ${DVD_AUDIO_ID[2]} ${DVD_AUDIO_ID[3]} ${DVD_AUDIO_ID[4]}"
 	fi
 
+	# Add checklist header to component number
+	ZENITY_AUDIO_TRACKS_COMPONENTS="$(expr $i + 1)"
+	ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* $ZENITY_AUDIO_TRACKS_COMPONENTS)"
+	ZENITY_AUDIO_TRACKS_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS)"
+	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS_HEIGHT $ZENITY_AUDIO_TRACKS_HEIGHT"; fi
+
 	ZENITY_AUDIO_TRACKS=$(
 		for ((l=1; l <= $i ; l++)); do echo TRUE; echo "${DVD_AUDIO_ID[l]}"; echo "${DVD_AUDIO_LANG[l]}"; echo "${DVD_AUDIO_FORMAT[l]}"; echo "${DVD_AUDIO_CHANNELS[l]} "; done | zenity --list --checklist \
 		--title="$ZEN_TITLE" \
 		--ok-label "Next" --cancel-label "Quit" \
 		--width "430" \
-		--height "300" \
+		--height $ZENITY_AUDIO_TRACKS_HEIGHT \
 		--column="Choice" --column="AID" --column="Language" --column="Format" --column="Channels" \
 		--print-column="2" \
 		--separator=' ' \
@@ -894,13 +957,19 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 		if [[ $DEBUG == "1" ]]; then
 			echo "DEBUG DVD_SUB_ID[X] ${DVD_SUB_ID[1]} ${DVD_SUB_ID[2]} ${DVD_SUB_ID[3]} ${DVD_SUB_ID[4]}"
 		fi
-	
+
+		# Add checklist header to component number
+		ZENITY_SUBTITLE_TRACKS_COMPONENTS="$(expr $i + 1)"
+		ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* $ZENITY_SUBTITLE_TRACKS_COMPONENTS)"
+		ZENITY_SUBTITLE_TRACKS_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS)"
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS_HEIGHT $ZENITY_SUBTITLE_TRACKS_HEIGHT"; fi
+
 		ZENITY_SUBTITLE_TRACKS=$(
 			for ((l=1; l <= $i ; l++)); do echo FALSE; echo "${DVD_SUB_ID[l]}"; echo "${DVD_SUB_LANG[l]} "; done | zenity --list --checklist \
 			--title="$ZEN_TITLE" \
 			--ok-label "Next" --cancel-label "Quit" \
 			--width "350" \
-			--height "300" \
+			--height $ZENITY_SUBTITLE_TRACKS_HEIGHT \
 			--column="Choice" --column="SID" --column="Language" \
 			--print-column="2" \
 			--separator=' ' \
@@ -945,11 +1014,15 @@ echo "" >> $CONF_FILE_TMP
 echo "## OTHER OPTIONS" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+ZENITY_OTHERS_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* 4)"
+ZENITY_OTHERS_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_OTHERS_HEIGHT_COMPONENTS)"
+if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_OTHERS_HEIGHT $ZENITY_OTHERS_HEIGHT"; fi
+
 ZENITY_OTHERS=$(zenity --list --checklist \
         --title="$ZEN_TITLE" \
         --ok-label "Next" --cancel-label "Quit" \
         --width "300" \
-        --height "200" \
+        --height $ZENITY_OTHERS_HEIGHT \
         --column="Choice" --column="Option" --column="OPTION_VAR" \
         --print-column="3" \
         --hide-column="3" \
@@ -983,30 +1056,39 @@ echo "" >> $CONF_FILE_TMP
 echo "## CODECS OPTIONS" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+ZENITY_CODEC_VIDEO_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* 5)"
+ZENITY_CODEC_VIDEO_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_CODEC_VIDEO_HEIGHT_COMPONENTS)"
+if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_CODEC_VIDEO_HEIGHT $ZENITY_CODEC_VIDEO_HEIGHT"; fi
+
 # default codecs
 ZENITY_CODEC_VIDEO=$(zenity --list --radiolist \
 	--title="$ZEN_TITLE" \
 	--ok-label "Next" --cancel-label "Quit" \
 	--width "420" \
-	--height "180" \
+	--height $ZENITY_CODEC_VIDEO_HEIGHT \
 	--column="ID" --column="Description" --column="codec" \
 	--print-column="3" \
 	--hide-column="3" \
 	--hide-header \
 	--text="Please choose your default video codec" \
-	FALSE "h264" H264 \
 	TRUE "Xvid" XVID \
+	FALSE "h264" H264 \
+	FALSE "HEVC" HEVC \
 	FALSE "Dump (faster) (original video track, mpeg source only)" DUMP \
 	FALSE "Dump with crop (mpeg source only)" DUMP_CROP \
 )
 if [ $? = "1" ]; then wazzuf_quit; fi
 echo "DEFAULT_CODEC_VIDEO="\"${ZENITY_CODEC_VIDEO}"\"" >> $CONF_FILE_TMP
 
+ZENITY_CODEC_AUDIO_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* 5)"
+ZENITY_CODEC_AUDIO_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_CODEC_AUDIO_HEIGHT_COMPONENTS)"
+if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_CODEC_AUDIO_HEIGHT $ZENITY_CODEC_AUDIO_HEIGHT"; fi
+
 ZENITY_CODEC_AUDIO=$(zenity --list --radiolist \
 	--title="$ZEN_TITLE" \
 	--ok-label "Next" --cancel-label "Quit" \
 	--width "200" \
-	--height "210" \
+	--height $ZENITY_CODEC_AUDIO_HEIGHT \
 	--column="ID" --column="Description" --column="codec" \
 	--print-column="3" \
 	--hide-column="3" \

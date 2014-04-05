@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+
+2014-04-05
+* New available video codec: HEVC (libx265) (ffmpeg >= 2.2)
+
 2014-04-01
 * Add optional video screenshots generation
 * NFO file generation is now optional
