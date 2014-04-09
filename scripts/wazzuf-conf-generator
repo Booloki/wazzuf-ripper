@@ -474,10 +474,21 @@ DVD | ISO_DVD )
 				DVD_TITLE_CHAPTERS[$i]="`echo ${line} | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //`"
 				DVD_TITLE_TRACKS_AUDIO[$i]="`echo ${line} | cut -d ',' -f4 | cut -d ':' -f2 | sed s/\ //`"
 				DVD_TITLE_TRACKS_SUBTITLES[$i]="`echo ${line} | cut -d ',' -f5 | cut -d ':' -f2 | sed s/\ //`"
+				if [[ $DEBUG == "1" ]]; then
+					echo "DEBUG i $i"
+					echo "DEBUG DVD_TITLE_ID[$i] ${DVD_TITLE_ID[$i]}"
+					echo "DEBUG DVD_TITLE_LENGTH[$i] ${DVD_TITLE_LENGTH[$i]}"
+					echo "DEBUG DVD_TITLE_CHAPTERS[$i] ${DVD_TITLE_CHAPTERS[$i]}"
+					echo "DEBUG DVD_TITLE_TRACKS_AUDIO[$i] ${DVD_TITLE_TRACKS_AUDIO[$i]}"
+					echo "DEBUG DVD_TITLE_TRACKS_SUBTITLES[$i] ${DVD_TITLE_TRACKS_SUBTITLES[$i]}"
+				fi
 			done  < DVD-Titles-lsdvd.info
-			if [[ $DEBUG == "1" ]]; then
-				echo "DEBUG DVD_TITLE_IDs ${DVD_TITLE_ID[1]} ${DVD_TITLE_ID[2]} ${DVD_TITLE_ID[3]} ${DVD_TITLE_ID[4]}"
-			fi
+
+			# Add radiolist header to component number
+			ZENITY_TITLES_COMPONENTS="$(expr $i + 1)"
+			ZENITY_TITLES_HEIGHT_COMPONENTS="$(expr $ZEN_HEIGHT_COMPONENT \* $ZENITY_TITLES_COMPONENTS)"
+			ZENITY_TITLES_HEIGHT="$(expr $ZEN_HEIGHT_BASE + $ZENITY_TITLES_HEIGHT_COMPONENTS)"
+			if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_TITLES_HEIGHT $ZENITY_TITLES_HEIGHT"; fi
 	
 			# Display all Titles but don't check Titles with DVD_TITLE_LENGTH < "00:01:00"
 			ZENITY_TITLES=$(

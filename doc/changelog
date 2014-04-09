@@ -4,6 +4,9 @@
 # Changelog file
 
 
+2014-04-09
+* Bugfix: wazzuf-conf-generator: undefined ZENITY_TITLES_HEIGHT zenity radiolist parameter.
+
 2014-04-05
 * New available video codec: HEVC (libx265) (ffmpeg >= 2.2)
 * wazzuf-audio: add CONV_PROJECT for Blu-ray PCM encoding
