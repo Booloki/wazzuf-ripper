@@ -259,3 +259,10 @@ check_tsmuxer () {
 		soft_to_install_exit
 	fi
 }
+
+check_ccextractor () {
+	if [ ! -x "/usr/bin/ccextractor" ]; then
+		SOFT_NAME="ccextractor"
+		soft_to_install_exit
+	fi
+}

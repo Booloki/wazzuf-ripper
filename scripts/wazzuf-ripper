@@ -613,9 +613,17 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 			if [[ "$SUBTITLE_FILE_FORCE" == "" ]]; then
 
 				if [[ $SOURCE == "M2TS" ]]; then
-					# default name (could not be changed with tsMuxeR...): 00800.track_4608.sup
-					M2TS_FILE_WE="`echo "$M2TS_FILE" | sed s/.m2ts//`"
-					SUBTITLE_FILE="$M2TS_FILE_WE.track_$SUBTITLE_SID.sup"
+					M2TS_FILE_WE="`echo "$M2TS_FILE" | sed s/.m2ts// | sed s/.ts//`"
+					if [[ $DEBUG == "1" ]]; then echo "DEBUG M2TS_FILE_WE $M2TS_FILE_WE"; fi
+					case $SUBTITLE_SOURCE in
+					PGS )
+						# Default output filename could not be changed with tsMuxeR.
+						SUBTITLE_FILE="$M2TS_FILE_WE.track_$SUBTITLE_SID.sup"
+						;;
+					CC )
+						SUBTITLE_FILE="$BASE_WORKING_FILE-$SUBTITLE_LANG.srt"
+						;;
+					esac
 				else
 					SUB_FILE="$BASE_WORKING_FILE.$SUBTITLE_SID-$SUBTITLE_LANG"
 					SUBTITLE_FILE="$SUB_FILE.idx"
@@ -1040,7 +1048,8 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 
 	check_mkvmerge
 	if [[ $WAZZUF_UI == "GUI" ]]; then
-		( echo 10; nice -n $NICENESS mkvmerge \
+		( echo 10; ionice -c $IONICENESS \
+			nice -n $NICENESS mkvmerge \
 			-o $MERGE_OUTPUT --title "$MERGE_TITLE" \
 			$MERGE_VIDEO \
 			$MERGE_AUDIO_FULL \
@@ -1051,7 +1060,9 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 			| zenity --progress --pulsate --title="$ZEN_TITLE - Final file merge" --text="Creating $MERGE_OUTPUT" --auto-close --auto-kill
 			if [ $? = "1" ]; then wazzuf_quit; fi
 	else
-		nice -n $NICENESS mkvmerge \
+		ionice -c $IONICENESS \
+			nice -n $NICENESS \
+			mkvmerge \
 			-o $MERGE_OUTPUT --title "$MERGE_TITLE" \
 			$MERGE_VIDEO \
 			$MERGE_AUDIO_FULL \

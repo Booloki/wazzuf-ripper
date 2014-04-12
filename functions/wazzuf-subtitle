@@ -43,21 +43,37 @@ subtitle_rip () {
 			FILE_NAME=$SUBTITLE_FILE
 			file_exists
 		else
-			# PSG format (.sup) - subtitle extraction
-			# Demux PSG files with tsMuxeR
-			check_tsmuxer
+			case $SUBTITLE_SOURCE in
+			PGS )
+				# PSG format (.sup) - subtitle extraction
+				# Demux PSG files with tsMuxeR
+				check_tsmuxer
 
-			# Meta file creation
-			TSMUXER_METAFILE="tsmuxer.meta"
-			echo "MUXOPT --no-pcr-on-video-pid --new-audio-pes --demux --vbr --vbv-len=500" > $TSMUXER_METAFILE
-			SOURCE_FILE="$M2TS_FILE_PATH"
-			echo "S_HDMV/PGS, \"$SOURCE_FILE\",bottom-offset=24,font-border=2,text-align=center,video-width=1920,video-height=1080,fps=23.976, track=$SUBTITLE_SID, lang=$SUBTITLE_LANG" >> $TSMUXER_METAFILE
+				# Meta file creation
+				TSMUXER_METAFILE="tsmuxer.meta"
+				echo "MUXOPT --no-pcr-on-video-pid --new-audio-pes --demux --vbr --vbv-len=500" > $TSMUXER_METAFILE
+				SOURCE_FILE="$M2TS_FILE_PATH"
+				echo "S_HDMV/PGS, \"$SOURCE_FILE\",bottom-offset=24,font-border=2,text-align=center,video-width=1920,video-height=1080,fps=23.976, track=$SUBTITLE_SID, lang=$SUBTITLE_LANG" >> $TSMUXER_METAFILE
 
-			# tsMuxeR demuxing
-			echo -ne "\n ***********************************************\n"
-			echo " Demuxing subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
-			echo -ne " ***********************************************\n"
-			tsMuxeR $TSMUXER_METAFILE .
+				# tsMuxeR demuxing
+				echo -ne "\n ***********************************************\n"
+				echo " Demuxing subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
+				echo -ne " ***********************************************\n"
+				ionice -c $IONICENESS nice -n $NICENESS tsMuxeR $TSMUXER_METAFILE .
+				;;
+			CC )
+				# CC format - subtitle extraction in srt file
+				# with CCExtractor
+				# only one file for now
+				check_ccextractor
+
+				SOURCE_FILE="$M2TS_FILE_PATH"
+				echo -ne "\n ***********************************************\n"
+				echo " Demuxing subtitle to $SUBTITLE_FILE "
+				echo -ne " ***********************************************\n"
+				ionice -c $IONICENESS nice -n $NICENESS ccextractor "$SOURCE_FILE" -o $SUBTITLE_FILE
+				;;
+			esac
 		fi
 		;;
 	esac

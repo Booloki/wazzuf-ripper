@@ -4,6 +4,11 @@
 # Changelog file
 
 
+2014-04-12
+* wazzuf-conf-generator: m2ts/ts analyse from ffmpeg/libav to mediainfo
+* Add experimental Closed Captions (CC) subtitles support for m2ts/ts files with CCExtractor (new dependancy)
+* Some small improvements
+
 2014-04-09
 * Bugfix: wazzuf-conf-generator: undefined ZENITY_TITLES_HEIGHT zenity radiolist parameter.
 

@@ -317,6 +317,10 @@ get_audio_bitrate () {
 	elif  [[ $AUDIO_SOURCE_BITRATE_STRING == *Mbps* ]]
 	then
 		AUDIO_SOURCE_BITRATE=`echo $AUDIO_SOURCE_BITRATE_STRING | sed 's/ //g' | sed 's/Mbps/000/g' | sed 's|Unknown/||'`
+	# If empty, put a big number to avoid stoopid errors #crap
+	elif  [[ $AUDIO_SOURCE_BITRATE_STRING == "" ]]
+	then
+		AUDIO_SOURCE_BITRATE="5000"
 	else
 		# error
 		MESSAGE="Audio bitrate $AUDIO_SOURCE_BITRATE_STRING (AUDIO_SOURCE_BITRATE_STRING)"
