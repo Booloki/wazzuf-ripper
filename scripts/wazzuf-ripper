@@ -359,7 +359,7 @@ do
 		DUMP_FILE="$BASE_WORKING_FILE.mpeg"
 		DUMP_CROP_FILE="$BASE_WORKING_FILE.mpeg2"
 
-		if [ -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ];	then
+		if [ -f "$SOURCE_DIRECTORY/$EPISODES_FILE" ]; then
 			if [[ $DVD_EPISODES_ORG == "CHAPTERS" ]]; then
 				EPISODE_NAME_FULL=`head -n $i "$SOURCE_DIRECTORY/$EPISODES_FILE" | tail -n 1`
 			else
@@ -530,34 +530,53 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 	M2TS )
 		SOURCE_FILE="$M2TS_FILE_PATH"
 
-		# chapters management
-		MPLS_FILE="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
+		# Chapters management
 		if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
-		if [ -f "$MPLS_FILE" ]; then
-			check_bdchapters
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML"; fi
-			if [[ $WAZZUF_UI == "GUI" ]]; then
-				( echo 10; bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML 1>/dev/null ) \
-				| zenity --progress --pulsate --auto-close --title "$ZEN_TITLE" \
-					--text "Creating $CHAPTERS_FILE_XML..."
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				echo " Creating $CHAPTERS_FILE_XML..."
-				bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML
-			fi
-			MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_XML"
-		else
+		if [ -f "$CHAPTERS_FILE_XML" ]; then
 			if [[ $WAZZUF_UI == "GUI" ]]; then
 				zenity --warning --title "$ZEN_TITLE" \
-					--text "No chapters file to create. Next..." \
+					--text "Chapters file already exists. Next..." \
 					--timeout=2
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				echo " No chapters file to create. Next..."
+				echo "Chapters file already exists. Next..."
 			fi
-			MERGE_CHAPTERS=""
+			MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_XML"
+		else
+			MPLS_FILE="`echo "$M2TS_FILE_PATH" | sed 's!m2ts$!mpls!'`"
+			if [ -f "$MPLS_FILE" ]; then
+				# with http://www.jamesthebard.net/blog/?p=125
+				# python BD\ Chapters_0.3.py -i /media/dev/rip/Planete_Terre/00005.mpls -o /media/dev/rip/Planete_Terre/00005.xml
+				check_bdchapters
+				if [[ $DEBUG == "1" ]]; then echo "DEBUG bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML"; fi
+				if [[ $WAZZUF_UI == "GUI" ]]; then
+					# pas d' --auto-close pour zenity --info
+					( echo 10; bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML 1>/dev/null ) \
+					| zenity --progress --pulsate --auto-close --title "$ZEN_TITLE" \
+						--text "Creating $CHAPTERS_FILE_XML..."
+					if [ $? = "1" ]; then wazzuf_quit; fi
+				else
+					echo " Creating $CHAPTERS_FILE_XML..."
+					bdchapters -i "$MPLS_FILE" -o $CHAPTERS_FILE_XML
+				fi
+				MERGE_CHAPTERS="--chapters $CHAPTERS_FILE_XML"
+			else
+				if [[ $WAZZUF_UI == "GUI" ]]; then
+					zenity --warning --title "$ZEN_TITLE" \
+						--text "No chapters file to create. Next..." \
+						--timeout=2
+					if [ $? = "1" ]; then wazzuf_quit; fi
+				else
+					echo " No chapters file to create. Next..."
+				fi
+				MERGE_CHAPTERS=""
+			fi
 		fi
 		if [[ ! $WAZZUF_UI == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
+		if [[ $DEBUG == "1" ]] && [ -f "$CHAPTERS_FILE_XML" ]; then
+			echo "DEBUG Chapters count: `grep ChapterString "$CHAPTERS_FILE_XML" | wc -l`"
+			echo "DEBUG Last chapter begin: `grep ChapterTimeStart "$CHAPTERS_FILE_XML" | tail -n1 | cut -d'>' -f2 | cut -d '.' -f1`"
+		fi
 		;;
 	esac
 	get_video_bitrate
@@ -1038,7 +1057,7 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 	if [[ $DEBUG == "1" ]]; then
 		echo "DEBUG TOTAL_TRACKS_SIZE $TOTAL_TRACKS_SIZE"
 		echo "DEBUG LOCAL_AVAILABLE_DISK_SIZE $LOCAL_AVAILABLE_DISK_SIZE"
-		echo "DEBUG nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title \"$MERGE_TITLE\" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"
+		echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS mkvmerge -o $MERGE_OUTPUT --title \"$MERGE_TITLE\" $MERGE_VIDEO $MERGE_AUDIO_FULL $MERGE_SUBTITLES_FULL $MERGE_CHAPTERS $MERGE_COVER $MERGE_XMLTAGS"
 	fi
 
 	if [[ "$TOTAL_TRACKS_SIZE" -gt "$LOCAL_AVAILABLE_DISK_SIZE" ]]; then
