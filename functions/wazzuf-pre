@@ -1,7 +1,7 @@
 ## pre-rip functions
 
 # Run cropdetect to establish the correct crop rectangle
-CROP_FRAMES=100
+CROP_FRAMES=150
 cropdetect(){
 	case ${1} in
 	GUI )

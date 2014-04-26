@@ -5,6 +5,7 @@
 
 
 2014-04-26
+* wazzuf-pre: improve cropdetect, setting CROP_FRAMES to 150
 * Bugfix: SUBTITLE_SOURCE definition
 * Improve BD/M2TS chapters management
 * Bugfix: wazzuf-conf-generator: DVD Titles analyse
