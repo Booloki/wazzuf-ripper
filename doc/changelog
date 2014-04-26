@@ -5,6 +5,7 @@
 
 
 2014-04-26
+* Bugfix: SUBTITLE_SOURCE definition
 * Improve BD/M2TS chapters management
 * Bugfix: wazzuf-conf-generator: DVD Titles analyse
 
