@@ -4,6 +4,9 @@
 # Changelog file
 
 
+2014-04-26
+* Bugfix: wazzuf-conf-generator: DVD Titles analyse
+
 2014-04-12
 * wazzuf-conf-generator: m2ts/ts analyse from ffmpeg/libav to mediainfo
 * Add experimental Closed Captions (CC) subtitles support for m2ts/ts files with CCExtractor (new dependancy)
