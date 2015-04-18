@@ -517,16 +517,16 @@ DVD | ISO_DVD )
 		CHAPTERS )
 			# If episodes are on DVD CHAPTERS
 			# Not used for now
-			DVD_TITLE_NUMBER="`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`"
+			DVD_TITLE_NUMBER="`strings DVD-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//`"
 			echo "DVD_TITLE_NUMBER="\"$DVD_TITLE_NUMBER\""" >> $CONF_FILE_TMP
 			DVD_CHAPTER_FIRST="1"
-			DVD_CHAPTER_LAST="`grep "^Title: $DVD_TITLE_NUMBER" DVD-lsdvd.info | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //`"
+			DVD_CHAPTER_LAST="`strings DVD-lsdvd.info | grep "^Title: $DVD_TITLE_NUMBER" | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //`"
 			echo "DVD_CHAPTER_FIRST="\"$DVD_CHAPTER_FIRST\""" >> $CONF_FILE_TMP
 			echo "DVD_CHAPTER_LAST="\"$DVD_CHAPTER_LAST\""" >> $CONF_FILE_TMP
 			;;
 		esac
 	else
-		DVD_TITLE_NUMBER="`grep "^Longest track:" DVD-lsdvd.info | sed s/'Longest track: '//`"
+		DVD_TITLE_NUMBER="`strings DVD-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//`"
 		echo "DVD_TITLE_NUMBER="\"$DVD_TITLE_NUMBER\""" >> $CONF_FILE_TMP
 		zenity --info --title "$ZEN_TITLE" --text "The longest track is <b>Title $DVD_TITLE_NUMBER</b>.
 This one will be use for cropping detection." --ok-label "Next"

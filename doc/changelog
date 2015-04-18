@@ -4,6 +4,9 @@
 # Changelog file
 
 
+2015-04-18
+* wazzuf-conf-generator: fix some rare lsdvd 'binary' output inclusion.
+
 2014-04-26
 * wazzuf-pre: improve cropdetect, setting CROP_FRAMES to 150
 * Bugfix: SUBTITLE_SOURCE definition
