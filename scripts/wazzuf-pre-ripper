@@ -216,6 +216,7 @@ ISO_DVD )
 	else
 		echo "Longest track chosen for crop detection: Title $DVD_TITLE_NUMBER"
 		echo `grep "Title: $DVD_TITLE_NUMBER" ISO-lsdvd.info | cut -d "," -f 2`
+		DVD_SOURCE="$ISO_FILE_PATH"
 		cropdetect
 		echo -ne "VIDEO_CROP=\"${VIDEO_CROP}\"\n"
 

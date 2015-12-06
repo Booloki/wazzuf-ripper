@@ -53,6 +53,7 @@ echo "" >> $CONF_FILE_TMP
 echo "## MEDIA INFORMATIONS" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+# zenity height
 ZENITY_SOURCE_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * 5))
 ZENITY_SOURCE_HEIGHT=$(($ZEN_HEIGHT_BASE + $ZENITY_SOURCE_HEIGHT_COMPONENTS))
 if [[ $DEBUG == "1" ]]; then
@@ -163,6 +164,7 @@ echo "" >> $CONF_FILE_TMP
 echo "## TAGGING" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+# zenity height
 ZENITY_VIDEO_TYPE_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * 3))
 ZENITY_VIDEO_TYPE_HEIGHT=$(($ZEN_HEIGHT_BASE + $ZENITY_VIDEO_TYPE_HEIGHT_COMPONENTS))
 if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_VIDEO_TYPE_HEIGHT $ZENITY_VIDEO_TYPE_HEIGHT"; fi
@@ -267,6 +269,7 @@ else
 	echo "COVER="\"\""" >> $CONF_FILE_TMP
 fi
 
+# Tags processing
 # zenity: window doesn't come to the center of the screen when using --forms
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=691357
 ZENITY_TAGS=$(zenity --forms \
@@ -284,8 +287,10 @@ echo "TAG_AUDIO=\"`echo "${ZENITY_TAGS}" | cut -d "|" -f2`\"" >> $CONF_FILE_TMP
 echo "TAG_SIGNATURE=\"`echo "${ZENITY_TAGS}" | cut -d "|" -f3`\"" >> $CONF_FILE_TMP
 echo "COMMENT=\"`echo "${ZENITY_TAGS}" | cut -d "|" -f4`\"" >> $CONF_FILE_TMP
 
+# Tag processing by video type
 case $ZENITY_VIDEO_TYPE in
 MOVIE )
+	# Director Tag processing
 	if  [[ $IMDB_ID == "" ]]; then
 		ZENITY_DIRECTOR=$(zenity --entry \
 			--title="$ZEN_TITLE" \
@@ -297,6 +302,7 @@ MOVIE )
 	fi
 	;;
 MUSIC )	
+	# Artist/Band Tag processing
 	ZENITY_ARTIST_NAME=$(zenity --entry \
 		--title="$ZEN_TITLE" \
 		--text="Artist/Band Name " \
@@ -304,6 +310,7 @@ MUSIC )
 	echo "ARTIST_NAME="\"$ZENITY_ARTIST_NAME\""" >> $CONF_FILE_TMP
 	;;
 SHOW )
+	# Episodes processing
 	# zenity: window doesn't come to the center of the screen when using --forms
 	# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=691357
 	ZENITY_SHOW=$(zenity --forms \
@@ -316,6 +323,8 @@ SHOW )
 	echo "SEASON_NUMBER=\"`echo "${ZENITY_SHOW}" | cut -d "|" -f1`\"" >> $CONF_FILE_TMP
 	echo "EPISODES_TOTAL_NUMBER=\"`echo "${ZENITY_SHOW}" | cut -d "|" -f2`\"" >> $CONF_FILE_TMP
 
+	# Episodes file choice
+	# zenity height
 	ZENITY_EPISODES_FILE_CHOICE_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * 3))
 	ZENITY_EPISODES_FILE_CHOICE_HEIGHT=$(($ZEN_HEIGHT_BASE + $ZENITY_EPISODES_FILE_CHOICE_HEIGHT_COMPONENTS))
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_EPISODES_FILE_CHOICE_HEIGHT $ZENITY_EPISODES_FILE_CHOICE_HEIGHT"; fi
@@ -362,7 +371,7 @@ SHOW )
 		fi		
 		;;
 	2 )
-		# explanations
+		# Episodes file explanations
 		zenity --info --title "$ZEN_TITLE" --text "Episode file syntax with ordered lines like: 05 - The haunted episode.
 Line numbers corresponds to CHAPTERS or TITLES (depends on DVD_EPISODES_ORG)." --ok-label "Next"
 		touch "$ZENITY_SOURCE_DIRECTORY/episodes.txt"
@@ -405,6 +414,7 @@ BD | ISO_BD )
 	        --pulsate \
 	        --auto-close
 
+	# Warning if not decrypted
 	if [[ `grep "Error calculating media key. Missing right processing key" BD-mplayer.err` ]]; then 
 		zenity --error --title "$ZEN_TITLE" \
 			--text "AACS Key Error. Exiting !" \
@@ -435,6 +445,7 @@ DVD | ISO_DVD )
 		# Propose to copy DVD to local iso file
 		zenity --question --title "$ZEN_TITLE" --text "Do you want to <b>make a local iso</b> file of your DVD ?" --ok-label "Yes" --cancel-label="No"
 		if [ $? = "0" ]; then
+			# only if ISO_FILE exists
 			if [[ "$ISO_FILE" == "" ]]; then
 				ISO_FILE="$TITLE_NAME-DVD-`date +%d-%H.%M`.iso"
 				sed -i "s/^SOURCE=\"DVD\"$/SOURCE=\"DVD\"\nISO_FILE=\"${ISO_FILE}\"/" $CONF_FILE_TMP
@@ -448,7 +459,6 @@ DVD | ISO_DVD )
 		DVD_SOURCE="$ISO_FILE_PATH"
 	fi
 
-	# does zenity really works ??
 	( lsdvd -acsv "$DVD_SOURCE" 2>/dev/null > DVD-lsdvd.info ) | zenity --progress \
 	        --title="$ZEN_TITLE" \
 	        --text="DVD analyse" \
@@ -468,7 +478,7 @@ DVD | ISO_DVD )
 		case $DVD_EPISODES_ORG in
 		TITLES )
 			# If episodes are on DVD TITLES
-			grep "^Title:" DVD-lsdvd.info > DVD-Titles-lsdvd.info
+			strings DVD-lsdvd.info | grep "^Title:" > DVD-Titles-lsdvd.info
 
 			# Titles
 			i=0
@@ -490,6 +500,7 @@ DVD | ISO_DVD )
 				fi
 			done  < DVD-Titles-lsdvd.info
 
+			# zenity height
 			# Add radiolist header to component number
 			ZENITY_TITLES_COMPONENTS=$(($i + 1))
 			ZENITY_TITLES_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * $ZENITY_TITLES_COMPONENTS))
@@ -680,6 +691,7 @@ M2TS )
 	do
 		j=$(($j + 1))
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG j -> $j - ZENITY_AUDIO_TRACK $ZENITY_AUDIO_TRACK"; fi
+		# loop on sur origin lines number (i)
 		for ((k=1; k <= $i ; k++))
 		do
 			if [[ "${M2TS_AUDIO_ID[$k]}" == "$ZENITY_AUDIO_TRACK" ]]; then
@@ -769,6 +781,7 @@ M2TS )
 			fi
 		done < $M2TS_CONF_SUBS_FINAL_PATH
 
+		# zenity height
 		# Add checklist header to component number
 		ZENITY_SUBTITLE_TRACKS_COMPONENTS=$(($i + 1))
 		ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * $ZENITY_SUBTITLE_TRACKS_COMPONENTS))
@@ -892,6 +905,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 		echo "DEBUG DVD_AUDIO_ID_[X] ${DVD_AUDIO_ID[1]} ${DVD_AUDIO_ID[2]} ${DVD_AUDIO_ID[3]} ${DVD_AUDIO_ID[4]}"
 	fi
 
+	# zenity height
 	# Add checklist header to component number
 	ZENITY_AUDIO_TRACKS_COMPONENTS=$(($i + 1))
 	ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * $ZENITY_AUDIO_TRACKS_COMPONENTS))
@@ -917,6 +931,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 	do
 		j=$(($j + 1))
 		if [[ $DEBUG == "1" ]]; then echo "DEBUG j -> $j - ZENITY_AUDIO_TRACK $ZENITY_AUDIO_TRACK"; fi
+		# loop on original lines number (i)
 		for ((k=1; k <= $i ; k++))
 		do
 			if [[ ${DVD_AUDIO_ID[$k]} == $ZENITY_AUDIO_TRACK ]]; then
@@ -989,6 +1004,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 			echo "DEBUG DVD_SUB_ID[X] ${DVD_SUB_ID[1]} ${DVD_SUB_ID[2]} ${DVD_SUB_ID[3]} ${DVD_SUB_ID[4]}"
 		fi
 
+		# zenity height
 		# Add checklist header to component number
 		ZENITY_SUBTITLE_TRACKS_COMPONENTS=$(($i + 1))
 		ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * $ZENITY_SUBTITLE_TRACKS_COMPONENTS))
@@ -1014,6 +1030,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 		do
 			j=$(($j + 1))
 			if [[ $DEBUG == "1" ]]; then echo "DEBUG j -> $j - ZENITY_SUBTITLE_TRACK $ZENITY_SUBTITLE_TRACK"; fi
+			# loop on original lines number (i)
 			for ((k=1; k <= $i ; k++))
 			do
 				if [[ ${DVD_SUB_ID[$k]} == $ZENITY_SUBTITLE_TRACK ]]; then
@@ -1087,6 +1104,7 @@ echo "" >> $CONF_FILE_TMP
 echo "## CODECS OPTIONS" >> $CONF_FILE_TMP
 echo "" >> $CONF_FILE_TMP
 
+# zenity height
 ZENITY_CODEC_VIDEO_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * 5))
 ZENITY_CODEC_VIDEO_HEIGHT=$(($ZEN_HEIGHT_BASE + $ZENITY_CODEC_VIDEO_HEIGHT_COMPONENTS))
 if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_CODEC_VIDEO_HEIGHT $ZENITY_CODEC_VIDEO_HEIGHT"; fi
@@ -1111,6 +1129,7 @@ ZENITY_CODEC_VIDEO=$(zenity --list --radiolist \
 if [ $? = "1" ]; then wazzuf_quit; fi
 echo "DEFAULT_CODEC_VIDEO="\"${ZENITY_CODEC_VIDEO}"\"" >> $CONF_FILE_TMP
 
+# zenity height
 ZENITY_CODEC_AUDIO_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * 5))
 ZENITY_CODEC_AUDIO_HEIGHT=$(($ZEN_HEIGHT_BASE + $ZENITY_CODEC_AUDIO_HEIGHT_COMPONENTS))
 if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_CODEC_AUDIO_HEIGHT $ZENITY_CODEC_AUDIO_HEIGHT"; fi

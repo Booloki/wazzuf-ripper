@@ -3,6 +3,8 @@
 # DVD/BD rip external tools download/install
 # booloki@lokizone.net
 
+# /!\ No more maintained since 2015
+
 GLOBAL_CONF_FILE="/etc/wazzuf-ripper/wazzuf-ripper-global.conf"
 source $GLOBAL_CONF_FILE
 

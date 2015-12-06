@@ -106,6 +106,8 @@ copy-dvd2iso (){
 
 ## get BD longest Title
 # need BD-mplayer.info
+#RETURN	BD_LONGEST_TITLE_NUMBER
+#	BD_LONGEST_LENGTH
 bd_get_longest_title () {
 	BD_LONGEST_LENGTH=`grep "^ID_BLURAY_TITLE_" BD-mplayer.info | grep _LENGTH | cut -d '=' -f 2 | sort -n | tail -1`
 	if [[ $DEBUG == "1" ]]; then echo "DEBUG BD_LONGEST_LENGTH $BD_LONGEST_LENGTH"; fi
