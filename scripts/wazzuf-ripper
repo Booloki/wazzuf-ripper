@@ -163,7 +163,7 @@ BD | ISO_BD )
 		;;
 	SHOW )
 		TITLE_LONG="$TITLE_NAME - $SEASON_DENOMINATION $SEASON_NUMBER"
-		TITLE_LIST="1"
+		TITLE_LIST="$BD_TITLE_LIST"
 		CHAPTER_FIRST="1"
 		CHAPTER_LAST="1"
 		;;
@@ -490,28 +490,16 @@ do
 			BD_MOUNT=`mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10`
 		fi
 
-		if [[ $WAZZUF_UI == "GUI" ]]; then
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS rsync -aP --chmod=Fugo+r,u+w --include='*.m2ts' --exclude='*.*' "${BD_MOUNT}"/BDMV/STREAM/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null"; fi
-			( echo 10; ionice -c $IONICENESS nice -n $NICENESS rsync -aP --chmod=Fugo+r,u+w --include='*.m2ts' --exclude='*.*' "${BD_MOUNT}"/BDMV/STREAM/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null ) \
-			| zenity --progress --pulsate --auto-kill --auto-close --title="$ZEN_TITLE" --text="Copying all m2ts files from BR."
-			if [ $? = "1" ]; then wazzuf_quit; fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS rsync -aP --chmod=Fugo+r,u+w --include='*.mpls' --exclude='*.*' "${BD_MOUNT}"/BDMV/PLAYLIST/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null"; fi
-			( echo 10; ionice -c $IONICENESS nice -n $NICENESS rsync -aP --chmod=Fugo+r,u+w --include='*.mpls' --exclude='*.*' "${BD_MOUNT}"/BDMV/PLAYLIST/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null ) \
-			| zenity --progress --pulsate --auto-kill --auto-close --title="$ZEN_TITLE" --text="Copying all mpls files from BR."
-			if [ $? = "1" ]; then wazzuf_quit; fi
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS rsync -aP --chmod=Fugo+r,u+w --include='*.clpi' --exclude='*.*' "${BD_MOUNT}"/BDMV/CLIPINF/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null"; fi
-			( echo 10; ionice -c $IONICENESS nice -n $NICENESS rsync -aP --chmod=Fugo+r,u+w --include='*.clpi' --exclude='*.*' "${BD_MOUNT}"/BDMV/CLIPINF/ "${SOURCE_DIRECTORY}"/ 1>/dev/null 2>/dev/null ) \
-			| zenity --progress --pulsate --auto-kill --auto-close --title="$ZEN_TITLE" --text="Copying all clpi files from BR."
-			if [ $? = "1" ]; then wazzuf_quit; fi
+		if [ ! -f $M2TS_FILE ]; then
+			echo -ne "\n *************************************\n"
+			echo " Extracting $M2TS_FILE from $ISO_FILE..."
+			if [[ $DEBUG == "1" ]]; then echo "ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc -bluray-device "$BD_MOUNT" -dumpstream br://$TITLE_NUMBER -dumpfile  "$SOURCE_DIRECTORY/T$TITLE_NUMBER-$M2TS_FILE""; fi
+			ionice -c $IONICENESS nice -n $NICENESS mplayer -nolirc -bluray-device "$BD_MOUNT" -dumpstream br://$TITLE_NUMBER -dumpfile  "$SOURCE_DIRECTORY/T$TITLE_NUMBER-$M2TS_FILE"
+			echo -ne " *************************************\n"
 		else
 			echo -ne "\n *************************************\n"
-			echo " Copying all m2ts/mpls/clpi files from BR..."
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS  rsync -avP --chmod=Fugo+r,u+w --include='*.m2ts' --exclude='*.*' "${BD_MOUNT}"/BDMV/STREAM/ "${SOURCE_DIRECTORY}"/"; fi
-			ionice -c $IONICENESS nice -n $NICENESS  rsync -avP --chmod=Fugo+r,u+w --include='*.m2ts' --exclude='*.*' "${BD_MOUNT}"/BDMV/STREAM/ "${SOURCE_DIRECTORY}"/
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS  rsync -avP --chmod=Fugo+r,u+w --include='*.mpls' --exclude='*.*' "${BD_MOUNT}"/BDMV/PLAYLIST/ "${SOURCE_DIRECTORY}"/"; fi
-			ionice -c $IONICENESS nice -n $NICENESS  rsync -avP --chmod=Fugo+r,u+w --include='*.mpls' --exclude='*.*' "${BD_MOUNT}"/BDMV/PLAYLIST/ "${SOURCE_DIRECTORY}"/
-			if [[ $DEBUG == "1" ]]; then echo "DEBUG ionice -c $IONICENESS nice -n $NICENESS  rsync -avP --chmod=Fugo+r,u+w --include='*.clpi' --exclude='*.*' "${BD_MOUNT}"/BDMV/CLIPINF/ "${SOURCE_DIRECTORY}"/"; fi
-			ionice -c $IONICENESS nice -n $NICENESS  rsync -avP --chmod=Fugo+r,u+w --include='*.clpi' --exclude='*.*' "${BD_MOUNT}"/BDMV/CLIPINF/ "${SOURCE_DIRECTORY}"/
+			echo " $M2TS_FILE file exists. Next..."
+			echo -ne " *************************************\n"
 		fi
 
 		if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount; fi

@@ -6,6 +6,9 @@
 
 2015-12-17
 * Bugfix: bd_get_longest_title error if same duration for multiple BD Titles
+* Introduce BD_TITLE_LIST configuration parameter (like DVD_TITLE_LIST for BD SHOW multiple titles)
+* Change BD 'copy' from rsync (m2ts/mpls/clpi files) to mplayer (m2ts files only...)
+* Remove some useless sleep
 
 2015-12-06
 * Some little improvements

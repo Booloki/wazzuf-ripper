@@ -422,15 +422,74 @@ BD | ISO_BD )
 		wazzuf_quit
 	fi
 
-	bd_get_longest_title
-	BD_LONGEST_TITLE_CHAPTERS="`grep ^ID_BLURAY_TITLE_${BD_LONGEST_TITLE_NUMBER}_CHAPTERS BD-mplayer.info | cut -d '=' -f2`"
-	BD_TOTAL_TITLES="`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f 2`"
+	if [[ $ZENITY_VIDEO_TYPE == "SHOW" ]]; then
+		# Multiple videos
+		# BD Episodes choice
+		DVD_EPISODES_ORG="TITLES"
+		echo "DVD_EPISODES_ORG="\"$DVD_EPISODES_ORG\""" >> $CONF_FILE_TMP
+		BD_TOTAL_TITLES="`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d'=' -f2`"
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG BD_TOTAL_TITLES $BD_TOTAL_TITLES"; fi
+	
+		# Titles
+		TITLE=1
+		while [ $TITLE -le $BD_TOTAL_TITLES ]
+		do
+                        BD_TITLE_LENGTH[$TITLE]=$((`grep ^ID_BLURAY_TITLE_${TITLE}_LENGTH BD-mplayer.info | cut -d'=' -f2 | cut -d'.' -f1` / 60))
+                        BD_TITLE_CHAPTERS[$TITLE]="`grep ^ID_BLURAY_TITLE_${TITLE}_CHAPTERS BD-mplayer.info | cut -d'=' -f2`"
+                        BD_TITLE_PLAYLIST_POSITION[$TITLE]="`grep ^ID_BLURAY_TITLE_${TITLE}_PLAYLIST BD-mplayer.info | cut -d'=' -f2`"
+                        BD_TITLE_ANGLES[$TITLE]="`grep ^ID_BLURAY_TITLE_${TITLE}_ANGLE BD-mplayer.info | cut -d'=' -f2`"
+			if [[ $DEBUG == "1" ]]; then
+				echo "DEBUG TITLE $TITLE"
+				echo "DEBUG BD_TITLE_LENGTH[$TITLE] ${BD_TITLE_LENGTH[$TITLE]}"
+				echo "DEBUG BD_TITLE_CHAPTERS[$TITLE] ${BD_TITLE_CHAPTERS[$TITLE]}"
+				echo "DEBUG BD_TITLE_PLAYLIST_POSITION[$TITLE] ${BD_TITLE_PLAYLIST_POSITION[$TITLE]}"
+				echo "DEBUG BD_TITLE_ANGLES[$TITLE] ${BD_TITLE_ANGLES[$TITLE]}"
+			fi
+			TITLE=$(($TITLE + 1))
+		done
 
-	if [[ $DEBUG == "1" ]]; then
-		echo "DEBUG BD_LONGEST_TITLE_NUMBER $BD_LONGEST_TITLE_NUMBER"
-		echo "DEBUG BD_TOTAL_TITLES $BD_TOTAL_TITLES"
-		echo "DEBUG BD_LONGEST_TITLE_CHAPTERS $BD_LONGEST_TITLE_CHAPTERS"
-	#	echo "BD_TITLE_NUMBER="\"$BD_LONGEST_TITLE_NUMBER\""" >> $CONF_FILE_TMP
+		# zenity height
+		# Add radiolist header to component number
+		ZENITY_TITLES_COMPONENTS=$TITLE
+		ZENITY_TITLES_HEIGHT_COMPONENTS=$(($ZEN_HEIGHT_COMPONENT * $ZENITY_TITLES_COMPONENTS))
+		ZENITY_TITLES_HEIGHT=$(($ZEN_HEIGHT_BASE + $ZENITY_TITLES_HEIGHT_COMPONENTS))
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_TITLES_HEIGHT $ZENITY_TITLES_HEIGHT"; fi
+
+		# Display all Titles but don't check Titles with DVD_TITLE_LENGTH < 5 min
+		ZENITY_TITLES=$(
+			for ((l=1; l < $TITLE ; l++)); do if [[ "`echo ${BD_TITLE_LENGTH[l]}`" -lt "5" ]]; then echo FALSE; else echo TRUE; fi ; echo "$l"; echo "${BD_TITLE_LENGTH[l]}"; echo "${BD_TITLE_CHAPTERS[l]}"; echo "${BD_TITLE_PLAYLIST_POSITION[l]}"; echo "${BD_TITLE_ANGLES[l]} "; done | zenity --list --checklist \
+				--title="$ZEN_TITLE" \
+				--ok-label "Next" --cancel-label "Quit" \
+				--width "550" \
+				--height $ZENITY_TITLES_HEIGHT \
+				--column="Choice" --column="Title" --column="Lenght (min)" --column="Chapters" --column="Playlist position" --column="Angles" \
+				--print-column="2" \
+				--separator=' ' \
+				--text="BD Title(s) choice"
+		)
+		if [ $? = "1" ]; then wazzuf_quit; fi
+		if [[ $DEBUG == "1" ]]; then echo "DEBUG ZENITY_TITLES $ZENITY_TITLES"; fi
+
+		BD_TITLE_LIST="$ZENITY_TITLES"
+		echo "BD_TITLE_LIST="\"$BD_TITLE_LIST\""" >> $CONF_FILE_TMP
+
+		exit 0
+	else
+		# single video
+		bd_get_longest_title
+		BD_LONGEST_TITLE_CHAPTERS="`grep ^ID_BLURAY_TITLE_${BD_LONGEST_TITLE_NUMBER}_CHAPTERS BD-mplayer.info | cut -d '=' -f2`"
+		BD_TOTAL_TITLES="`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f2`"
+	
+		if [[ $DEBUG == "1" ]]; then
+			echo "DEBUG BD_LONGEST_TITLE_NUMBER $BD_LONGEST_TITLE_NUMBER"
+			echo "DEBUG BD_TOTAL_TITLES $BD_TOTAL_TITLES"
+			echo "DEBUG BD_LONGEST_TITLE_CHAPTERS $BD_LONGEST_TITLE_CHAPTERS"
+			# sert à rien pour le moment...
+		#	echo "BD_TITLE_NUMBER="\"$BD_LONGEST_TITLE_NUMBER\""" >> $CONF_FILE_TMP
+		fi
+
+		zenity --info --title "$ZEN_TITLE" --text "The longest track is <b>Title $BD_LONGEST_TITLE_NUMBER</b> / $BD_TOTAL_TITLES (Chapters: $BD_LONGEST_TITLE_CHAPTERS).
+This one will be use for cropping detection." --ok-label "Next"
 	fi
 
 	zenity --info --title "$ZEN_TITLE" --text "The longest track is <b>Title $BD_LONGEST_TITLE_NUMBER</b> / $BD_TOTAL_TITLES (Chapters: $BD_LONGEST_TITLE_CHAPTERS).
