@@ -4,6 +4,12 @@
 # Changelog file
 
 
+2015-12-17
+* Bugfix: bd_get_longest_title error if same duration for multiple BD Titles
+
+2015-12-06
+* Some little improvements
+
 2015-04-18
 * wazzuf-conf-generator: fix some rare lsdvd 'binary' output inclusion.
 

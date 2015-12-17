@@ -423,7 +423,7 @@ BD | ISO_BD )
 	fi
 
 	bd_get_longest_title
-	BD_LONGEST_TITLE_CHAPTERS="`grep ^ID_BLURAY_TITLE_$BD_LONGEST_TITLE_NUMBER BD-mplayer.info | grep _CHAPTERS | cut -d '=' -f 2`"
+	BD_LONGEST_TITLE_CHAPTERS="`grep ^ID_BLURAY_TITLE_${BD_LONGEST_TITLE_NUMBER}_CHAPTERS BD-mplayer.info | cut -d '=' -f2`"
 	BD_TOTAL_TITLES="`grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f 2`"
 
 	if [[ $DEBUG == "1" ]]; then
