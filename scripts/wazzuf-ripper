@@ -605,7 +605,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
 				echo -ne "\n *************************************\n"
-				echo " No more subtitle track choice. Next..." && sleep 1
+				echo " No more subtitle track choice. Next..."
 				echo -ne " *************************************\n"
 			fi
 			SUB_COUNTER=0
@@ -746,7 +746,7 @@ or use M2TS instead of BD in $CONF_FILE and run wazzuf-pre-ripper."
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
 				echo -ne "\n *************************************\n"
-				echo " No more audio track choice, next..." && sleep 1
+				echo " No more audio track choice, next..."
 				echo -ne " *************************************\n"
 			fi
 			AUDIO_COUNTER=0
@@ -923,7 +923,7 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 
 	if [[ ! $WAZZUF_UI == "GUI" ]]; then
 		echo -ne "\n *************************************\n"
-		echo " $SOURCE_FILE 2 pass $CODEC_VIDEO encoding"  && sleep 1
+		echo " $SOURCE_FILE 2 pass $CODEC_VIDEO encoding"
 		echo -ne " *************************************\n"
 	fi
 	if [[ $DEBUG == "1" ]]; then
@@ -1153,7 +1153,7 @@ done
 
 cd ..
 if [[ $WAZZUF_UI == "GUI" ]]; then
-	# basic information
+	# Basic Information
 	zenity --info --title "$ZEN_TITLE" --text "$TITLE_LONG $TAG_RIP finished"
 else
 	echo -ne "\n *************************************\n"
