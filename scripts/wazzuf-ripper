@@ -11,8 +11,10 @@ trap "echo -e '\nWazzuf Ripper failed !' && exit 1" 15
 
 # check wazzuf files
 source $FUNCTIONS_CHECK
-checkandsource_wazzuf_conf
 checkandsource_wazzuf_files
+# Check if user is not a super-user (root)
+check_user
+checkandsource_wazzuf_conf
 
 # video codec choice check
 case $1 in

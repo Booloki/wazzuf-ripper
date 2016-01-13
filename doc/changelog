@@ -3,6 +3,8 @@
 # booloki@lokizone.net
 # Changelog file
 
+2016-01-13
+* Check if run as super-user (root)
 
 2015-12-17
 * Bugfix: bd_get_longest_title error if same duration for multiple BD Titles

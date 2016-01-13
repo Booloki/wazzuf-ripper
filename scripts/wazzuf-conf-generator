@@ -10,6 +10,9 @@ source $GLOBAL_CONF_FILE
 source $FUNCTIONS_CHECK
 checkandsource_wazzuf_files
 
+# Check if user is not a super-user (root)
+check_user
+
 WAZZUF_UI="GUI"
 
 # Zenity variables
