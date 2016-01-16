@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2016-01-16
+* wazzuf-conf-generator: better practice for variables call and execution
+
 2016-01-13
 * Check if run as super-user (root)
 
