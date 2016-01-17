@@ -11,31 +11,31 @@ iso_bd_manage () {
 	case ${1} in
 	mount )
 		# check if ISO_BD not already mounted
-		if [[ `mount | grep udf | grep "$ISO_MOUNT_POINT" | wc -l` == "1" ]]; then
-			echo "$ISO_MOUNT_POINT mount point already used"
+		if [[ $(mount | grep udf | grep "${ISO_MOUNT_POINT}" | wc -l) == "1" ]]; then
+			echo "${ISO_MOUNT_POINT} mount point already used"
 			exit 1
 		else
 			if [[ ${2} == "GUI" ]]; then
 				# useless ?
-				gksudo --description Wazzuf-Ripper "mkdir -p $ISO_MOUNT_POINT"
+				gksudo --description Wazzuf-Ripper "mkdir -p ${ISO_MOUNT_POINT}"
 				# mounted read-only to avoid warning
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG gksudo --description Wazzuf-Ripper \"mount -r -o loop $ISO_FILE_PATH ${ISO_MOUNT_POINT}\"";fi
-				gksudo --description Wazzuf-Ripper "mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT"
+				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG gksudo --description Wazzuf-Ripper \"mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}\"";fi
+				gksudo --description Wazzuf-Ripper "mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}"
 			else
-				echo "Mount ISO_BD to $ISO_MOUNT_POINT"
-				sudo mkdir -p $ISO_MOUNT_POINT
+				echo "Mount ISO_BD to ${ISO_MOUNT_POINT}"
+				sudo mkdir -p ${ISO_MOUNT_POINT}
 				# mounted read-only to avoid warning
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT";fi
-				sudo mount -r -o loop $ISO_FILE_PATH $ISO_MOUNT_POINT
+				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG sudo mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}";fi
+				sudo mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}
 			fi
 		fi
 		;;
 	umount )
 		if [[ ${2} == "GUI" ]]; then
-			gksudo --description Wazzuf-Ripper "umount $ISO_MOUNT_POINT"
+			gksudo --description Wazzuf-Ripper "umount ${ISO_MOUNT_POINT}"
 		else
 			echo "Umount ISO_BD"
-			sudo umount $ISO_MOUNT_POINT
+			sudo umount ${ISO_MOUNT_POINT}
 		fi
 		;;
 	esac
@@ -47,12 +47,12 @@ iso_bd_manage () {
 #
 # return nothing
 soft_to_install_exit () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --error --title "$ZEN_TITLE" \
-			--text "Please install $SOFT_NAME ! Exiting."
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --error --title "${ZEN_TITLE}" \
+			--text "Please install ${SOFT_NAME} ! Exiting."
 	else
 		echo -ne "\n *************************************\n"
-		echo -ne " Please install $SOFT_NAME ! Exiting. \n"
+		echo -ne " Please install ${SOFT_NAME} ! Exiting. \n"
 		echo -ne " *************************************\n"
 	fi
 	exit 1
@@ -64,13 +64,13 @@ soft_to_install_exit () {
 #
 # return nothing
 file_exists () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --info --title "$ZEN_TITLE" \
-			--text "$FILE_NAME file exists. Next..." \
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --info --title "${ZEN_TITLE}" \
+			--text "${FILE_NAME} file exists. Next..." \
 			--timeout=2
 	else
 		echo -ne "\n *************************************\n"
-		echo " $FILE_NAME file exists. Next..."  && sleep 1
+		echo " ${FILE_NAME} file exists. Next..."  && sleep 1
 		echo -ne " *************************************\n"
 	fi
 }
@@ -82,13 +82,13 @@ file_exists () {
 #
 # return nothing
 dont_exists_warn () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --warning --title "$ZEN_TITLE" \
-			--text "$FILE_NAME file does not exists in $SOURCE_NAME ! Skipping..." \
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --warning --title "${ZEN_TITLE}" \
+			--text "${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Skipping..." \
 			--timeout=2
 	else
 		echo -ne "\n *************************************\n"
-		echo " Warning: $FILE_NAME file does not exists in $SOURCE_NAME ! Skipping..." && sleep 2
+		echo " Warning: ${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Skipping..." && sleep 2
 		echo -ne " *************************************\n"
 	fi
 }
@@ -100,13 +100,13 @@ dont_exists_warn () {
 #
 # return nothing
 dont_exists_exit () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --error --title "$ZEN_TITLE" \
-			--text "$FILE_NAME file does not exists in $SOURCE_NAME ! Exiting..." \
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --error --title "${ZEN_TITLE}" \
+			--text "${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Exiting..." \
 			--timeout=2
 	else
 		echo -ne "\n *************************************\n"
-		echo " Error: $FILE_NAME file does not exists in $SOURCE_NAME ! Exiting..." && sleep 2
+		echo " Error: ${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Exiting..." && sleep 2
 		echo -ne " *************************************\n"
 	fi
 	exit 1
@@ -118,12 +118,12 @@ dont_exists_exit () {
 #
 # return nothing
 not_recognized_exit () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --error --title "$ZEN_TITLE" \
-			--text "$MESSAGE not recognized ! Exiting."
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --error --title "${ZEN_TITLE}" \
+			--text "${MESSAGE} not recognized ! Exiting."
 	else
 		echo -ne "\n *************************************\n"
-		echo -ne " Error: $MESSAGE not recognized ! Exiting. \n"
+		echo -ne " Error: ${MESSAGE} not recognized ! Exiting. \n"
 		echo -ne " *************************************\n"
 	fi
 	exit 1
@@ -135,12 +135,12 @@ not_recognized_exit () {
 #
 # return nothing
 empty_exit () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --error --title "$ZEN_TITLE" \
-			--text "$MESSAGE is empty ! Exiting."
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --error --title "${ZEN_TITLE}" \
+			--text "${MESSAGE} is empty ! Exiting."
 	else
 		echo -ne "\n *************************************\n"
-		echo -ne " Error: $MESSAGE is empty ! Exiting. \n"
+		echo -ne " Error: ${MESSAGE} is empty ! Exiting. \n"
 		echo -ne " *************************************\n"
 	fi
 	exit 1
@@ -151,8 +151,8 @@ empty_exit () {
 #
 # return nothing
 wazzuf_quit () {
-	zenity --info --title "$ZEN_TITLE" \
-		--text "$ZEN_TITLE will know quit."
+	zenity --info --title "${ZEN_TITLE}" \
+		--text "${ZEN_TITLE} will know quit."
 	exit 0
 }
 
@@ -162,12 +162,12 @@ wazzuf_quit () {
 #
 # return nothing
 disk_full_quit () {
-	if [[ $WAZZUF_UI == "GUI" ]]; then
-		zenity --info --title "$ZEN_TITLE" \
-			--text "Insufficient disk space in $MESSAGE ! Exiting."
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		zenity --info --title "${ZEN_TITLE}" \
+			--text "Insufficient disk space in ${MESSAGE} ! Exiting."
 	else
 		echo -ne "\n *************************************\n"
-		echo -ne " Error: Insufficient disk space in $MESSAGE ! Exiting. \n"
+		echo -ne " Error: Insufficient disk space in ${MESSAGE} ! Exiting. \n"
 		echo -ne " *************************************\n"
 	fi
 	exit 1

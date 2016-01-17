@@ -3,47 +3,47 @@
 # DVD only - .idx and .sub files
 # BD - sup files
 subtitle_rip () {
-	case $SOURCE in
+	case ${SOURCE} in
 	DVD | ISO_DVD )
-		if [ -f "$SUBTITLE_FILE" ]; then
-			FILE_NAME=$SUBTITLE_FILE
+		if [ -f "${SUBTITLE_FILE}" ]; then
+			FILE_NAME=${SUBTITLE_FILE}
 			file_exists
 	        else
 			check_mencoder
-			if [[ $WAZZUF_UI == "GUI" ]]; then
-				nice -n $NICENESS mencoder -dvd-device "$MPLAYER_DEVICE" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
-					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
+			if [[ ${WAZZUF_UI} == "GUI" ]]; then
+				nice -n ${NICENESS} mencoder -dvd-device "${MPLAYER_DEVICE}" dvd://${TITLE_NUMBER} ${MPLAYER_CHAPTERS} \
+					-vobsubout ${SUB_FILE} -vobsuboutindex 0 -sid ${SUBTITLE_SID} \
 					-o /dev/null -nosound -ovc frameno 2>/dev/null \
 					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
-					| zenity --progress --auto-close --title="$ZEN_TITLE - subtitle $SUBTITLE_SID extracting"
+					| zenity --progress --auto-close --title="${ZEN_TITLE} - subtitle ${SUBTITLE_SID} extracting"
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
 				echo -ne "\n *************************************\n"
-	        	        echo " Extracting subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
+	        	        echo " Extracting subtitle ${SUBTITLE_SID} to ${SUBTITLE_FILE} "
 	        	        echo -ne " *************************************\n"
-				if [[ $DEBUG == "1" ]]; then echo "DEBUG nice -n $NICENESS mencoder -dvd-device \"$MPLAYER_DEVICE\" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS -vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID -o /dev/null -nosound -ovc frameno"; fi
-				nice -n $NICENESS mencoder -dvd-device "$MPLAYER_DEVICE" dvd://$TITLE_NUMBER $MPLAYER_CHAPTERS \
-					-vobsubout $SUB_FILE -vobsuboutindex 0 -sid $SUBTITLE_SID \
+				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} mencoder -dvd-device \"${MPLAYER_DEVICE}\" dvd://${TITLE_NUMBER} ${MPLAYER_CHAPTERS} -vobsubout ${SUB_FILE} -vobsuboutindex 0 -sid ${SUBTITLE_SID} -o /dev/null -nosound -ovc frameno"; fi
+				nice -n ${NICENESS} mencoder -dvd-device "${MPLAYER_DEVICE}" dvd://${TITLE_NUMBER} ${MPLAYER_CHAPTERS} \
+					-vobsubout ${SUB_FILE} -vobsuboutindex 0 -sid ${SUBTITLE_SID} \
 					-o /dev/null -nosound -ovc frameno
 			fi
 		fi
 		;;
 	BD )
-		if [ -f "$SUBTITLE_FILE" ]; then
-			FILE_NAME=$SUBTITLE_FILE
+		if [ -f "${SUBTITLE_FILE}" ]; then
+			FILE_NAME=${SUBTITLE_FILE}
 			file_exists
 		else
-			FILE_NAME="$SUBTITLE_FILE subtitle"
+			FILE_NAME="${SUBTITLE_FILE} subtitle"
 			SOURCE_NAME="${SOURCE_DIRECTORY}"
 			dont_exists_warn
 		fi
 		;;
 	M2TS )
-		if [ -f "$SUBTITLE_FILE" ]; then
-			FILE_NAME=$SUBTITLE_FILE
+		if [ -f "${SUBTITLE_FILE}" ]; then
+			FILE_NAME=${SUBTITLE_FILE}
 			file_exists
 		else
-			case $SUBTITLE_SOURCE in
+			case ${SUBTITLE_SOURCE} in
 			PGS )
 				# PSG format (.sup) - subtitle extraction
 				# Demux PSG files with tsMuxeR
@@ -51,15 +51,15 @@ subtitle_rip () {
 
 				# Meta file creation
 				TSMUXER_METAFILE="tsmuxer.meta"
-				echo "MUXOPT --no-pcr-on-video-pid --new-audio-pes --demux --vbr --vbv-len=500" > $TSMUXER_METAFILE
-				SOURCE_FILE="$M2TS_FILE_PATH"
-				echo "S_HDMV/PGS, \"$SOURCE_FILE\",bottom-offset=24,font-border=2,text-align=center,video-width=1920,video-height=1080,fps=23.976, track=$SUBTITLE_SID, lang=$SUBTITLE_LANG" >> $TSMUXER_METAFILE
+				echo "MUXOPT --no-pcr-on-video-pid --new-audio-pes --demux --vbr --vbv-len=500" > ${TSMUXER_METAFILE}
+				SOURCE_FILE="${M2TS_FILE_PATH}"
+				echo "S_HDMV/PGS, \"${SOURCE_FILE}\",bottom-offset=24,font-border=2,text-align=center,video-width=1920,video-height=1080,fps=23.976, track=${SUBTITLE_SID}, lang=${SUBTITLE_LANG}" >> ${TSMUXER_METAFILE}
 
 				# tsMuxeR demuxing
 				echo -ne "\n ***********************************************\n"
-				echo " Demuxing subtitle $SUBTITLE_SID to $SUBTITLE_FILE "
+				echo " Demuxing subtitle ${SUBTITLE_SID} to ${SUBTITLE_FILE} "
 				echo -ne " ***********************************************\n"
-				ionice -c $IONICENESS nice -n $NICENESS tsMuxeR $TSMUXER_METAFILE .
+				ionice -c ${IONICENESS} nice -n ${NICENESS} tsMuxeR ${TSMUXER_METAFILE} .
 				;;
 			CC )
 				# CC format - subtitle extraction in srt file
@@ -67,11 +67,11 @@ subtitle_rip () {
 				# only one file for now
 				check_ccextractor
 
-				SOURCE_FILE="$M2TS_FILE_PATH"
+				SOURCE_FILE="${M2TS_FILE_PATH}"
 				echo -ne "\n ***********************************************\n"
-				echo " Demuxing subtitle to $SUBTITLE_FILE "
+				echo " Demuxing subtitle to ${SUBTITLE_FILE} "
 				echo -ne " ***********************************************\n"
-				ionice -c $IONICENESS nice -n $NICENESS ccextractor "$SOURCE_FILE" -o $SUBTITLE_FILE
+				ionice -c ${IONICENESS} nice -n ${NICENESS} ccextractor "${SOURCE_FILE}" -o ${SUBTITLE_FILE}
 				;;
 			esac
 		fi
@@ -83,41 +83,41 @@ subtitle_rip () {
 # Or Warning if charset unrecognized
 # return MERGE_SUBTITLE_CHARSET
 subtitle_srt_check () {
-	SUBTITLE_TYPE=`file "$SUBTITLE_FILE_FORCE_PATH"`
-	SUBTITLE_MIME=`file -b --mime-encoding "$SUBTITLE_FILE_FORCE_PATH"`
-	if [[ `echo $SUBTITLE_TYPE | grep Unicode` == "" ]]; then
-		case $SUBTITLE_MIME in
+	SUBTITLE_TYPE=$(file "${SUBTITLE_FILE}_FORCE_PATH")
+	SUBTITLE_MIME=$(file -b --mime-encoding "${SUBTITLE_FILE}_FORCE_PATH")
+	if [[ $(echo ${SUBTITLE_TYPE} | grep Unicode) == "" ]]; then
+		case ${SUBTITLE_MIME} in
 			iso-8859-1 )
 				SUBTITLE_CHARSET="ISO-8859-1"
-				MERGE_SUBTITLE_CHARSET="--sub-charset 0:$SUBTITLE_CHARSET"
-				if [[ $DEBUG == "1" ]]; then
-					echo "DEBUG SUBTITLE_MIME $SUBTITLE_MIME"
-					echo "DEBUG SUBTITLE_CHARSET $SUBTITLE_CHARSET"
+				MERGE_SUBTITLE_CHARSET="--sub-charset 0:${SUBTITLE_CHARSET}"
+				if [[ ${DEBUG} == "1" ]]; then
+					echo "DEBUG SUBTITLE_MIME ${SUBTITLE_MIME}"
+					echo "DEBUG SUBTITLE_CHARSET ${SUBTITLE_CHARSET}"
 				fi
 				;;
 			unknown-8bit )
 				SUBTITLE_CHARSET="WINDOWS-1252"
-				MERGE_SUBTITLE_CHARSET="--sub-charset 0:$SUBTITLE_CHARSET"
-				if [[ $DEBUG == "1" ]]; then
-					echo "DEBUG SUBTITLE_MIME $SUBTITLE_MIME"
-					echo "DEBUG SUBTITLE_CHARSET $SUBTITLE_CHARSET"
+				MERGE_SUBTITLE_CHARSET="--sub-charset 0:${SUBTITLE_CHARSET}"
+				if [[ ${DEBUG} == "1" ]]; then
+					echo "DEBUG SUBTITLE_MIME ${SUBTITLE_MIME}"
+					echo "DEBUG SUBTITLE_CHARSET ${SUBTITLE_CHARSET}"
 				fi
 				;;
 			* )
 				# unrecognized charset
 				SUBTITLE_CHARSET=""
 				MERGE_SUBTITLE_CHARSET=""
-				if [[ $DEBUG == "1" ]]; then
-					echo "DEBUG SUBTITLE_MIME $SUBTITLE_MIME"
+				if [[ ${DEBUG} == "1" ]]; then
+					echo "DEBUG SUBTITLE_MIME ${SUBTITLE_MIME}"
 					echo "DEBUG SUBTITLE_CHARSET TODO"
 				fi
-				if [[ $WAZZUF_UI == "GUI" ]]; then
-					zenity --warning --title "$ZEN_TITLE" \
+				if [[ ${WAZZUF_UI} == "GUI" ]]; then
+					zenity --warning --title "${ZEN_TITLE}" \
 						--text "Provided subtitle is not Unicode and unrecognized." \
 						--timeout=2
 				else
 					echo " Warning. Provided subtitle is not Unicode and unrecognized."
-					echo " $SUBTITLE_TYPE" && sleep 2
+					echo " ${SUBTITLE_TYPE}" && sleep 1
 				fi
 				;;
 		esac

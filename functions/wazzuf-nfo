@@ -10,67 +10,67 @@
 # return AUDIO_FILE
 generate_nfo () {
 	# Replace output file if exists
-	echo "$MERGE_OUTPUT" > $MERGE_OUTPUT.nfo
-	echo "" >> $MERGE_OUTPUT.nfo
+	echo "${MERGE_OUTPUT}" > ${MERGE_OUTPUT}.nfo
+	echo "" >> ${MERGE_OUTPUT}.nfo
 
 	# md5sum
-	MD5=`md5sum "$MERGE_OUTPUT" | awk '{print($1);}'`
-	echo "md5: $MD5" >> $MERGE_OUTPUT.nfo
+	MD5=$(md5sum "${MERGE_OUTPUT}" | awk '{print($1);}')
+	echo "md5: ${MD5}" >> ${MERGE_OUTPUT}.nfo
 
 	# Signature, if exists
-	if [ -f "$SIG_FILE_PATH" ]; then
-		cat "$SIG_FILE_PATH" >> $MERGE_OUTPUT.nfo
+	if [ -f "${SIG_FILE_PATH}" ]; then
+		cat "${SIG_FILE_PATH}" >> ${MERGE_OUTPUT}.nfo
 	fi
 
-	echo "" >> $MERGE_OUTPUT.nfo
-	echo "###################  IMdb Info  ###################" >> $MERGE_OUTPUT.nfo
-	echo "" >> $MERGE_OUTPUT.nfo
+	echo "" >> ${MERGE_OUTPUT}.nfo
+	echo "###################  IMdb Info  ###################" >> ${MERGE_OUTPUT}.nfo
+	echo "" >> ${MERGE_OUTPUT}.nfo
 
 	# Provided informations (from IMdb or not)
-	case $VIDEO_TYPE in
+	case ${VIDEO_TYPE} in
 	MOVIE )
-		echo "Title          : $TITLE_NAME" >> $MERGE_OUTPUT.nfo
-		if  [[ $IMDB_DIRECTOR == "" || $IMDB_DIRECTOR == "N/A" ]]; then
-			echo "Director       : $DIRECTOR_NAME" >> $MERGE_OUTPUT.nfo
+		echo "Title          : ${TITLE_NAME}" >> ${MERGE_OUTPUT}.nfo
+		if  [[ ${IMDB_DIRECTOR} == "" || ${IMDB_DIRECTOR} == "N/A" ]]; then
+			echo "Director       : ${DIRECTOR_NAME}" >> ${MERGE_OUTPUT}.nfo
 		else
-			echo "Director       : $IMDB_DIRECTOR" >> $MERGE_OUTPUT.nfo
+			echo "Director       : ${IMDB_DIRECTOR}" >> ${MERGE_OUTPUT}.nfo
 		fi
-		echo "Release Date   : $DATE"  >> $MERGE_OUTPUT.nfo
+		echo "Release Date   : ${DATE}"  >> ${MERGE_OUTPUT}.nfo
 	        ;;
 	SHOW )
-		echo "Show           : $TITLE_NAME" >> $MERGE_OUTPUT.nfo
-		echo "Season         : $SEASON_NUMBER" >> $MERGE_OUTPUT.nfo
-		if [[ "$MERGE_OUTPUT" == *BONUS* || "$EPISODES_TOTAL_NUMBER" == "" ]]; then
-			echo "Episode Number : $EPISODE_NUMBER" >> $MERGE_OUTPUT.nfo
+		echo "Show           : ${TITLE_NAME}" >> ${MERGE_OUTPUT}.nfo
+		echo "Season         : ${SEASON_NUMBER}" >> ${MERGE_OUTPUT}.nfo
+		if [[ "${MERGE_OUTPUT}" == *BONUS* || "${EPISODES_TOTAL_NUMBER}" == "" ]]; then
+			echo "Episode Number : ${EPISODE_NUMBER}" >> ${MERGE_OUTPUT}.nfo
 		else
-			echo "Episode Number : $EPISODE_NUMBER/$EPISODES_TOTAL_NUMBER" >> $MERGE_OUTPUT.nfo
+			echo "Episode Number : ${EPISODE_NUMBER}/${EPISODES_TOTAL_NUMBER}" >> ${MERGE_OUTPUT}.nfo
 		fi
-		echo "Episode Title  : $EPISODE_NAME" >> $MERGE_OUTPUT.nfo
-		echo "Release Date   : $DATE" >> $MERGE_OUTPUT.nfo
+		echo "Episode Title  : ${EPISODE_NAME}" >> ${MERGE_OUTPUT}.nfo
+		echo "Release Date   : ${DATE}" >> ${MERGE_OUTPUT}.nfo
 	        ;;
 	MUSIC )
-		echo "Title        : $TITLE_NAME" >> $MERGE_OUTPUT.nfo
-		echo "Artist       : $ARTIST_NAME" >> $MERGE_OUTPUT.nfo
-		echo "Release Date : $DATE" >> $MERGE_OUTPUT.nfo
+		echo "Title        : ${TITLE_NAME}" >> ${MERGE_OUTPUT}.nfo
+		echo "Artist       : $ARTIST_NAME" >> ${MERGE_OUTPUT}.nfo
+		echo "Release Date : ${DATE}" >> ${MERGE_OUTPUT}.nfo
 	        ;;
 	esac
 
 	# IMdb informations
-	if [[ ! $IMDB_ID == "" ]]; then
-		echo "Writer(s)      : $IMDB_WRITER" >> $MERGE_OUTPUT.nfo
-		echo "Actors(s)      : $IMDB_ACTORS" >> $MERGE_OUTPUT.nfo
-		echo "Genre(s)       : $IMDB_GENRE" >> $MERGE_OUTPUT.nfo
-		echo "Plot           : $IMDB_PLOT" >> $MERGE_OUTPUT.nfo
-		echo "Rated          : $IMDB_RATED" >> $MERGE_OUTPUT.nfo
-		echo "IMdb Rating    : $IMDB_RATING" >> $MERGE_OUTPUT.nfo
-		echo "IMdb Votes     : $IMDB_VOTES" >> $MERGE_OUTPUT.nfo
-		echo "Runtime        : $IMDB_RUNTIME" >> $MERGE_OUTPUT.nfo
+	if [[ ! ${IMDB_ID} == "" ]]; then
+		echo "Writer(s)      : ${IMDB_WRITER}" >> ${MERGE_OUTPUT}.nfo
+		echo "Actors(s)      : ${IMDB_ACTORS}" >> ${MERGE_OUTPUT}.nfo
+		echo "Genre(s)       : ${IMDB_GENRE}" >> ${MERGE_OUTPUT}.nfo
+		echo "Plot           : ${IMDB_PLOT}" >> ${MERGE_OUTPUT}.nfo
+		echo "Rated          : ${IMDB_RATED}" >> ${MERGE_OUTPUT}.nfo
+		echo "IMdb Rating    : ${IMDB_RATING}" >> ${MERGE_OUTPUT}.nfo
+		echo "IMdb Votes     : ${IMDB_VOTES}" >> ${MERGE_OUTPUT}.nfo
+		echo "Runtime        : ${IMDB_RUNTIME}" >> ${MERGE_OUTPUT}.nfo
 	fi
 
-	echo "" >> $MERGE_OUTPUT.nfo
-	echo "###################  Media Info  ###################" >> $MERGE_OUTPUT.nfo
-	echo "" >> $MERGE_OUTPUT.nfo
+	echo "" >> ${MERGE_OUTPUT}.nfo
+	echo "###################  Media Info  ###################" >> ${MERGE_OUTPUT}.nfo
+	echo "" >> ${MERGE_OUTPUT}.nfo
 	# mediainfo output
-	mediainfo "$MERGE_OUTPUT" >> "$MERGE_OUTPUT.nfo"
+	mediainfo "${MERGE_OUTPUT}" >> "${MERGE_OUTPUT}.nfo"
 
 }
