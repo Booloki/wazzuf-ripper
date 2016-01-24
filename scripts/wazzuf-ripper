@@ -61,7 +61,7 @@ OPUS | Opus | opus )
 	;;
 "" | GUI )
 	# use default CODEC_AUDIO
-	if [ ${DEFAULT_CODEC_AUDIO} == "DUMP" ]; then
+	if [[ ${DEFAULT_CODEC_AUDIO} == "DUMP" ]]; then
 		CODEC_AUDIO_1=${AUDIO_1_SOURCE}
 	else
 		CODEC_AUDIO_1=${DEFAULT_CODEC_AUDIO}
@@ -93,7 +93,7 @@ if [[ ! ${AUDIO_2_LANG} == "" ]]; then
 		;;
 	* )
 		# use default CODEC_AUDIO
-		if [ ${DEFAULT_CODEC_AUDIO} == "DUMP" ]; then
+		if [[ ${DEFAULT_CODEC_AUDIO} == "DUMP" ]]; then
 			CODEC_AUDIO_2=${AUDIO_2_SOURCE}
 		else
 			CODEC_AUDIO_2=${DEFAULT_CODEC_AUDIO}
@@ -110,7 +110,7 @@ if [[ ${DEBUG} == "1" ]]; then echo "DEBUG CODEC_AUDIO_2 ${CODEC_AUDIO_2}"; fi
 for AUDIO_TRACK_NUMBER in $(seq 3 20)
 do
 	CODEC_AUDIO_VARNAME=CODEC_AUDIO_${AUDIO_TRACK_NUMBER}
-	if [ ${DEFAULT_CODEC_AUDIO} == "DUMP" ]; then
+	if [[ ${DEFAULT_CODEC_AUDIO} == "DUMP" ]]; then
 		AUDIO_SOURCE_VARNAME="AUDIO_${AUDIO_TRACK_NUMBER_SOURCE}"
 		eval ${CODEC_AUDIO_VARNAME}=${!AUDIO_SOURCE_VARNAME}
 	else
@@ -246,9 +246,9 @@ with ${CODEC_VIDEO} video codec
 and ${CODEC_AUDIO_1} ${CODEC_AUDIO_2} audio codec(s)"
 	if [ $? = "1" ]; then wazzuf_quit; fi
 else
-	echo -ne "\n *************************************\n"
+	printf "${WAZZUF_SEPARATOR_HEAD}"
 	echo " Start ${VIDEO_TYPE} ${TAG_RIP} : ${TITLE_LONG} with ${CODEC_VIDEO} and ${CODEC_AUDIO_1} ${CODEC_AUDIO_2}"
-	echo -ne " *************************************\n"
+	printf "${WAZZUF_SEPARATOR_FOOT}"
 fi
 
 # Check if source is OK
@@ -315,9 +315,9 @@ do
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " Work in progress: ${TITLE_NAME} (${DATE})"
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 		;;
 	MUSIC )
@@ -338,9 +338,9 @@ do
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " Work in progress: ${ARTIST_NAME} - ${TITLE_NAME} (${DATE})"
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 		;;
 	SHOW )
@@ -404,9 +404,9 @@ do
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " Work in progress: ${EPISODE_DENOMINATION} ${EPISODE_NAME_FULL}"
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 		;;
 	esac
@@ -414,7 +414,7 @@ do
 
 
 	# Retrieve IMdb informations
-	if [[ ! ${WAZZUF_UI} == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
+	if [[ ! ${WAZZUF_UI} == "GUI" ]]; then printf "${WAZZUF_SEPARATOR_HEAD}"; fi
 	if [[ ${IMDB_ID} == "" ]]; then
 		if [[ ${WAZZUF_UI} == "GUI" ]]; then
 			zenity --warning --title "${ZEN_TITLE}" \
@@ -437,7 +437,7 @@ do
 			get_imdb_informations
 		fi
 	fi
-	if [[ ! ${WAZZUF_UI} == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
+	if [[ ! ${WAZZUF_UI} == "GUI" ]]; then printf "${WAZZUF_SEPARATOR_HEAD}"; fi
 
 
 	# Extract full working file (.vob or .m2ts)
@@ -489,19 +489,19 @@ do
 			BD_MOUNT=${ISO_MOUNT_POINT}
 			iso_bd_manage mount
 		else
-			BD_MOUNT=$(mount | grep udf | sed 's/" type udf "/""/g' | cut -d '(' -f 1 | cut -d ' ' -f 3-10)
+			BD_MOUNT=$(mount | grep udf | sed 's/ type udf //g' | cut -d '(' -f 1 | cut -d ' ' -f 3-10)
 		fi
 
 		if [ ! -f ${M2TS_FILE} ]; then
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " Extracting ${M2TS_FILE} from ${ISO_FILE}..."
 			if [[ ${DEBUG} == "1" ]]; then echo "ionice -c ${IONICENESS} nice -n ${NICENESS} mplayer -nolirc -bluray-device "${BD_MOUNT}" -dumpstream br://${TITLE_NUMBER} -dumpfile  "${SOURCE_DIRECTORY}/T${TITLE_NUMBER}-${M2TS_FILE}""; fi
 			ionice -c ${IONICENESS} nice -n ${NICENESS} mplayer -nolirc -bluray-device "${BD_MOUNT}" -dumpstream br://${TITLE_NUMBER} -dumpfile  "${SOURCE_DIRECTORY}/T${TITLE_NUMBER}-${M2TS_FILE}"
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " ${M2TS_FILE} file exists. Next..."
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 
 		if [[ ${SOURCE} == "ISO_BD" ]]; then iso_bd_manage umount; fi
@@ -511,10 +511,10 @@ do
 				--text "Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,
 or use M2TS instead of BD in ${CONF_FILE} and run wazzuf-pre-ripper."
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo -ne " Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,\n"
 			echo -ne " or use M2TS instead of BD in ${CONF_FILE} and run wazzuf-pre-ripper.\n"
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 		exit 0
 		;;
@@ -522,7 +522,7 @@ or use M2TS instead of BD in ${CONF_FILE} and run wazzuf-pre-ripper."
 		SOURCE_FILE="${M2TS_FILE_PATH}"
 
 		# Chapters management
-		if [[ ! ${WAZZUF_UI} == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
+		if [[ ! ${WAZZUF_UI} == "GUI" ]]; then printf "${WAZZUF_SEPARATOR_HEAD}"; fi
 		if [ -f "${CHAPTERS_FILE_XML}" ]; then
 			if [[ ${WAZZUF_UI} == "GUI" ]]; then
 				zenity --warning --title "${ZEN_TITLE}" \
@@ -560,7 +560,7 @@ or use M2TS instead of BD in ${CONF_FILE} and run wazzuf-pre-ripper."
 				MERGE_CHAPTERS=""
 			fi
 		fi
-		if [[ ! ${WAZZUF_UI} == "GUI" ]]; then echo -ne "\n *************************************\n"; fi
+		if [[ ! ${WAZZUF_UI} == "GUI" ]]; then printf "${WAZZUF_SEPARATOR_HEAD}"; fi
 		if [[ ${DEBUG} == "1" ]] && [ -f "${CHAPTERS_FILE_XML}" ]; then
 			echo "DEBUG Chapters count: $(grep ChapterString "${CHAPTERS_FILE_XML}" | wc -l)"
 			echo "DEBUG Last chapter begin: $(grep ChapterTimeStart "${CHAPTERS_FILE_XML}" | tail -n1 | cut -d'>' -f2 | cut -d '.' -f1)"
@@ -591,9 +591,9 @@ or use M2TS instead of BD in ${CONF_FILE} and run wazzuf-pre-ripper."
 					--timeout=2
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				echo -ne "\n *************************************\n"
+				printf "${WAZZUF_SEPARATOR_HEAD}"
 				echo " No more subtitle track choice. Next..."
-				echo -ne " *************************************\n"
+				printf "${WAZZUF_SEPARATOR_FOOT}"
 			fi
 			SUB_COUNTER=0
 		else
@@ -732,9 +732,9 @@ or use M2TS instead of BD in ${CONF_FILE} and run wazzuf-pre-ripper."
 					--timeout=2
 				if [ $? = "1" ]; then wazzuf_quit; fi
 			else
-				echo -ne "\n *************************************\n"
+				printf "${WAZZUF_SEPARATOR_HEAD}"
 				echo " No more audio track choice, next..."
-				echo -ne " *************************************\n"
+				printf "${WAZZUF_SEPARATOR_FOOT}"
 			fi
 			AUDIO_COUNTER=0
 		else
@@ -909,9 +909,9 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 	fi
 
 	if [[ ! ${WAZZUF_UI} == "GUI" ]]; then
-		echo -ne "\n *************************************\n"
+		printf "${WAZZUF_SEPARATOR_HEAD}"
 		echo " ${SOURCE_FILE} 2 pass ${CODEC_VIDEO} encoding"
-		echo -ne " *************************************\n"
+		printf "${WAZZUF_SEPARATOR_FOOT}"
 	fi
 	if [[ ${DEBUG} == "1" ]]; then
 		echo "DEBUG VIDEO_BITRATE ${VIDEO_BITRATE}"
@@ -947,9 +947,9 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " No image attachment. Skipping..." && sleep 1
-		        echo -ne " *************************************\n"
+		        printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 		MERGE_COVER=""
 	else
@@ -1026,9 +1026,9 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " XML tags file generation problem. Skipping..."  && sleep 2
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 		MERGE_XMLTAGS=""
 	fi
@@ -1038,9 +1038,9 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 	## merge
 	trap "echo -e '\nManual killed script (Ctrl-C) during final mkv merge' && exit 1" 2
 	if [[ ! ${WAZZUF_UI} == "GUI" ]]; then
-		echo -ne "\n *************************************\n"
+		printf "${WAZZUF_SEPARATOR_HEAD}"
 		echo " Final file merge:"
-		echo -ne " *************************************\n"
+		printf "${WAZZUF_SEPARATOR_FOOT}"
 	fi
 
 	TOTAL_TRACKS_SIZE=$(expr ${TOTAL_AUDIO_SIZE} + ${TOTAL_SUBTITLE_SIZE} + ${TOTAL_IMAGE_SIZE} + ${VIDEO_SIZE} )
@@ -1090,10 +1090,10 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 			( generate_nfo ) | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Generating nfo file..." --auto-close
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " Generating nfo file..."
 			generate_nfo
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 	fi
 
@@ -1125,13 +1125,13 @@ Manually adjust the XXRIP_VIDEO_BITRATE value if the final size does not suit yo
 			done ) | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Taking some screenshots..." --auto-close
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			echo -ne "\n *************************************\n"
+			printf "${WAZZUF_SEPARATOR_HEAD}"
 			echo " Taking some screenshots..."
 			for SCREENSHOT_TIMER in ${TIMER_LIST}; do
 				mplayer -really-quiet -nolirc -nosound -ss ${SCREENSHOT_TIMER}:00 -frames 1 -vo png:z=9 ${MERGE_OUTPUT}
 				mv 00000001.png ${SCREENSHOT_BASENAME}-${SCREENSHOT_TIMER}.png
 			done
-			echo -ne " *************************************\n"
+			printf "${WAZZUF_SEPARATOR_FOOT}"
 		fi
 	fi
 
@@ -1143,9 +1143,9 @@ if [[ ${WAZZUF_UI} == "GUI" ]]; then
 	# Basic Information
 	zenity --info --title "${ZEN_TITLE}" --text "${TITLE_LONG} ${TAG_RIP} finished"
 else
-	echo -ne "\n *************************************\n"
+	printf "${WAZZUF_SEPARATOR_HEAD}"
 	echo " ${TITLE_LONG} ${TAG_RIP} finished"
-	echo -ne " *************************************\n"
+	printf "${WAZZUF_SEPARATOR_FOOT}"
 fi
 
 exit 0

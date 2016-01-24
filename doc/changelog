@@ -4,6 +4,7 @@
 # Changelog file
 
 2016-01-24
+* Separator display setting variable
 * Updating Makefile with internationalization
 
 2016-01-21
