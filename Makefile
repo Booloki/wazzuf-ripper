@@ -14,6 +14,7 @@ docdir = $(datarootdir)/doc/wazzuf-ripper
 datadir = $(datarootdir)/wazzuf-ripper
 iconsdir = $(datarootdir)/pixmaps
 desktopdir = $(datarootdir)/applications
+localedir = $(datarootdir)/locale
 manpagesdir1= $(datarootdir)/man/man1
 manpagesdir4= $(datarootdir)/man/man4
 templatesdir = $(datadir)/tag-templates
@@ -24,7 +25,7 @@ installdirs:
 	$(DESTDIR)$(libdir) $(DESTDIR)$(sysconfdir) \
 	$(DESTDIR)$(docdir) $(DESTDIR)$(manpagesdir1) \
 	$(DESTDIR)$(manpagesdir4) $(DESTDIR)$(desktopdir) \
-	$(DESTDIR)$(iconsdir)
+	$(DESTDIR)$(localedir) $(DESTDIR)$(iconsdir)
 
 install: installdirs 
 	$(NORMAL_INSTALL)
@@ -38,3 +39,4 @@ install: installdirs
 		$(INSTALL) manpages/man4/* $(DESTDIR)$(manpagesdir4)/
 		$(INSTALL) gui/desktop/* $(DESTDIR)$(desktopdir)/
 		$(INSTALL) gui/icons/* $(DESTDIR)$(iconsdir)/
+		$(INSTALL) fr/LC_MESSAGES/* $(DESTDIR)$(iconsdir)/fr/LC_MESSAGES/
