@@ -365,9 +365,9 @@ time for ((i=${CHAPTER_FIRST}; i <= CHAPTER_LAST ; i++)); do
 
 			if [ -f "${SOURCE_DIRECTORY}/${EPISODES_FILE}" ]; then
 				if [[ ${DVD_EPISODES_ORG} == "CHAPTERS" ]]; then
-					EPISODE_NAME_FULL=$(head -n $i "${SOURCE_DIRECTORY}/${EPISODES_FILE}" | tail -n 1)
+					EPISODE_NAME_FULL=$(sed "${i}q;d" "${SOURCE_DIRECTORY}/${EPISODES_FILE}")
 				else
-					EPISODE_NAME_FULL=$(head -n ${TITLE_NUMBER} "${SOURCE_DIRECTORY}/${EPISODES_FILE}" | tail -n 1)
+					EPISODE_NAME_FULL=$(sed "${TITLE_NUMBER}q;d" "${SOURCE_DIRECTORY}/${EPISODES_FILE}")
 				fi
 				EPISODE_NAME=$(echo ${EPISODE_NAME_FULL} | cut -d '-' -f 2-10 | sed 's/\ //')
 				EPISODE_NUMBER=$(echo ${EPISODE_NAME_FULL} | cut -d '-' -f 1 | sed 's/\ //')			
