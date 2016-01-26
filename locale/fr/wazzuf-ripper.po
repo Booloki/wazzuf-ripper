@@ -1,0 +1,157 @@
+# French translations for wazzuf-ripper package
+# Traductions françaises du paquet wazzuf-ripper.
+# Copyright (C) 2016 Nicolas Perrin
+# This file is distributed under the same license as the wazzuf-ripper package.
+# Nicolas Perrin <booloki@lokizone.net>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: wazzuf-ripper 6\n"
+"Report-Msgid-Bugs-To: booloki@lokizone.net\n"
+"POT-Creation-Date: 2016-01-26 19:51+0100\n"
+"PO-Revision-Date: 2016-01-26 19:51+0100\n"
+"Last-Translator: Nicolas Perrin <booloki@lokizone.net>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 1.8.6\n"
+
+#: ../scripts/wazzuf-ripper:16
+msgid "\\nWazzuf Ripper failed !"
+msgstr "\\nWazzuf Ripper a planté !"
+
+#: ../scripts/wazzuf-ripper:250
+msgid " Start %s %s :\\n%s\\nwith %s video codec\\nand %s %s audio codec(s)"
+msgstr ""
+" Démarrage de %s %s :\\n%s\\navec le codec vidéo %s\\net le(s) codec(s) "
+"audio %s %s"
+
+#: ../scripts/wazzuf-ripper:310
+msgid "Work in progress:"
+msgstr "Travail en cours:"
+
+#: ../scripts/wazzuf-ripper:441
+msgid "No IMdb ID provided. Skipping..."
+msgstr "Aucun ID IMdb fourni. Je passe..."
+
+#: ../scripts/wazzuf-ripper:453
+msgid "Retrieving IMdb informations..."
+msgstr "Récupération des informations IMdb..."
+
+#: ../scripts/wazzuf-ripper:472
+msgid "\\nManual killed script (Ctrl-C) during extracting working file"
+msgstr ""
+"\\nScript interrompu manuellement (Ctrl-C) pendant l'extraction de fichier "
+"de travail"
+
+#: ../scripts/wazzuf-ripper:611
+msgid "Extracting %s from %s "
+msgstr "Extraction de %s depuis %s "
+
+#: ../scripts/wazzuf-ripper:630
+msgid ""
+"Please now run wazzuf-conf-generator with chosen M2TS file to get more "
+"tracks informations,\\nor use M2TS instead of BD in %s and run wazzuf-pre-"
+"ripper.\\n"
+msgstr ""
+"SVP, lancez maintenant wazzuf-conf-generator avec le fichier M2TS choisi "
+"pour obtenir plus d’informations sur les pistes,\\noù utilisez M2TS à la "
+"place de BD dans %s et lancez wazzuf-pre-ripper.\\n"
+
+#: ../scripts/wazzuf-ripper:651
+msgid "%s generation"
+msgstr "Génération de %s"
+
+#: ../scripts/wazzuf-ripper:676
+msgid "No chapters file to create. Next..."
+msgstr "Pas de fichier de chapitres à créer. Suivant..."
+
+#: ../scripts/wazzuf-ripper:708
+msgid "\\nManual killed script (Ctrl-C) during checking/extracting subtitles"
+msgstr ""
+"\\nScript interrompu manuellement (Ctrl-C) pendant la vérification/"
+"extraction des sous-titres"
+
+#: ../scripts/wazzuf-ripper:718
+msgid "No more subtitle track choice. Next..."
+msgstr "Plus de choix de piste de sous-titre. Suivant..."
+
+#: ../scripts/wazzuf-ripper:859
+msgid ""
+"\\nManual killed script (Ctrl-C) during audio track(s) extraction/encoding"
+msgstr ""
+"\\nScript interrompu manuellement (Ctrl-C) pendant l'extraction/encodage de "
+"piste(s) audio"
+
+#: ../scripts/wazzuf-ripper:869
+msgid "No more audio track choice, next..."
+msgstr "Plus de choix de piste audio. Suivant..."
+
+#: ../scripts/wazzuf-ripper:942
+msgid "\\nManual killed script (Ctrl-C) during video encoding"
+msgstr "\\nScript interrompu manuellement (Ctrl-C) pendant l'encodage vidéo"
+
+#: ../scripts/wazzuf-ripper:955
+msgid "Provided TARGET_SIZE is not set to CD, DVD, or an integer ! Exiting."
+msgstr ""
+"Le paramètre TARGET_SIZE fourni n'est pas mis à CD, DVD ou avec un entier ! "
+"Je quitte."
+
+#: ../scripts/wazzuf-ripper:1070
+msgid ""
+"h264 video bitrate encoding estimation: %s kb/s.\\nManually adjust the "
+"XXRIP_VIDEO_BITRATE value if the final size does not suit you."
+msgstr ""
+"Estimation du débit d'encodage vidéo h264: %s kb/s.\\nAjustez manuellement "
+"la valeur de XXRIP_VIDEO_BITRATE si la taille finale ne vous convient pas."
+
+#: ../scripts/wazzuf-ripper:1090
+msgid ""
+"Xvid video bitrate encoding estimation: %s kb/s.\\nManually adjust the "
+"XXRIP_VIDEO_BITRATE value if the final size does not suit you."
+msgstr ""
+"Estimation du débit d'encodage vidéo Xvid: %s kb/s.\\nAjustez manuellement "
+"la valeur de XXRIP_VIDEO_BITRATE si la taille finale ne vous convient pas."
+
+#: ../scripts/wazzuf-ripper:1120
+msgid ""
+"Warning: VIDEO_CROP is empty ! Run wazzuf-conf-generator for crop detection."
+msgstr ""
+"Attention: le paramètre VIDEO_CROP est vide ! Lancez wazzuf-conf-generator "
+"pour une détection de cadrage."
+
+#: ../scripts/wazzuf-ripper:1134
+msgid "%s 2 pass %s encoding\\n"
+msgstr "Encodage de %s en %s  2 passes\\n"
+
+#: ../scripts/wazzuf-ripper:1166
+msgid "No image attachment. Skipping..."
+msgstr "Pas d'image jointe. Je passe..."
+
+#: ../scripts/wazzuf-ripper:1263
+msgid "XML tags file generation error. Skipping..."
+msgstr "Erreur de génération de fichier XML d'étiquettes. Je passe..."
+
+#: ../scripts/wazzuf-ripper:1281
+msgid "\\nManual killed script (Ctrl-C) during final mkv merge"
+msgstr "\\nScript interrompu manuellement (Ctrl-C) pendant la fusion finale"
+
+#: ../scripts/wazzuf-ripper:1283
+msgid "Final file merge"
+msgstr "Fusion finale du fichier"
+
+#: ../scripts/wazzuf-ripper:1366
+msgid "nfo file generation"
+msgstr "Génération de fichier nfo"
+
+#: ../scripts/wazzuf-ripper:1402
+msgid "Taking some screenshots"
+msgstr "Prends quelques captures d'écran"
+
+#: ../scripts/wazzuf-ripper:1428
+#, fuzzy
+msgid "%s %s is finished"
+msgstr "%s %s est terminé"
