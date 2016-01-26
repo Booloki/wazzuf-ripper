@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+2016-01-26
+* Better wazzuf-ripper indentation
+* Prepare wazzuf-ripper for internationalization
+
 2016-01-24
 * Separator display setting variable
 * Updating Makefile with internationalization
