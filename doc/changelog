@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+
+2016-02-20
+* wazzuf-ripper internationalization activation
+
 2016-01-26
 * Better wazzuf-ripper indentation
 * wazzuf-ripper internationalization (french language)

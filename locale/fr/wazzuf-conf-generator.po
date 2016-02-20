@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wazzuf-ripper 6\n"
 "Report-Msgid-Bugs-To: booloki@lokizone.net\n"
-"POT-Creation-Date: 2016-01-26 19:21+0100\n"
+"POT-Creation-Date: 2016-02-20 15:50+0100\n"
 "PO-Revision-Date: 2016-01-20 19:10+0100\n"
 "Last-Translator: Nicolas Perrin <booloki@lokizone.net>\n"
 "Language-Team: French\n"
@@ -19,97 +19,97 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 1.8.6\n"
 
-#: ../scripts/wazzuf-conf-generator:28
+#: wazzuf-conf-generator:25
 msgid "Wazzuf Ripper Conf Generator"
 msgstr "Générateur de configuration Wazzuf Ripper"
 
-#: ../scripts/wazzuf-conf-generator:29
+#: wazzuf-conf-generator:26
 msgid "Choice"
 msgstr "Choix"
 
-#: ../scripts/wazzuf-conf-generator:30
+#: wazzuf-conf-generator:27
 msgid "Description"
 msgstr "Description"
 
-#: ../scripts/wazzuf-conf-generator:31
+#: wazzuf-conf-generator:28
 msgid "Title"
 msgstr "Titre"
 
-#: ../scripts/wazzuf-conf-generator:32
+#: wazzuf-conf-generator:29
 msgid "Language"
 msgstr "Langue"
 
-#: ../scripts/wazzuf-conf-generator:33
+#: wazzuf-conf-generator:30
 msgid "Chapters"
 msgstr "Chapitres"
 
-#: ../scripts/wazzuf-conf-generator:34
+#: wazzuf-conf-generator:31
 msgid "Channels"
 msgstr "Canaux"
 
-#: ../scripts/wazzuf-conf-generator:35
+#: wazzuf-conf-generator:32
 msgid "Lenght"
 msgstr "Durée"
 
-#: ../scripts/wazzuf-conf-generator:36
+#: wazzuf-conf-generator:33
 msgid "Audio tracks"
 msgstr "Piste(s) audio"
 
-#: ../scripts/wazzuf-conf-generator:37
+#: wazzuf-conf-generator:34
 msgid "Subtitle tracks"
 msgstr "Piste(s) de sous-titre"
 
-#: ../scripts/wazzuf-conf-generator:38
+#: wazzuf-conf-generator:35
 msgid "Next"
 msgstr "Suivant"
 
-#: ../scripts/wazzuf-conf-generator:39
+#: wazzuf-conf-generator:36
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../scripts/wazzuf-conf-generator:40
+#: wazzuf-conf-generator:37
 msgid "Quit"
 msgstr "Quitter"
 
-#: ../scripts/wazzuf-conf-generator:41
+#: wazzuf-conf-generator:38
 msgid "Yes"
 msgstr "Oui"
 
-#: ../scripts/wazzuf-conf-generator:42
+#: wazzuf-conf-generator:39
 msgid "No"
 msgstr "Non"
 
-#: ../scripts/wazzuf-conf-generator:50
+#: wazzuf-conf-generator:47
 msgid "Do you want to generate a <b>new Wazzuf Ripper configuration file</b> ?"
 msgstr ""
 "Voulez-vous générer un <b>nouveau fichier de configuration Wazzuf Ripper</"
 "b> ?"
 
-#: ../scripts/wazzuf-conf-generator:101
+#: wazzuf-conf-generator:96
 msgid "Which media type do you want to rip ?"
 msgstr "Quel type de média voulez-vous convertir ?"
 
-#: ../scripts/wazzuf-conf-generator:102
+#: wazzuf-conf-generator:97
 msgid "Physical DVD"
 msgstr "DVD (physique)"
 
-#: ../scripts/wazzuf-conf-generator:103
+#: wazzuf-conf-generator:98
 msgid "DVD iso file"
 msgstr "DVD (iso)"
 
-#: ../scripts/wazzuf-conf-generator:104
+#: wazzuf-conf-generator:99
 msgid "Physical Blu-Ray"
 msgstr "Blu-Ray (physique)"
 
-#: ../scripts/wazzuf-conf-generator:105
+#: wazzuf-conf-generator:100
 msgid "Blu-Ray iso file"
 msgstr "Blu-Ray (iso)"
 
-#: ../scripts/wazzuf-conf-generator:106
+#: wazzuf-conf-generator:101
 msgid "m2ts/ts file"
 msgstr "Fichier m2ts/ts"
 
-#: ../scripts/wazzuf-conf-generator:115
+#: wazzuf-conf-generator:110
 msgid ""
 "Please select your <b>source directory</b>\n"
 "(m2ts/ts, iso, external subtitles, cover image, episodes list,...)."
@@ -118,108 +118,108 @@ msgstr ""
 "(m2ts/ts, iso, sous-titres externes, image de couverture, liste "
 "d'épisodes,...)."
 
-#: ../scripts/wazzuf-conf-generator:128
+#: wazzuf-conf-generator:122
 msgid "Please select your <b>Disc Directory</b>."
 msgstr "Sélectionnez votre <b>répertoire de disque</b>"
 
-#: ../scripts/wazzuf-conf-generator:140
+#: wazzuf-conf-generator:128
 msgid "Please select your <b>iso file</b> (source directory only)."
 msgstr "Sélectionnez votre <b>fichier iso</b> (répertoire source uniquement)."
 
-#: ../scripts/wazzuf-conf-generator:164
+#: wazzuf-conf-generator:151
 msgid "Please select your <b>m2ts/ts file</b> (source directory only)."
 msgstr ""
 "Sélectionnez votre <b>fichier m2ts/ts</b> (répertoire source uniquement)."
 
-#: ../scripts/wazzuf-conf-generator:190
+#: wazzuf-conf-generator:176
 msgid "Do you want to change the <b>working files directory</b> (%s) ?"
 msgstr "Voulez-vous changer le <b>répertoire de travail</b> par défaut (%s) ?"
 
-#: ../scripts/wazzuf-conf-generator:222
+#: wazzuf-conf-generator:206
 msgid "What is the type of this video media ?"
 msgstr "Quel est le type de ce media vidéo ?"
 
-#: ../scripts/wazzuf-conf-generator:223
+#: wazzuf-conf-generator:207
 msgid "Movie"
 msgstr "Film"
 
-#: ../scripts/wazzuf-conf-generator:224
+#: wazzuf-conf-generator:208
 msgid "TV show/serie (multiple videos)"
 msgstr "Série/Show TV (vidéos multiples)"
 
-#: ../scripts/wazzuf-conf-generator:225
+#: wazzuf-conf-generator:209
 msgid "Musical video"
 msgstr "Vidéo musicale"
 
-#: ../scripts/wazzuf-conf-generator:234
+#: wazzuf-conf-generator:218
 msgid "Videos informations"
 msgstr "Informations vidéo"
 
-#: ../scripts/wazzuf-conf-generator:235
+#: wazzuf-conf-generator:219
 msgid "Original title *"
 msgstr "Titre original *"
 
-#: ../scripts/wazzuf-conf-generator:236
+#: wazzuf-conf-generator:220
 msgid "Release date"
 msgstr "Date de sortie"
 
-#: ../scripts/wazzuf-conf-generator:332
+#: wazzuf-conf-generator:300
 msgid "Please provide some tags"
 msgstr "Merci de fournir des étiquettes"
 
-#: ../scripts/wazzuf-conf-generator:333
+#: wazzuf-conf-generator:301
 msgid "Rip tag (BDRIP DVDRIP DVDDUMP 1080p 720p...)"
 msgstr "Étiquette de rip (BDRIP DVDRIP DVDDUMP 1080p 720p...)"
 
-#: ../scripts/wazzuf-conf-generator:334
+#: wazzuf-conf-generator:302
 msgid "Audio tag (MULTI ENGLISH subforced...)"
 msgstr "Étiquette audio (MULTI FRENCH VOST subforced...)"
 
-#: ../scripts/wazzuf-conf-generator:335
+#: wazzuf-conf-generator:303
 msgid "Signature tag"
 msgstr "Étiquette de signature"
 
-#: ../scripts/wazzuf-conf-generator:336
+#: wazzuf-conf-generator:304
 msgid "Comment"
 msgstr "Commentaire"
 
-#: ../scripts/wazzuf-conf-generator:354
+#: wazzuf-conf-generator:320
 msgid "Movie director"
 msgstr "Réalisateur"
 
-#: ../scripts/wazzuf-conf-generator:366
+#: wazzuf-conf-generator:331
 msgid "Artist/Band Name"
 msgstr "Nom d'artiste/groupe"
 
-#: ../scripts/wazzuf-conf-generator:376
+#: wazzuf-conf-generator:341
 msgid "About the Show"
 msgstr "À propos du show"
 
-#: ../scripts/wazzuf-conf-generator:377
+#: wazzuf-conf-generator:342
 msgid "Season number (ex: 02)"
 msgstr "Numéro de saison (ex: 02)"
 
-#: ../scripts/wazzuf-conf-generator:378
+#: wazzuf-conf-generator:343
 msgid "Total episodes number in the season"
 msgstr "Nombre total d'épisodes de la saison"
 
-#: ../scripts/wazzuf-conf-generator:399
+#: wazzuf-conf-generator:364
 msgid "About the episodes list (text file)"
 msgstr "À propos de la liste d'épisodes (fichier texte)"
 
-#: ../scripts/wazzuf-conf-generator:400
+#: wazzuf-conf-generator:365
 msgid "None"
 msgstr "Aucun"
 
-#: ../scripts/wazzuf-conf-generator:401
+#: wazzuf-conf-generator:366
 msgid "Select one (in %s source directory only)"
 msgstr "En sélectionnez un (dans le répertoire source %s uniquement)."
 
-#: ../scripts/wazzuf-conf-generator:402
+#: wazzuf-conf-generator:367
 msgid "Create one"
 msgstr "En créer un"
 
-#: ../scripts/wazzuf-conf-generator:434
+#: wazzuf-conf-generator:398
 msgid ""
 "Episode file syntax with ordered lines like: 05 - The haunted episode.\n"
 "Line numbers corresponds to CHAPTERS or TITLES (depends on DVD_EPISODES_ORG)."
@@ -229,19 +229,19 @@ msgstr ""
 "Les numéros de lignes correspondent à CHAPTERS ou TITLES (dépendant de "
 "DVD_EPISODES_ORG)."
 
-#: ../scripts/wazzuf-conf-generator:488
+#: wazzuf-conf-generator:435
 msgid "BD analyse"
 msgstr "Analyse du Blu-Ray"
 
-#: ../scripts/wazzuf-conf-generator:516
+#: wazzuf-conf-generator:443
 msgid "AACS Key Error. Exiting !"
 msgstr "Erreur de clé AACS !"
 
-#: ../scripts/wazzuf-conf-generator:578
+#: wazzuf-conf-generator:491
 msgid "BD Title(s) choice"
 msgstr "Choix de Titres Blu-Ray"
 
-#: ../scripts/wazzuf-conf-generator:603
+#: wazzuf-conf-generator:512
 msgid ""
 "The longest track is <b>Title %s</b> / %s (Chapters: %s).\n"
 "This one will be use for cropping detection."
@@ -249,23 +249,19 @@ msgstr ""
 "La plus longue piste est le <b>Titre %s</b> / %s (Chapitres: %s).\n"
 "Celui-ci sera utilisé pour la détection du recadrage."
 
-#: ../scripts/wazzuf-conf-generator:611
-msgid "Do you want to <b>extract</b> Bluray file(s) ?"
-msgstr "Voulez-vous <b>extraire les fichiers</b> du Blu-Ray ?"
-
-#: ../scripts/wazzuf-conf-generator:638
+#: wazzuf-conf-generator:526
 msgid "Do you want to <b>make a local iso</b> file of your DVD ?"
 msgstr "Voulez-vous <b>faire un fichier iso local </b>du DVD ?"
 
-#: ../scripts/wazzuf-conf-generator:682
+#: wazzuf-conf-generator:544
 msgid "DVD analyse"
 msgstr "Analyse du DVD"
 
-#: ../scripts/wazzuf-conf-generator:745
+#: wazzuf-conf-generator:600
 msgid "DVD Title(s) choice"
 msgstr "Choix de Titre(s) du DVD"
 
-#: ../scripts/wazzuf-conf-generator:774
+#: wazzuf-conf-generator:622
 msgid ""
 "The longest track is <b>Title %s</b>.\n"
 "This one will be use for cropping detection."
@@ -273,55 +269,55 @@ msgstr ""
 "La plus longue piste est le <b>Titre %s</b>.\n"
 "Celui-ci sera utilisé pour la détection du recadrage."
 
-#: ../scripts/wazzuf-conf-generator:781
+#: wazzuf-conf-generator:629
 msgid "M2TS analyse"
 msgstr "Analyse du M2TS"
 
-#: ../scripts/wazzuf-conf-generator:821
+#: wazzuf-conf-generator:666
 msgid "The m2ts/ts video crop has not been found"
 msgstr "Le recadrage de la vidéo m2ts/ts n'a pas été trouvé."
 
-#: ../scripts/wazzuf-conf-generator:823
+#: wazzuf-conf-generator:668
 msgid "The m2ts/ts video crop has been set to %s"
 msgstr "Le recadrage de la vidéo m2ts/ts a été défini à %s"
 
-#: ../scripts/wazzuf-conf-generator:868
+#: wazzuf-conf-generator:698
 msgid "Audio analyze"
 msgstr "Analyse audio"
 
-#: ../scripts/wazzuf-conf-generator:892
+#: wazzuf-conf-generator:722
 msgid "Audio analyze - Track %s Channel"
 msgstr "Analyse audio - Canaux de la piste %s"
 
-#: ../scripts/wazzuf-conf-generator:899
+#: wazzuf-conf-generator:729
 msgid "Audio analyze - Track %s BitRate"
 msgstr "Analyse audio - Bitrate de la piste %s"
 
-#: ../scripts/wazzuf-conf-generator:1065 ../scripts/wazzuf-conf-generator:1494
+#: wazzuf-conf-generator:767 wazzuf-conf-generator:1009
 msgid "Audio track(s) choice"
 msgstr "Choix de piste(s) audio"
 
-#: ../scripts/wazzuf-conf-generator:1190
+#: wazzuf-conf-generator:825
 msgid "Subtitle analyze"
 msgstr "Analyse de sous-titre(s)"
 
-#: ../scripts/wazzuf-conf-generator:1258 ../scripts/wazzuf-conf-generator:1594
+#: wazzuf-conf-generator:883 wazzuf-conf-generator:1108
 msgid "Subtitle track(s) choice"
 msgstr "Choix de piste(s) de sous-titre"
 
-#: ../scripts/wazzuf-conf-generator:1415
+#: wazzuf-conf-generator:933
 msgid "The BD video crop has not been found."
 msgstr "Le recadrage du Blu-Ray n'a pas été trouvé."
 
-#: ../scripts/wazzuf-conf-generator:1418
+#: wazzuf-conf-generator:936
 msgid "The BD video crop has been set to %s"
 msgstr "Le recadrage du Blu-Ray a été défini à %s"
 
-#: ../scripts/wazzuf-conf-generator:1440 ../scripts/wazzuf-conf-generator:1449
+#: wazzuf-conf-generator:956 wazzuf-conf-generator:965
 msgid "The DVD video crop has not been found."
 msgstr "Le recadrage du DVD n'a pas été trouvé."
 
-#: ../scripts/wazzuf-conf-generator:1442
+#: wazzuf-conf-generator:958
 msgid ""
 "The DVD video crop has been set to %s.\n"
 "This is the biggest one. Crop detection for all choosen Titles are in conf "
@@ -331,58 +327,61 @@ msgstr ""
 "Celui-ci est le plus grand. La détection du recadrage pour tous les Titres "
 "choisis est dans le fichier de configuration aussi."
 
-#: ../scripts/wazzuf-conf-generator:1452
+#: wazzuf-conf-generator:968
 msgid "The DVD video crop has been set to %s"
 msgstr "Le recadrage du DVD a été défini à %s"
 
-#: ../scripts/wazzuf-conf-generator:1649
+#: wazzuf-conf-generator:1163
 msgid "Other options choice"
 msgstr "Autre choix d'options"
 
-#: ../scripts/wazzuf-conf-generator:1650
+#: wazzuf-conf-generator:1164
 msgid "NFO file creation"
 msgstr "Création de fichier NFO"
 
-#: ../scripts/wazzuf-conf-generator:1651
+#: wazzuf-conf-generator:1165
 msgid "Video screenshots creation"
 msgstr "Création de copies d'écran vidéo"
 
-#: ../scripts/wazzuf-conf-generator:1652
+#: wazzuf-conf-generator:1166
 msgid "Debug"
 msgstr "Debug"
 
-#: ../scripts/wazzuf-conf-generator:1693
+#: wazzuf-conf-generator:1207
 msgid "Please choose your default video codec"
 msgstr "Choisissez votre codec vidéo par défaut"
 
-#: ../scripts/wazzuf-conf-generator:1697
+#: wazzuf-conf-generator:1211
 msgid "Dump (faster) (original video track, mpeg source only)"
 msgstr ""
 "Extraction (plus rapide) (piste vidéo originale, source mpeg seulement)"
 
-#: ../scripts/wazzuf-conf-generator:1698
+#: wazzuf-conf-generator:1212
 msgid "Dump with crop (mpeg source only)"
 msgstr "Extraction avec recadrage (source mpeg seulement)"
 
-#: ../scripts/wazzuf-conf-generator:1717
+#: wazzuf-conf-generator:1231
 msgid "Please choose your default audio codec"
 msgstr "Choisissez votre codec audio par défaut"
 
-#: ../scripts/wazzuf-conf-generator:1718
+#: wazzuf-conf-generator:1232
 msgid "AC3 (DTS source only)"
 msgstr "AC3 (source DTS uniquement)"
 
-#: ../scripts/wazzuf-conf-generator:1722
+#: wazzuf-conf-generator:1236
 msgid "Dump (original audio track)"
 msgstr "Extraction (piste audio originale)"
 
-#: ../scripts/wazzuf-conf-generator:1734
+#: wazzuf-conf-generator:1248
 msgid ""
 "Your Wazzuf configuration file has been saved to <b>%s</b>\n"
 "(If you want to use it with Wazzuf Ripper, it must be %s )"
 msgstr ""
 "Votre fichier de configuration Wazzuf a été sauvegardé sous <b>%s</b>\n"
 "(Si vous voulez l'utilisez avec Wazzuf Ripper, ce doit être %s)"
+
+#~ msgid "Do you want to <b>extract</b> Bluray file(s) ?"
+#~ msgstr "Voulez-vous <b>extraire les fichiers</b> du Blu-Ray ?"
 
 #~ msgid "Downloading cover"
 #~ msgstr "Téléchargement d'image de couverture"

@@ -3,6 +3,12 @@
 # DVD/BD rip script
 # booloki@lokizone.net
 
+# Internationalization
+TEXTDOMAINDIR="/usr/share/locale"
+export TEXTDOMAINDIR="/usr/share/locale"
+TEXTDOMAIN=wazzuf-ripper
+export TEXTDOMAIN=wazzuf-ripper
+
 GLOBAL_CONF_FILE="/etc/wazzuf-ripper/wazzuf-ripper-global.conf"
 source ${GLOBAL_CONF_FILE}
 
@@ -1181,7 +1187,7 @@ done
 done
 
 cd ..
-MESSAGE_END=$(printf "$(gettext "%s %s isfinished")" "${TITLE_LONG}" "${TAG_RIP}")
+MESSAGE_END=$(printf "$(gettext "%s %s is finished")" "${TITLE_LONG}" "${TAG_RIP}")
 if [[ ${WAZZUF_UI} == "GUI" ]]; then
 	# Basic Information
 	zenity --info \
