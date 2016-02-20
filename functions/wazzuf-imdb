@@ -60,6 +60,7 @@ download_imdb_poster () {
 				;;
 			* )
 				check_imdb
+				check_wget
 				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG wget ${IMDB_POSTER} -O cover.jpg"; fi
 				wget ${IMDB_POSTER} -O cover.jpg
 				;;

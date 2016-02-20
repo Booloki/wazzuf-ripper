@@ -270,6 +270,7 @@ if  [[ ! ${IMDB_ID} == "" ]]; then
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG IMDB_URL_COVER ${IMDB_URL_COVER}"; fi
 	# check if url exists
 	if [[ ! ${IMDB_URL_COVER} == "N/A" ]]; then
+		check_wget
 		( wget -q "${IMDB_URL_COVER}" -O cover.jpg ) | zenity --progress \
 		        --title="${ZEN_TITLE}" \
 		        --text="$(gettext "Downloading cover")" \

@@ -276,3 +276,15 @@ check_ccextractor () {
 		soft_to_install_exit
 	fi
 }
+check_wget () {
+	if [ ! -x "/usr/bin/wget" ]; then
+		SOFT_NAME="wget"
+		soft_to_install_exit
+	fi
+}
+check_md5sum () {
+	if [ ! -x "/usr/bin/md5sum" ]; then
+		SOFT_NAME="md5sum"
+		soft_to_install_exit
+	fi
+}

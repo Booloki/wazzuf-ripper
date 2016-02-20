@@ -14,6 +14,7 @@ generate_nfo () {
 	echo "" >> ${MERGE_OUTPUT}.nfo
 
 	# md5sum
+	check_md5sum
 	MD5=$(md5sum "${MERGE_OUTPUT}" | awk '{print($1);}')
 	echo "md5: ${MD5}" >> ${MERGE_OUTPUT}.nfo
 
