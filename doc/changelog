@@ -6,6 +6,7 @@
 
 2016-02-20
 * wazzuf-ripper internationalization activation
+* Removing wazzuf-external-tools-install and wazzuf-pre-ripper scripts (unmaintained for years)
 
 2016-01-26
 * Better wazzuf-ripper indentation

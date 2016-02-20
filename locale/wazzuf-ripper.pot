@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: booloki@lokizone.net\n"
-"POT-Creation-Date: 2016-02-20 15:53+0100\n"
+"POT-Creation-Date: 2016-02-20 16:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,8 +48,7 @@ msgstr ""
 #: wazzuf-ripper:520
 msgid ""
 "Please now run wazzuf-conf-generator with chosen M2TS file to get more "
-"tracks informations,\\nor use M2TS instead of BD in %s and run wazzuf-pre-"
-"ripper.\\n"
+"tracks informations,\\nor use M2TS instead of BD in %s.\\n"
 msgstr ""
 
 #: wazzuf-ripper:540

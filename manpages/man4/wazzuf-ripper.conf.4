@@ -1,4 +1,4 @@
-.TH WAZZUF-RIPPER.CONF 4 "October 15, 2012"
+.TH WAZZUF-RIPPER.CONF 4 "February 20, 2016"
 .SH NAME
 wazzuf-ripper.conf \- Wazzuf Ripper configuration file
 .SH DESCRIPTION
@@ -113,9 +113,7 @@ The artist name. For MUSIC VIDEO_TYPE only.
 .B DVD_TITLE_NUMBER
 The DVD title number to rip (integer). Useless with SHOW VIDEO_TYPE and DVD_EPISODES_ORG is TITLES.
 .br
-Could be found with help of
-.BR wazzuf-pre-ripper (1)
-or manually with 'mplayer dvd://DVD_TITLE_NUMBER' for physical DVD or 'mplayer -nocache dvdnav://'.
+Could be found manually with 'mplayer dvd://DVD_TITLE_NUMBER' for physical DVD or 'mplayer -nocache dvdnav://'.
 .TP
 .B MULTICHAP_FORCE
 Set to "yes" to force multiple DVD/ISO chapters to the same output video. Useless with SHOW VIDEO_TYPE and DVD_EPISODES_ORG is CHAPTERS.
@@ -148,9 +146,7 @@ Example: "2 3 5 6"
 .B VIDEO_CROP
 The video cropping used to eliminate unwanted areas of the video track.
 .br
-Could be found with help of
-.BR wazzuf-pre-ripper (1)
-or manually with 'mplayer dvd://DVD_TITLE_NUMBER -vf cropdetect' or 'mplayer -dvd-device dvd.iso dvd://DVD_TITLE_NUMBER -vf cropdetect'
+Could be found manually with 'mplayer dvd://DVD_TITLE_NUMBER -vf cropdetect' or 'mplayer -dvd-device dvd.iso dvd://DVD_TITLE_NUMBER -vf cropdetect'
 .br
 Example: "720:480:0:0"
 .TP
@@ -323,10 +319,6 @@ More informations at http://www.mplayerhq.hu/DOCS/HTML/en/menc-feat-xvid.html .
 .PP
 .SH SEE ALSO
 .BR wazzuf-ripper (1)
-,
-.BR wazzuf-external-tools-install (1)
-,
-.BR wazzuf-pre-ripper (1)
 ,
 .BR wazzuf-ripper-global.conf (4)
 .

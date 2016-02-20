@@ -517,7 +517,7 @@ time for ((i=${CHAPTER_FIRST}; i <= CHAPTER_LAST ; i++)); do
 
 			if [[ ${SOURCE} == "ISO_BD" ]]; then iso_bd_manage umount; fi
 
-			MESSAGE_DBTOM2TS=$(printf "$(gettext "Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,\nor use M2TS instead of BD in %s and run wazzuf-pre-ripper.\n")" "${CONF_FILE}")
+			MESSAGE_DBTOM2TS=$(printf "$(gettext "Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,\nor use M2TS instead of BD in %s.\n")" "${CONF_FILE}")
 			if [[ ${WAZZUF_UI} == "GUI" ]]; then
 				zenity --info \
 					--title "${ZEN_TITLE}" \
