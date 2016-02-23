@@ -3,6 +3,8 @@
 # booloki@lokizone.net
 # Changelog file
 
+2016-02-23
+* Bugfix: wazzuf-pre functions file re-load
 
 2016-02-20
 * wazzuf-ripper internationalization activation
