@@ -6,39 +6,66 @@ wazzuf_usage () {
 	exit 1
 }
 
-# mount/umount BD iso file
-iso_bd_manage () {
+# Iso file management
+# need ISO_FILE_PATH
+#
+# return ISO_MOUNT_POINT (if 'mount')
+# first argument: "mount" or "umount"
+# second argument: "GUI" or empty
+iso_manage () {
 	case ${1} in
 	mount )
-		# check if ISO_BD not already mounted
-		if [[ $(mount | grep udf | grep "${ISO_MOUNT_POINT}" | wc -l) == "1" ]]; then
-			echo "${ISO_MOUNT_POINT} mount point already used"
-			exit 1
+		# Check if iso file already mounted
+		if [[ $(mount | grep udf | grep "${ISO_FILE_PATH}" | wc -l) == "1" ]]; then
+			echo "${ISO_FILE_PATH} already mounted"
+			# Get mount point
+			ISO_MOUNT_POINT=$(mount | grep udf | grep "${ISO_FILE_PATH}" | sed 's/ type udf //g'  | cut -d '(' -f 1 | awk '{print $NF}')
 		else
+			# mount iso file
+			# udisksctl does not require root privileges
+			check_udisksctl
 			if [[ ${2} == "GUI" ]]; then
-				# useless ?
-				gksudo --description Wazzuf-Ripper "mkdir -p ${ISO_MOUNT_POINT}"
-				# mounted read-only to avoid warning
-				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG gksudo --description Wazzuf-Ripper \"mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}\"";fi
-				gksudo --description Wazzuf-Ripper "mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}"
+				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
+				udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
 			else
-				echo "Mount ISO_BD to ${ISO_MOUNT_POINT}"
-				sudo mkdir -p ${ISO_MOUNT_POINT}
-				# mounted read-only to avoid warning
-				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG sudo mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}";fi
-				sudo mount -r -o loop ${ISO_FILE_PATH} ${ISO_MOUNT_POINT}
+				echo "Mount iso file"
+				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
+				udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
 			fi
+			# Get mount point
+			ISO_MOUNT_POINT=$(mount | grep udf | sed 's/ type udf //g'  | cut -d '(' -f 1 | awk '{print $NF}')
 		fi
 		;;
 	umount )
+		# No specific privilege required (if mounted with udisksctl)
 		if [[ ${2} == "GUI" ]]; then
-			gksudo --description Wazzuf-Ripper "umount ${ISO_MOUNT_POINT}"
+			umount "${ISO_FILE_PATH}"
 		else
-			echo "Umount ISO_BD"
-			sudo umount ${ISO_MOUNT_POINT}
+			echo "Umount iso file"
+			umount "${ISO_FILE_PATH}"
 		fi
 		;;
 	esac
+}
+
+# Get the type of the mounted media device
+# need  MOUNT_PATH
+#
+# return MEDIA_DEVICE_TYPE
+get_media_device_type () {
+	check_mediainfo
+	MEDIA_FORMAT_FULL=$(mediainfo --Inform="General;%Format%" "${MOUNT_PATH}" 2> /dev/null)
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_FORMAT_FULL ${MEDIA_FORMAT_FULL}";fi
+
+	if [[ $(echo ${MEDIA_FORMAT_FULL} | grep Blu-ray) ]]; then
+		MEDIA_DEVICE_TYPE="BD"
+	elif [[ $(echo ${MEDIA_FORMAT_FULL} | grep DVD) ]]; then
+		MEDIA_DEVICE_TYPE="DVD"
+	else
+		# Not a DVD nor BD
+		MEDIA_DEVICE_TYPE="UNKNOWN"
+	fi
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_DEVICE_TYPE ${MEDIA_DEVICE_TYPE}";fi
 }
 
 # soft_to_install_exit
@@ -152,7 +179,7 @@ empty_exit () {
 # return nothing
 wazzuf_quit () {
 	zenity --info --title "${ZEN_TITLE}" \
-		--text "${ZEN_TITLE} will know quit."
+		--text "${ZEN_TITLE} will now quit."
 	exit 0
 }
 

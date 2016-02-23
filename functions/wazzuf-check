@@ -41,76 +41,6 @@ if [[ ${EUID} -eq 0 ]]; then
 fi
 } 
 
-# check physical BD/DVD (only one device) or ISO_DVD/ISO_BD file presence
-check_device () {
-	case ${1} in
-	BD )
-		DEVICE_TEST="-d $(mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10)/BDMV/"
-		DEVICE_NAME="BD"
-		WORKING_FILES=".m2ts"
-		;;
-	M2TS )
-		DEVICE_TEST="-f '${M2TS_FILE_PATH}'"
-		DEVICE_NAME="${M2TS_FILE_PATH}"
-		WORKING_FILES="?"
-		;;
-	DVD )
-		DEVICE_TEST="-d $(mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10)/VIDEO_TS/"
-		DEVICE_NAME="DVD"
-		WORKING_FILES=".vob"
-		;;
-	ISO_DVD | ISO_BD )
-		DEVICE_TEST="-f '${SOURCE_DIRECTORY}/${ISO_FILE}'"
-		DEVICE_NAME="'${SOURCE_DIRECTORY}/${ISO_FILE}' iso file"
-		if [[ ${1} == "ISO_DVD" ]]; then WORKING_FILES=".vob"; else WORKING_FILES=".m2ts"; fi
-		;;
-	* )
-		if [[ $WAZZUF_UI == "GUI" ]]; then
-			zenity --error --title "${ZEN_TITLE}" \
-				--text "Unexpected error: No device to check !" \
-				--timeout=2
-		else
-			echo "Unexpected error: No device to check !"
-		fi
-		;;
-	esac
-
-	if [[ ${DEBUG} == "1" ]]; then
-		echo "DEBUG DEVICE_TEST ${DEVICE_TEST}"
-		echo "DEBUG DEVICE_NAME ${DEVICE_NAME}"
-		echo "DEBUG WORKING_FILES ${WORKING_FILES}"
-	fi
-
-	if [ ! "${DEVICE_TEST}" ]
-	then
-		echo -ne "\n *************************************\n"
-		echo -ne " ${DEVICE_NAME} not found !\n"
-		case ${2} in
-		PRE )
-			echo -ne " Exiting...\n"
-			echo -ne " *************************************\n"
-			exit 1
-			;;
-		RIP )
-			echo -ne " Do you you want to bypass media source (y/N)?\n"
-			echo -ne " Note: Working files (${WORKING_FILES},...) had to be already extracted.\n"
-			echo -ne " *************************************\n"
-			read DEVICE_ANSWER
-			case ${DEVICE_ANSWER} in
-				n* | N* | "" )
-					echo " Quit." && exit 0
-					;;
-				y* | Y* )
-					echo " Bypassing media source."
-					;;
-			esac
-			;;
-		esac
-	else
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ${DEVICE_NAME} found."; fi
-	fi
-}
-
 # check if value is an integer
 # need  NUMBER_TO_CHECK
 #	MESSAGE
@@ -276,15 +206,24 @@ check_ccextractor () {
 		soft_to_install_exit
 	fi
 }
+
 check_wget () {
 	if [ ! -x "/usr/bin/wget" ]; then
 		SOFT_NAME="wget"
 		soft_to_install_exit
 	fi
 }
+
 check_md5sum () {
 	if [ ! -x "/usr/bin/md5sum" ]; then
 		SOFT_NAME="md5sum"
+		soft_to_install_exit
+	fi
+}
+
+check_udisksctl () {
+	if [ ! -x "/usr/bin/udisksctl" ]; then
+		SOFT_NAME="udisksctl"
 		soft_to_install_exit
 	fi
 }

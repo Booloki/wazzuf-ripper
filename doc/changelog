@@ -4,6 +4,7 @@
 # Changelog file
 
 2016-02-23
+* Media checking and iso management rework with udisksctl (new dependancy)
 * Bugfix: wazzuf-pre functions file re-load
 
 2016-02-20

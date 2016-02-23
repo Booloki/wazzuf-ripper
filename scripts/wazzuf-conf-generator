@@ -119,13 +119,13 @@ echo "SOURCE_DIRECTORY=\""${ZENITY_SOURCE_DIRECTORY}"\"" >> ${CONF_FILE_TMP}
 case $SOURCE in
 BD | DVD )
 	# device for conf generator only
-	zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>Disc Directory</b>.")" --ok-label "${ZEN_LABEL_NEXT}"
+	zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>Disc Directory</b>. ")" --ok-label "${ZEN_LABEL_NEXT}"
 	ZENITY_DISC_DIR=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "/media/" --directory)
 	if [ $? = "1" ]; then wazzuf_quit; fi
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ZENITY_DISC_DIR ${ZENITY_DISC_DIR}"; fi
 	;;
 ISO_BD | ISO_DVD )
-	zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>iso file</b> (source directory only).")" --ok-label "${ZEN_LABEL_NEXT}"
+	zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>iso file</b> (source directory only). ")" --ok-label "${ZEN_LABEL_NEXT}"
 	ZENITY_ISO_FILE=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "${ZENITY_SOURCE_DIRECTORY}"/)
 	if [ $? = "1" ]; then exit 0; fi
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ZENITY_ISO_FILE ${ZENITY_ISO_FILE}"; fi 
@@ -139,6 +139,7 @@ ISO_BD | ISO_DVD )
 			empty_exit
 		else
 			echo "ISO_FILE=\""${ISO_FILE}"\"" >> ${CONF_FILE_TMP}
+			# Prepare the M2TS file variable
 			echo "M2TS_FILE=\"\"" >> ${CONF_FILE_TMP}
 		fi
 	else
@@ -148,7 +149,7 @@ ISO_BD | ISO_DVD )
 	fi
 	;;
 M2TS )
-	zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>m2ts/ts file</b> (source directory only).")" --ok-label "${ZEN_LABEL_NEXT}"
+	zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>m2ts/ts file</b> (source directory only). ")" --ok-label "${ZEN_LABEL_NEXT}"
 	ZENITY_M2TS_FILE=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "${ZENITY_SOURCE_DIRECTORY}"/)
 	if [ $? = "1" ]; then wazzuf_quit; fi
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ZENITY_M2TS_FILE ${ZENITY_M2TS_FILE}"; fi 
@@ -378,7 +379,7 @@ SHOW )
 		if [[ $(echo "${ZENITY_EPISODES_FILE}" | grep "${ZENITY_SOURCE_DIRECTORY}" | wc -l)  == "1" ]]; then
 			# from full path to filename
 			EPISODES_FILE=$(echo ${ZENITY_EPISODES_FILE} | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%)
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG EPISODES_FILE ${EPISODES_FILE}"; fi 
+			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG EPISODES_FILE ${EPISODES_FILE}"; fi
 			# Test if "empty"
 			if [[ $(echo ${EPISODES_FILE}) == "" ]]; then
 				if [[ ${DEBUG} == "1" ]]; then
@@ -397,7 +398,7 @@ SHOW )
 	2 )
 		# Episodes file explanations
 		zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Episode file syntax with ordered lines like: 05 - The haunted episode.
-Line numbers corresponds to CHAPTERS or TITLES (depends on DVD_EPISODES_ORG).")" --ok-label "${ZEN_LABEL_NEXT}"
+Line numbers corresponds to CHAPTERS or TITLES (depends on DVD_EPISODES_ORG). ")" --ok-label "${ZEN_LABEL_NEXT}"
 		touch "${ZENITY_SOURCE_DIRECTORY}/episodes.txt"
 		# edit episodes file
 		echo "EPISODES_FILE=\"episodes.txt\"" >> ${CONF_FILE_TMP}
@@ -418,22 +419,35 @@ echo "" >> ${CONF_FILE_TMP}
 ISO_FILE_PATH="${SOURCE_DIRECTORY}/${ISO_FILE}"
 M2TS_FILE_PATH="${SOURCE_DIRECTORY}/${M2TS_FILE}"
 
-# Media analyse
+
+## Media analyse
+
 case $SOURCE in
 BD | ISO_BD )
 	echo "M2TS_FILE="\"\""" >> ${CONF_FILE_TMP}
 	if [[ ${SOURCE} == "ISO_BD" ]]; then
-		check_device ISO_BD PRE
-		iso_bd_manage mount GUI
-		BD_MOUNT=${ISO_MOUNT_POINT}
+		iso_manage mount GUI
+		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"; fi
+		BD_MOUNT="${ISO_MOUNT_POINT}"
 	else
-		check_device BD PRE
-		BD_MOUNT=$(mount | grep udf | sed s/" type udf "/""/g | cut -d '(' -f 1 | cut -d ' ' -f 3-10)
+		BD_MOUNT="${BD_PATH}"
 	fi
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG BD_MOUNT ${BD_MOUNT}"; fi
+
+	# Compare the provided media device type with the detected one
+	MOUNT_PATH="${BD_MOUNT}"
+	get_media_device_type
+	if [[ ! ${MEDIA_DEVICE_TYPE} == "BD" ]]; then
+		zenity --error --title "${ZEN_TITLE}" \
+			--text "$(gettext "Media device not recognized as Blu-Ray but as ${MEDIA_DEVICE_TYPE} ! ")" \
+			--timeout=5
+		wazzuf_quit
+	fi
+
+	# Get BD informations
 	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify br:// -bluray-device "${BD_MOUNT}" 2> BD-mplayer.err > BD-mplayer.info ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
-	        --text="$(gettext "BD analyse")" \
+	        --text="$(gettext "BD analyse ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
 	        --pulsate \
 	        --auto-close
@@ -441,8 +455,8 @@ BD | ISO_BD )
 	# Warning if not decrypted
 	if [[ $(grep "Error calculating media key. Missing right processing key" BD-mplayer.err) ]]; then 
 		zenity --error --title "${ZEN_TITLE}" \
-			--text "$(gettext "AACS Key Error. Exiting !")" \
-			--timeout=2
+			--text "$(gettext "AACS Key Error. Exiting ! ")" \
+			--timeout=5
 		wazzuf_quit
 	fi
 
@@ -453,7 +467,7 @@ BD | ISO_BD )
 		echo "DVD_EPISODES_ORG="\"${DVD_EPISODES_ORG}\""" >> ${CONF_FILE_TMP}
 		BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d'=' -f2)
 		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG BD_TOTAL_TITLES ${BD_TOTAL_TITLES}"; fi
-	
+
 		# Titles
 		TITLE=1
 		while [[ ${TITLE} -le ${BD_TOTAL_TITLES} ]]
@@ -497,7 +511,6 @@ BD | ISO_BD )
 		BD_TITLE_LIST="${ZENITY_TITLES}"
 		echo "BD_TITLE_LIST="\"${BD_TITLE_LIST}\""" >> ${CONF_FILE_TMP}
 
-		exit 0
 	else
 		# single video
 		bd_get_longest_title
@@ -511,20 +524,38 @@ BD | ISO_BD )
 		fi
 
 		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The longest track is <b>Title %s</b> / %s (Chapters: %s).
-This one will be use for cropping detection.")" "${BD_LONGEST_TITLE_NUMBER}" "${BD_TOTAL_TITLES}" "${BD_LONGEST_TITLE_CHAPTERS}")" --ok-label "${ZEN_LABEL_NEXT}"
+This one will be use for cropping detection.")" "${BD_LONGEST_TITLE_NUMBER}" "${BD_TOTAL_TITLES}" ${BD_LONGEST_TITLE_CHAPTERS})" --ok-label "${ZEN_LABEL_NEXT}"
 	fi
-
-	zenity --info --title "${ZEN_TITLE}" --text "The longest track is <b>Title ${BD_LONGEST_TITLE_NUMBER}</b> / ${BD_TOTAL_TITLES} (Chapters: ${BD_LONGEST_TITLE_CHAPTERS}).
-This one will be use for cropping detection." --ok-label "Next"
 	;;
 DVD | ISO_DVD )
 	check_lsdvd
 	DVD_PATH="${ZENITY_DISC_DIR}"
 
 	if [[ $SOURCE == "DVD" ]]; then
-		DVD_MOUNT_PATH=${DVD_PATH}
+		# If an iso, mount the device
+		if [[ ${SOURCE} == "ISO_DVD" ]]; then
+			iso_manage mount GUI
+			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"; fi
+			DVD_MOUNT_PATH="${ISO_MOUNT_POINT}"
+		else
+			DVD_MOUNT_PATH="${DVD_PATH}"
+		fi
+		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG BD_MOUNT ${BD_MOUNT}"; fi
+
+		# Compare the provided media device type with the detected one
+		MOUNT_PATH="${DVD_MOUNT_PATH}"
+		get_media_device_type
+		if [[ ! ${MEDIA_DEVICE_TYPE} == "DVD" ]]; then
+			zenity --error --title "${ZEN_TITLE}" \
+				--text "$(gettext "Media device not recognized as DVD but as ${MEDIA_DEVICE_TYPE} ! ")" \
+				--timeout=5
+			wazzuf_quit
+		fi
+
 		# Propose to copy DVD to local iso file
-		zenity --question --title "${ZEN_TITLE}" --text "$(gettext "Do you want to <b>make a local iso</b> file of your DVD ?")" --ok-label "${ZEN_LABEL_YES}" --cancel-label="${ZEN_LABEL_NO}"
+		# need  ISO_FILE
+		#	DVD_MOUNT_PATH
+		zenity --question --title "${ZEN_TITLE}" --text "$(gettext "Do you want to <b>make a local iso</b> file of your DVD ? ")" --ok-label "${ZEN_LABEL_YES}" --cancel-label="${ZEN_LABEL_NO}"
 		if [ $? = "0" ]; then
 			# only if ISO_FILE exists
 			if [[ "${ISO_FILE}" == "" ]]; then
@@ -542,7 +573,7 @@ DVD | ISO_DVD )
 
 	( lsdvd -acsv "${DVD_SOURCE}" 2>/dev/null > DVD-lsdvd.info ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
-	        --text="$(gettext "DVD analyse")" \
+	        --text="$(gettext "DVD analyse ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
 	        --pulsate \
 	        --auto-close
@@ -621,13 +652,13 @@ DVD | ISO_DVD )
 		DVD_TITLE_NUMBER=$(strings DVD-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//)
 		echo "DVD_TITLE_NUMBER="\"${DVD_TITLE_NUMBER}\""" >> ${CONF_FILE_TMP}
 		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The longest track is <b>Title %s</b>.
-This one will be use for cropping detection.")" "${DVD_TITLE_NUMBER}")" --ok-label "${ZEN_LABEL_NEXT}"
+This one will be use for cropping detection.")" ${DVD_TITLE_NUMBER})" --ok-label "${ZEN_LABEL_NEXT}"
 	fi
 	;;
 M2TS )
 	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify "${M2TS_FILE_PATH}" 2>/dev/null > M2TS-mplayer.info; ${CONV_PROJECT} -i "${M2TS_FILE_PATH}" 2> M2TS-${CONV_PROJECT}.info ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
-	        --text="$(gettext "M2TS analyse")" \
+	        --text="$(gettext "M2TS analyse ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
 	        --pulsate \
 	        --auto-close
@@ -664,9 +695,9 @@ M2TS )
 	# Begin with video crop detection
 	cropdetect GUI
 	if [[ "${VIDEO_CROP}" == "" ]]; then
-		zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The m2ts/ts video crop has not been found")" --ok-label "${ZEN_LABEL_NEXT}"
+		zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The m2ts/ts video crop has not been found ")" --ok-label "${ZEN_LABEL_NEXT}"
 	else
-		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The m2ts/ts video crop has been set to %s")" "${VIDEO_CROP}")" --ok-label "${ZEN_LABEL_NEXT}"
+		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The m2ts/ts video crop has been set to %s")" ${VIDEO_CROP})" --ok-label "${ZEN_LABEL_NEXT}"
 	fi
 	echo "VIDEO_CROP="\"${VIDEO_CROP}\""" >> ${CONF_FILE_TMP}
 
@@ -696,7 +727,7 @@ M2TS )
 	M2TS_CONF_AUDIOS_FINAL_PATH="/tmp/wazzuf-conf-audio-final.txt"
 	( mediainfo --Inform="Audio;%ID%|%Format%|%Language/String%|%Channel(s)%|%BitRate%\n" "${M2TS_FILE_TOANALYSE}" > ${M2TS_CONF_AUDIOS_PATH} ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
-	        --text="$(gettext "Audio analyze")" \
+	        --text="$(gettext "Audio analyze ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
 	        --pulsate \
 	        --auto-close
@@ -823,7 +854,7 @@ M2TS )
 	M2TS_CONF_SUBS_FINAL_PATH="/tmp/wazzuf-conf-subs-final.txt"
 	( mediainfo --Inform="Text;%ID%|%Format%|%Language/String%\n" "${M2TS_FILE_TOANALYSE}" > ${M2TS_CONF_SUBS_PATH} ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
-	        --text="$(gettext "Subtitle analyze")" \
+	        --text="$(gettext "Subtitle analyze ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
 	        --pulsate \
 	        --auto-close
@@ -931,10 +962,10 @@ ISO_BD | BD )
 	cropdetect GUI
 	# VIDEO_CROP value check
 	if [[ ${VIDEO_CROP} == "" ]]; then
-		zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The BD video crop has not been found.")" --ok-label "${ZEN_LABEL_NEXT}"
+		zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The BD video crop has not been found. ")" --ok-label "${ZEN_LABEL_NEXT}"
 		echo "VIDEO_CROP="\"\"" # not found" >> ${CONF_FILE_TMP}
 	else
-		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The BD video crop has been set to %s")" "${VIDEO_CROP}")" --ok-label "${ZEN_LABEL_NEXT}"
+		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The BD video crop has been set to %s")" ${VIDEO_CROP})" --ok-label "${ZEN_LABEL_NEXT}"
 		echo "VIDEO_CROP="\"${VIDEO_CROP}\""" >> ${CONF_FILE_TMP}
 	fi
 
@@ -954,19 +985,19 @@ DVD | ISO_DVD )
 		echo "VIDEO_CROP="\"$(grep ^#VIDEO_CROP_TITLE_ ${CONF_FILE_TMP} | cut -d '"' -f 2 | sort -n | tail -1)\""" >> ${CONF_FILE_TMP}
 		# VIDEO_CROP value check
 		if [[ ${VIDEO_CROP} == "" ]]; then
-			zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The DVD video crop has not been found.")" --ok-label "${ZEN_LABEL_NEXT}"
+			zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The DVD video crop has not been found. ")" --ok-label "${ZEN_LABEL_NEXT}"
 		else
 			zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The DVD video crop has been set to %s.
-This is the biggest one. Crop detection for all choosen Titles are in conf file too.")" "${VIDEO_CROP}")" --ok-label "${ZEN_LABEL_NEXT}"
+This is the biggest one. Crop detection for all choosen Titles are in conf file too.")" ${VIDEO_CROP})" --ok-label "${ZEN_LABEL_NEXT}"
 		fi
 	else
 		cropdetect GUI
 		# VIDEO_CROP value check
 		if [[ ${VIDEO_CROP} == "" ]]; then
-			zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The DVD video crop has not been found.")" --ok-label "${ZEN_LABEL_NEXT}"
+			zenity --info --title "${ZEN_TITLE}" --text "$(gettext "The DVD video crop has not been found. ")" --ok-label "${ZEN_LABEL_NEXT}"
 			echo "VIDEO_CROP="\"\"" # not found" >> ${CONF_FILE_TMP}
 		else
-			zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The DVD video crop has been set to %s")" "${VIDEO_CROP}")" --ok-label "${ZEN_LABEL_NEXT}"
+			zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The DVD video crop has been set to %s")" ${VIDEO_CROP})" --ok-label "${ZEN_LABEL_NEXT}"
 			echo "VIDEO_CROP="\"${VIDEO_CROP}\""" >> ${CONF_FILE_TMP}
 		fi
 
