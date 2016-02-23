@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wazzuf-ripper 6\n"
 "Report-Msgid-Bugs-To: booloki@lokizone.net\n"
-"POT-Creation-Date: 2016-02-20 16:41+0100\n"
-"PO-Revision-Date: 2016-01-26 19:51+0100\n"
+"POT-Creation-Date: 2016-02-23 18:38+0100\n"
+"PO-Revision-Date: 2016-02-23 18:37+0100\n"
 "Last-Translator: Nicolas Perrin <booloki@lokizone.net>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 1.8.7\n"
 
 #: wazzuf-ripper:16
 msgid "\\nWazzuf Ripper failed !"
@@ -29,29 +29,29 @@ msgstr ""
 " Démarrage de %s %s :\\n%s\\navec le codec vidéo %s\\net le(s) codec(s) "
 "audio %s %s"
 
-#: wazzuf-ripper:301
+#: wazzuf-ripper:396
 msgid "Work in progress:"
 msgstr "Travail en cours:"
 
-#: wazzuf-ripper:427
+#: wazzuf-ripper:522
 msgid "No IMdb ID provided. Skipping..."
 msgstr "Aucun ID IMdb fourni. Je passe..."
 
-#: wazzuf-ripper:439
+#: wazzuf-ripper:534
 msgid "Retrieving IMdb informations..."
 msgstr "Récupération des informations IMdb..."
 
-#: wazzuf-ripper:458
+#: wazzuf-ripper:553
 msgid "\\nManual killed script (Ctrl-C) during extracting working file"
 msgstr ""
 "\\nScript interrompu manuellement (Ctrl-C) pendant l'extraction de fichier "
 "de travail"
 
-#: wazzuf-ripper:509
+#: wazzuf-ripper:598
 msgid "Extracting %s from %s "
 msgstr "Extraction de %s depuis %s "
 
-#: wazzuf-ripper:520
+#: wazzuf-ripper:609
 msgid ""
 "Please now run wazzuf-conf-generator with chosen M2TS file to get more "
 "tracks informations,\\nor use M2TS instead of BD in %s.\\n"
@@ -60,46 +60,46 @@ msgstr ""
 "pour obtenir plus d’informations sur les pistes,\\noù utilisez M2TS à la "
 "place de BD dans %s.\\n"
 
-#: wazzuf-ripper:540
+#: wazzuf-ripper:629
 msgid "%s generation"
 msgstr "Génération de %s"
 
-#: wazzuf-ripper:561
+#: wazzuf-ripper:650
 msgid "No chapters file to create. Next..."
 msgstr "Pas de fichier de chapitres à créer. Suivant..."
 
-#: wazzuf-ripper:592
+#: wazzuf-ripper:681
 msgid "\\nManual killed script (Ctrl-C) during checking/extracting subtitles"
 msgstr ""
 "\\nScript interrompu manuellement (Ctrl-C) pendant la vérification/"
 "extraction des sous-titres"
 
-#: wazzuf-ripper:601
+#: wazzuf-ripper:690
 msgid "No more subtitle track choice. Next..."
 msgstr "Plus de choix de piste de sous-titre. Suivant..."
 
-#: wazzuf-ripper:735
+#: wazzuf-ripper:824
 msgid ""
 "\\nManual killed script (Ctrl-C) during audio track(s) extraction/encoding"
 msgstr ""
 "\\nScript interrompu manuellement (Ctrl-C) pendant l'extraction/encodage de "
 "piste(s) audio"
 
-#: wazzuf-ripper:744
+#: wazzuf-ripper:833
 msgid "No more audio track choice, next..."
 msgstr "Plus de choix de piste audio. Suivant..."
 
-#: wazzuf-ripper:815
+#: wazzuf-ripper:904
 msgid "\\nManual killed script (Ctrl-C) during video encoding"
 msgstr "\\nScript interrompu manuellement (Ctrl-C) pendant l'encodage vidéo"
 
-#: wazzuf-ripper:828
+#: wazzuf-ripper:917
 msgid "Provided TARGET_SIZE is not set to CD, DVD, or an integer ! Exiting."
 msgstr ""
 "Le paramètre TARGET_SIZE fourni n'est pas mis à CD, DVD ou avec un entier ! "
 "Je quitte."
 
-#: wazzuf-ripper:878
+#: wazzuf-ripper:967
 msgid ""
 "h264 video bitrate encoding estimation: %s kb/s.\\nManually adjust the "
 "XXRIP_VIDEO_BITRATE value if the final size does not suit you."
@@ -107,7 +107,7 @@ msgstr ""
 "Estimation du débit d'encodage vidéo h264: %s kb/s.\\nAjustez manuellement "
 "la valeur de XXRIP_VIDEO_BITRATE si la taille finale ne vous convient pas."
 
-#: wazzuf-ripper:896
+#: wazzuf-ripper:985
 msgid ""
 "Xvid video bitrate encoding estimation: %s kb/s.\\nManually adjust the "
 "XXRIP_VIDEO_BITRATE value if the final size does not suit you."
@@ -115,41 +115,41 @@ msgstr ""
 "Estimation du débit d'encodage vidéo Xvid: %s kb/s.\\nAjustez manuellement "
 "la valeur de XXRIP_VIDEO_BITRATE si la taille finale ne vous convient pas."
 
-#: wazzuf-ripper:926
+#: wazzuf-ripper:1015
 msgid ""
 "Warning: VIDEO_CROP is empty ! Run wazzuf-conf-generator for crop detection."
 msgstr ""
 "Attention: le paramètre VIDEO_CROP est vide ! Lancez wazzuf-conf-generator "
 "pour une détection de cadrage."
 
-#: wazzuf-ripper:940
+#: wazzuf-ripper:1029
 msgid "%s 2 pass %s encoding\\n"
 msgstr "Encodage de %s en %s  2 passes\\n"
 
-#: wazzuf-ripper:971
+#: wazzuf-ripper:1060
 msgid "No image attachment. Skipping..."
 msgstr "Pas d'image jointe. Je passe..."
 
-#: wazzuf-ripper:1052
+#: wazzuf-ripper:1141
 msgid "XML tags file generation error. Skipping..."
 msgstr "Erreur de génération de fichier XML d'étiquettes. Je passe..."
 
-#: wazzuf-ripper:1070
+#: wazzuf-ripper:1159
 msgid "\\nManual killed script (Ctrl-C) during final mkv merge"
 msgstr "\\nScript interrompu manuellement (Ctrl-C) pendant la fusion finale"
 
-#: wazzuf-ripper:1072
+#: wazzuf-ripper:1161
 msgid "Final file merge"
 msgstr "Fusion finale du fichier"
 
-#: wazzuf-ripper:1128
+#: wazzuf-ripper:1217
 msgid "nfo file generation"
 msgstr "Génération de fichier nfo"
 
-#: wazzuf-ripper:1164
+#: wazzuf-ripper:1253
 msgid "Taking some screenshots"
 msgstr "Prends quelques captures d'écran"
 
-#: wazzuf-ripper:1190
+#: wazzuf-ripper:1279
 msgid "%s %s is finished"
 msgstr "%s %s est terminé"
