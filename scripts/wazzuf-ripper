@@ -604,7 +604,7 @@ time for ((i=${CHAPTER_FIRST}; i <= CHAPTER_LAST ; i++)); do
 				file_exists
 			fi
 
-			if [[ ${SOURCE} == "ISO_BD" ]]; then iso_bd_manage umount; fi
+			if [[ ${SOURCE} == "ISO_BD" ]]; then iso_manage umount; fi
 
 			MESSAGE_DBTOM2TS=$(printf "$(gettext "Please now run wazzuf-conf-generator with chosen M2TS file to get more tracks informations,\nor use M2TS instead of BD in %s.\n")" "${CONF_FILE}")
 			if [[ ${WAZZUF_UI} == "GUI" ]]; then
@@ -715,7 +715,6 @@ time for ((i=${CHAPTER_FIRST}; i <= CHAPTER_LAST ; i++)); do
 			SUBTITLE_FILE_FORCE_PATH="${SOURCE_DIRECTORY}/${SUBTITLE_FILE_FORCE}"
 
 			if [[ ${DEBUG} == "1" ]]; then
-				echo ""
 				echo "DEBUG SUB_COUNTER ${SUB_COUNTER}"
 				echo "DEBUG SUBTITLE_NAME ${SUBTITLE_NAME}"
 				echo "DEBUG SUBTITLE_SID ${SUBTITLE_SID}"

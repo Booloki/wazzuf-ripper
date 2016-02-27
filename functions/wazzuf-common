@@ -68,6 +68,15 @@ get_media_device_type () {
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_DEVICE_TYPE ${MEDIA_DEVICE_TYPE}";fi
 }
 
+# Get the name of the mounted media device
+# need MOUNT_PATH
+#
+# return MEDIA_TITLE
+get_media_title () {
+	MEDIA_TITLE=$(echo ${MOUNT_PATH} | awk 'BEGIN {FS = "/"} ; {print $NF}')
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_TITLE ${MEDIA_TITLE}";fi
+}
+
 # soft_to_install_exit
 # need  SOFT_NAME
 #	WAZZUF_UI

@@ -3,6 +3,10 @@
 # booloki@lokizone.net
 # Changelog file
 
+2016-02-27
+* Add basic Blu-ray iso generation (copy_bd2iso function)
+* Add input media title research (get_media_title function)
+
 2016-02-23
 * Media checking and iso management rework with udisksctl (new dependancy)
 * Bugfix: wazzuf-pre functions file re-load

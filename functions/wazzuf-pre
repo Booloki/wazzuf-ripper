@@ -2,7 +2,7 @@
 
 # Run cropdetect to establish the correct crop rectangle
 CROP_FRAMES=150
-cropdetect(){
+cropdetect () {
 	case ${1} in
 	GUI )
 		case ${SOURCE} in
@@ -64,7 +64,7 @@ cropdetect(){
 }
 
 ## 'decode' avconv output file
-avconv-decode(){
+avconv_decode () {
 	while read LINE
 	do
 		ID_HEX=$(echo "${LINE}" | grep '^Stream' | cut -d '[' -f 2 | cut -d ']' -f 1)
@@ -75,7 +75,7 @@ avconv-decode(){
 }
 
 ## 'decode' lsdvd output file
-lsdvd-decode(){
+lsdvd_decode () {
 	while read LINE
 	do
 		ID_HEX=$(echo ${LINE} | grep -vE '^Title|VTS|Chapter' | grep -o '.\{5\}$' | sed 's/,//')
@@ -89,18 +89,32 @@ lsdvd-decode(){
 ## copy DVD to local iso file
 # need  ISO_FILE
 #	DVD_MOUNT_PATH
-copy-dvd2iso (){
+copy_dvd2iso () {
 	check_genisoimage
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}""; fi
 	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}""; fi
 		( genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}" 2>&1 \
 			| sed -u 's/.* \(.*[0-9]\)\.\([0-9]\+%\)\(.*\)/\1\n# iso file creation in progress\t\t\1.\2/' )\
 			| zenity --progress \
 			--title="${ZEN_TITLE}" \
 			--auto-close
 	else
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}""; fi
 		genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}"
+	fi
+}
+
+## copy BD to local iso file
+# need  ISO_FILE
+#	DEVICE_PATH_BASE
+copy_bd2iso () {
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG dd if=${DEVICE_PATH_BASE} of=${ISO_FILE}" 2>&1 > /dev/null; fi
+	if [[ ${WAZZUF_UI} == "GUI" ]]; then
+		( dd if=${DEVICE_PATH_BASE} of=${ISO_FILE} 2>&1 > /dev/null ) \
+			| zenity --progress \
+			--pulsate \
+			--title="${ZEN_TITLE}"
+	else
+		dd if=${DEVICE_PATH_BASE} of=${ISO_FILE}
 	fi
 }
 

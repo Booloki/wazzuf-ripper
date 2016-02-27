@@ -139,8 +139,10 @@ ISO_BD | ISO_DVD )
 			empty_exit
 		else
 			echo "ISO_FILE=\""${ISO_FILE}"\"" >> ${CONF_FILE_TMP}
-			# Prepare the M2TS file variable
-			echo "M2TS_FILE=\"\"" >> ${CONF_FILE_TMP}
+			# Prepare the M2TS file variable if source is ISO_BD
+			if [[ ${SOURCE} == "ISO_BD" ]]; then
+				echo "M2TS_FILE=\"\"" >> ${CONF_FILE_TMP}
+			fi
 		fi
 	else
 		SOURCE_NAME="source directory"
@@ -424,7 +426,9 @@ M2TS_FILE_PATH="${SOURCE_DIRECTORY}/${M2TS_FILE}"
 
 case $SOURCE in
 BD | ISO_BD )
+	BD_PATH="${ZENITY_DISC_DIR}"
 	echo "M2TS_FILE="\"\""" >> ${CONF_FILE_TMP}
+	# If an iso, mount the device
 	if [[ ${SOURCE} == "ISO_BD" ]]; then
 		iso_manage mount GUI
 		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"; fi
@@ -443,9 +447,10 @@ BD | ISO_BD )
 			--timeout=5
 		wazzuf_quit
 	fi
+	get_media_title
 
 	# Get BD informations
-	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify br:// -bluray-device "${BD_MOUNT}" 2> BD-mplayer.err > BD-mplayer.info ) | zenity --progress \
+	( echo 10; mplayer -nolirc -v -vo null -ao null -frames 0 -identify br:// -bluray-device "${BD_MOUNT}" 2> ${MEDIA_TITLE}-mplayer.err > ${MEDIA_TITLE}-mplayer.info ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
 	        --text="$(gettext "BD analyse ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
@@ -453,11 +458,29 @@ BD | ISO_BD )
 	        --auto-close
 
 	# Warning if not decrypted
-	if [[ $(grep "Error calculating media key. Missing right processing key" BD-mplayer.err) ]]; then 
+	if [[ $(grep "Error calculating media key. Missing right processing key" ${MEDIA_TITLE}-mplayer.err) ]]; then
 		zenity --error --title "${ZEN_TITLE}" \
 			--text "$(gettext "AACS Key Error. Exiting ! ")" \
 			--timeout=5
 		wazzuf_quit
+	fi
+
+	if [[ ${SOURCE} == "BD" ]]; then
+		# Propose to copy BD to local iso file
+		# need  ISO_FILE
+		zenity --question --title "${ZEN_TITLE}" --text "$(gettext "Do you want to <b>make a local iso</b> file of your BD ? ")" --ok-label "${ZEN_LABEL_YES}" --cancel-label="${ZEN_LABEL_NO}"
+		if [ $? = "0" ]; then
+			# only if ISO_FILE exists
+			if [[ "${ISO_FILE}" == "" ]]; then
+				# pas top
+				#ISO_FILE="${TITLE_NAME}-BD-$(date +%d-%H.%M).iso"
+				ISO_FILE="${MEDIA_TITLE}.iso"
+				sed -i "s/^SOURCE=\"BD\"$/SOURCE=\"BD\"\nISO_FILE=\"${ISO_FILE}\"/" ${CONF_FILE_TMP}
+			fi
+			copy_bd2iso
+			# Change SOURCE="BD" to "ISO_BD" in configuration file
+			sed -i 's/^SOURCE="BD"$/SOURCE="ISO_BD"/' ${CONF_FILE_TMP}
+		fi
 	fi
 
 	if [[ ${ZENITY_VIDEO_TYPE} == "SHOW" ]]; then
@@ -465,17 +488,17 @@ BD | ISO_BD )
 		# BD Episodes choice
 		DVD_EPISODES_ORG="TITLES"
 		echo "DVD_EPISODES_ORG="\"${DVD_EPISODES_ORG}\""" >> ${CONF_FILE_TMP}
-		BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d'=' -f2)
+		BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES ${MEDIA_TITLE}-mplayer.info | cut -d'=' -f2)
 		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG BD_TOTAL_TITLES ${BD_TOTAL_TITLES}"; fi
 
 		# Titles
 		TITLE=1
 		while [[ ${TITLE} -le ${BD_TOTAL_TITLES} ]]
 		do
-                        BD_TITLE_LENGTH[${TITLE}]=$(($(grep ^ID_BLURAY_TITLE_${TITLE}_LENGTH BD-mplayer.info | cut -d'=' -f2 | cut -d'.' -f1) / 60))
-                        BD_TITLE_CHAPTERS[$TITLE]=$(grep ^ID_BLURAY_TITLE_${TITLE}_CHAPTERS BD-mplayer.info | cut -d'=' -f2)
-                        BD_TITLE_PLAYLIST_POSITION[${TITLE}]=$(grep ^ID_BLURAY_TITLE_${TITLE}_PLAYLIST BD-mplayer.info | cut -d'=' -f2)
-                        BD_TITLE_ANGLES[${TITLE}]=$(grep ^ID_BLURAY_TITLE_${TITLE}_ANGLE BD-mplayer.info | cut -d'=' -f2)
+                        BD_TITLE_LENGTH[${TITLE}]=$(($(grep ^ID_BLURAY_TITLE_${TITLE}_LENGTH ${MEDIA_TITLE}-mplayer.info | cut -d'=' -f2 | cut -d'.' -f1) / 60))
+                        BD_TITLE_CHAPTERS[$TITLE]=$(grep ^ID_BLURAY_TITLE_${TITLE}_CHAPTERS ${MEDIA_TITLE}-mplayer.info | cut -d'=' -f2)
+                        BD_TITLE_PLAYLIST_POSITION[${TITLE}]=$(grep ^ID_BLURAY_TITLE_${TITLE}_PLAYLIST ${MEDIA_TITLE}-mplayer.info | cut -d'=' -f2)
+                        BD_TITLE_ANGLES[${TITLE}]=$(grep ^ID_BLURAY_TITLE_${TITLE}_ANGLE ${MEDIA_TITLE}-mplayer.info | cut -d'=' -f2)
 			if [[ ${DEBUG} == "1" ]]; then
 				echo "DEBUG TITLE ${TITLE}"
 				echo "DEBUG BD_TITLE_LENGTH[${TITLE}] ${BD_TITLE_LENGTH[$TITLE]}"
@@ -514,8 +537,8 @@ BD | ISO_BD )
 	else
 		# single video
 		bd_get_longest_title
-		BD_LONGEST_TITLE_CHAPTERS=$(grep ^ID_BLURAY_TITLE_${BD_LONGEST_TITLE_NUMBER}_CHAPTERS BD-mplayer.info | cut -d '=' -f2)
-		BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES BD-mplayer.info | cut -d '=' -f2)
+		BD_LONGEST_TITLE_CHAPTERS=$(grep ^ID_BLURAY_TITLE_${BD_LONGEST_TITLE_NUMBER}_CHAPTERS ${MEDIA_TITLE}-mplayer.info | cut -d '=' -f2)
+		BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES ${MEDIA_TITLE}-mplayer.info | cut -d '=' -f2)
 	
 		if [[ ${DEBUG} == "1" ]]; then
 			echo "DEBUG BD_LONGEST_TITLE_NUMBER ${BD_LONGEST_TITLE_NUMBER}"
@@ -551,6 +574,7 @@ DVD | ISO_DVD )
 				--timeout=5
 			wazzuf_quit
 		fi
+		get_media_title
 
 		# Propose to copy DVD to local iso file
 		# need  ISO_FILE
@@ -559,19 +583,22 @@ DVD | ISO_DVD )
 		if [ $? = "0" ]; then
 			# only if ISO_FILE exists
 			if [[ "${ISO_FILE}" == "" ]]; then
-				ISO_FILE="${TITLE_NAME}-DVD-$(date +%d-%H.%M).iso"
+				ISO_FILE="${MEDIA_TITLE}.iso"
 				sed -i "s/^SOURCE=\"DVD\"$/SOURCE=\"DVD\"\nISO_FILE=\"${ISO_FILE}\"/" ${CONF_FILE_TMP}
 			fi
-			copy-dvd2iso
+			copy_dvd2iso
 			# Change SOURCE="DVD" to "ISO_DVD" in configuration file
 			sed -i 's/^SOURCE="DVD"$/SOURCE="ISO_DVD"/' ${CONF_FILE_TMP}
 		fi
 		DVD_SOURCE="${DVD_PATH}"
 	else
 		DVD_SOURCE="${ISO_FILE_PATH}"
+		
+		MEDIA_TITLE=$(echo ${ISO_FILE_PATH} | awk 'BEGIN {FS = "/"} ; {print $NF}' | sed 's/.iso//')
+		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_TITLE ${MEDIA_TITLE}";fi
 	fi
 
-	( lsdvd -acsv "${DVD_SOURCE}" 2>/dev/null > DVD-lsdvd.info ) | zenity --progress \
+	( lsdvd -acsv "${DVD_SOURCE}" 2>/dev/null > ${MEDIA_TITLE}-lsdvd.info ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
 	        --text="$(gettext "DVD analyse ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
@@ -590,7 +617,7 @@ DVD | ISO_DVD )
 		case ${DVD_EPISODES_ORG} in
 		TITLES )
 			# If episodes are on DVD TITLES
-			strings DVD-lsdvd.info | grep "^Title:" > DVD-Titles-lsdvd.info
+			strings ${MEDIA_TITLE}-lsdvd.info | grep "^Title:" > ${MEDIA_TITLE}-Titles-lsdvd.info
 
 			# Titles
 			i=0
@@ -610,7 +637,7 @@ DVD | ISO_DVD )
 					echo "DEBUG DVD_TITLE_TRACKS_AUDIO[$i] ${DVD_TITLE_TRACKS_AUDIO[$i]}"
 					echo "DEBUG DVD_TITLE_TRACKS_SUBTITLES[$i] ${DVD_TITLE_TRACKS_SUBTITLES[$i]}"
 				fi
-			done  < DVD-Titles-lsdvd.info
+			done  < ${MEDIA_TITLE}-Titles-lsdvd.info
 
 			# zenity height
 			# Add radiolist header to component number
@@ -640,23 +667,23 @@ DVD | ISO_DVD )
 		CHAPTERS )
 			# If episodes are on DVD CHAPTERS
 			# Not used for now
-			DVD_TITLE_NUMBER=$(strings DVD-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//)
+			DVD_TITLE_NUMBER=$(strings ${MEDIA_TITLE}-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//)
 			echo "DVD_TITLE_NUMBER="\"${DVD_TITLE_NUMBER}\""" >> ${CONF_FILE_TMP}
 			DVD_CHAPTER_FIRST="1"
-			DVD_CHAPTER_LAST=$(strings DVD-lsdvd.info | grep "^Title: ${DVD_TITLE_NUMBER}" | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //)
+			DVD_CHAPTER_LAST=$(strings ${MEDIA_TITLE}-lsdvd.info | grep "^Title: ${DVD_TITLE_NUMBER}" | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //)
 			echo "DVD_CHAPTER_FIRST="\"${DVD_CHAPTER_FIRST}\""" >> ${CONF_FILE_TMP}
 			echo "DVD_CHAPTER_LAST="\"${DVD_CHAPTER_LAST}\""" >> ${CONF_FILE_TMP}
 			;;
 		esac
 	else
-		DVD_TITLE_NUMBER=$(strings DVD-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//)
+		DVD_TITLE_NUMBER=$(strings ${MEDIA_TITLE}-lsdvd.info | grep "^Longest track:" | sed s/'Longest track: '//)
 		echo "DVD_TITLE_NUMBER="\"${DVD_TITLE_NUMBER}\""" >> ${CONF_FILE_TMP}
 		zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The longest track is <b>Title %s</b>.
 This one will be use for cropping detection.")" ${DVD_TITLE_NUMBER})" --ok-label "${ZEN_LABEL_NEXT}"
 	fi
 	;;
 M2TS )
-	( echo 10; mplayer -v -vo null -ao null -frames 0 -identify "${M2TS_FILE_PATH}" 2>/dev/null > M2TS-mplayer.info; ${CONV_PROJECT} -i "${M2TS_FILE_PATH}" 2> M2TS-${CONV_PROJECT}.info ) | zenity --progress \
+	( echo 10; mplayer -nolirc -v -vo null -ao null -frames 0 -identify "${M2TS_FILE_PATH}" 2>/dev/null > M2TS-mplayer.info; ${CONV_PROJECT} -i "${M2TS_FILE_PATH}" 2> M2TS-${CONV_PROJECT}.info ) | zenity --progress \
 	        --title="${ZEN_TITLE}" \
 	        --text="$(gettext "M2TS analyse ")" \
 	        --cancel-label="${ZEN_LABEL_CANCEL}" \
@@ -969,7 +996,7 @@ ISO_BD | BD )
 		echo "VIDEO_CROP="\"${VIDEO_CROP}\""" >> ${CONF_FILE_TMP}
 	fi
 
-	if [[ $SOURCE == "ISO_BD" ]]; then iso_bd_manage umount GUI; fi
+	if [[ $SOURCE == "ISO_BD" ]]; then iso_manage umount GUI; fi
 	;;
 DVD | ISO_DVD )
 	if [[ ${ZENITY_VIDEO_TYPE} == "SHOW" && ${DVD_EPISODES_ORG} == "TITLES" ]]; then
@@ -978,8 +1005,8 @@ DVD | ISO_DVD )
 			cropdetect GUI
 			# VIDEO_CROP for each TITLE (for information only)
 			echo "#VIDEO_CROP_TITLE_${DVD_TITLE_NUMBER}="\"${VIDEO_CROP}\""" >> ${CONF_FILE_TMP}
-			lsdvd -t ${DVD_TITLE_NUMBER} -acsv ${DVD_SOURCE} 2>/dev/null | grep -E "Subtitle|Audio|VTS" > DVD-lsdvd-T${DVD_TITLE_NUMBER}.info
-			lsdvd -t ${DVD_TITLE_NUMBER} -acsv "${DVD_SOURCE}" 2>/dev/null | grep -E "Audio: " > DVD-lsdvd-T${DVD_TITLE_NUMBER}-audio.info
+			lsdvd -t ${DVD_TITLE_NUMBER} -acsv ${DVD_SOURCE} 2>/dev/null | grep -E "Subtitle|Audio|VTS" > ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}.info
+			lsdvd -t ${DVD_TITLE_NUMBER} -acsv "${DVD_SOURCE}" 2>/dev/null | grep -E "Audio: " > ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-audio.info
 		done
 		# default VIDEO_CROP: the "biggest"
 		echo "VIDEO_CROP="\"$(grep ^#VIDEO_CROP_TITLE_ ${CONF_FILE_TMP} | cut -d '"' -f 2 | sort -n | tail -1)\""" >> ${CONF_FILE_TMP}
@@ -1001,7 +1028,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 			echo "VIDEO_CROP="\"${VIDEO_CROP}\""" >> ${CONF_FILE_TMP}
 		fi
 
-		lsdvd -t ${DVD_TITLE_NUMBER} -acsv "${DVD_SOURCE}" 2>/dev/null | grep "Audio:" > DVD-lsdvd-T${DVD_TITLE_NUMBER}-audio.info
+		lsdvd -t ${DVD_TITLE_NUMBER} -acsv "${DVD_SOURCE}" 2>/dev/null | grep "Audio:" > ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-audio.info
 	fi
 
 	# audio
@@ -1017,7 +1044,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 			DVD_AUDIO_FORMAT[$i]=$(echo ${LINE} | cut -d ',' -f3 | cut -d ':' -f2 | sed s/\ //)
 			DVD_AUDIO_CHANNELS[$i]=$(echo ${LINE} | cut -d ',' -f6 | cut -d ':' -f2 | sed s/\ //)
 		fi
-	done  < DVD-lsdvd-T${DVD_TITLE_NUMBER}-audio.info
+	done  < ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-audio.info
 	if [[ ${DEBUG} == "1" ]]; then
 		echo "DEBUG DVD_AUDIO_ID_[X] ${DVD_AUDIO_ID[1]} ${DVD_AUDIO_ID[2]} ${DVD_AUDIO_ID[3]} ${DVD_AUDIO_ID[4]}"
 	fi
@@ -1103,9 +1130,9 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 	done
 
 	# Subtitles
-	lsdvd -t ${DVD_TITLE_NUMBER} -acsv "${DVD_SOURCE}" 2>/dev/null | grep "Subtitle:" > DVD-lsdvd-T${DVD_TITLE_NUMBER}-sub.info
+	lsdvd -t ${DVD_TITLE_NUMBER} -acsv "${DVD_SOURCE}" 2>/dev/null | grep "Subtitle:" > ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-sub.info
 
-	if [ $(cat DVD-lsdvd-T${DVD_TITLE_NUMBER}-sub.info | wc -l) -ge "1" ]; then
+	if [ $(cat ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-sub.info | wc -l) -ge "1" ]; then
 		i=0
 		while read LINE
 		do
@@ -1116,7 +1143,7 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
 				DVD_SUB_ID[$i]=${SID}
 				DVD_SUB_LANG[$i]=$(echo ${LINE} | cut -d ',' -f2 | cut -d ':' -f2 | sed s/\ //)
 			fi
-		done < DVD-lsdvd-T${DVD_TITLE_NUMBER}-sub.info
+		done < ${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-sub.info
 		if [[ ${DEBUG} == "1" ]]; then
 			echo "DEBUG DVD_SUB_ID[X] ${DVD_SUB_ID[1]} ${DVD_SUB_ID[2]} ${DVD_SUB_ID[3]} ${DVD_SUB_ID[4]}"
 		fi
