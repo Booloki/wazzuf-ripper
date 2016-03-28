@@ -21,4 +21,4 @@ install: installdirs
 		$(INSTALL) scripts/wazzuf-conf-generator $(DESTDIR)$(bindir)/
 		$(INSTALL) gui/desktop/*.desktop $(DESTDIR)$(desktopdir)/
 		$(INSTALL) gui/icons/wazzuf-ripper.svg $(DESTDIR)$(iconsdir)/
-		$(INSTALL) fr/LC_MESSAGES/wazzuf-conf-generator.mo $(DESTDIR)$(localedir)/fr/LC_MESSAGES/
+		$(INSTALL) locale/fr/LC_MESSAGES/wazzuf-conf-generator.mo $(DESTDIR)$(localedir)/fr/LC_MESSAGES/

@@ -34,4 +34,4 @@ install: installdirs
 		$(INSTALL) doc/* $(DESTDIR)$(docdir)/
 		$(INSTALL) manpages/man1/* $(DESTDIR)$(manpagesdir1)/
 		$(INSTALL) manpages/man4/* $(DESTDIR)$(manpagesdir4)/
-		$(INSTALL) fr/LC_MESSAGES/wazzuf-ripper.mo $(DESTDIR)$(localedir)/fr/LC_MESSAGES/
+		$(INSTALL) locale/fr/LC_MESSAGES/wazzuf-ripper.mo $(DESTDIR)$(localedir)/fr/LC_MESSAGES/
