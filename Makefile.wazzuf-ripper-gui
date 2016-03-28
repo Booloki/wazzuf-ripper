@@ -1,0 +1,24 @@
+SHELL = /bin/sh
+
+prefix = /usr
+datarootdir = $(prefix)/share
+exec_prefix = $(prefix)
+MKINSTALLDIRS = mkdir -p
+INSTALL = cp
+
+bindir = $(exec_prefix)/bin
+desktopdir = $(datarootdir)/applications
+iconsdir = $(datarootdir)/pixmaps
+localedir = $(datarootdir)/locale
+
+installdirs: 
+	$(MKINSTALLDIRS) \
+	$(DESTDIR)$(bindir) $(DESTDIR)$(desktopdir) \
+	$(DESTDIR)$(iconsdir) $(DESTDIR)$(localedir)
+
+install: installdirs 
+	$(NORMAL_INSTALL)
+		$(INSTALL) scripts/wazzuf-conf-generator $(DESTDIR)$(bindir)/
+		$(INSTALL) gui/desktop/*.desktop $(DESTDIR)$(desktopdir)/
+		$(INSTALL) gui/icons/wazzuf-ripper.svg $(DESTDIR)$(iconsdir)/
+		$(INSTALL) fr/LC_MESSAGES/wazzuf-conf-generator.mo $(DESTDIR)$(localedir)/fr/LC_MESSAGES/
