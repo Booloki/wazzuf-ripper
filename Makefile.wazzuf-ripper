@@ -22,7 +22,7 @@ installdirs:
 	$(DESTDIR)$(bindir) $(DESTDIR)$(templatesdir) \
 	$(DESTDIR)$(libdir) $(DESTDIR)$(sysconfdir) \
 	$(DESTDIR)$(docdir) $(DESTDIR)$(manpagesdir1) \
-	$(DESTDIR)$(manpagesdir4) $(DESTDIR)$(localedir)
+	$(DESTDIR)$(manpagesdir4) $(DESTDIR)$(localedir)/fr/LC_MESSAGES/
 
 install: installdirs 
 	$(NORMAL_INSTALL)

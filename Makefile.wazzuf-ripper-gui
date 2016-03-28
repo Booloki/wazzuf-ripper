@@ -14,7 +14,7 @@ localedir = $(datarootdir)/locale
 installdirs: 
 	$(MKINSTALLDIRS) \
 	$(DESTDIR)$(bindir) $(DESTDIR)$(desktopdir) \
-	$(DESTDIR)$(iconsdir) $(DESTDIR)$(localedir)
+	$(DESTDIR)$(iconsdir) $(DESTDIR)$(localedir)/fr/LC_MESSAGES/
 
 install: installdirs 
 	$(NORMAL_INSTALL)
