@@ -312,14 +312,13 @@ audio_rip () {
 # return AUDIO_SOURCE_BITRATE
 get_audio_bitrate () {
 	AUDIO_SOURCE_BITRATE_STRING=$(mediainfo --Inform="Audio;%ID/String%:%BitRate/String%\n" ${SOURCE_FILE} | grep ${AUDIO_AID} | cut -d':' -f2)
-	# Could be in Mbps or Kbps... Or even "Unknown / 1 509 Kbps" for some DTS-MA tracks
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG AUDIO_SOURCE_BITRATE_STRING ${AUDIO_SOURCE_BITRATE_STRING}"; fi
-	if [[ ${AUDIO_SOURCE_BITRATE_STRING} == *Kbps* ]]
+	if [[ ${AUDIO_SOURCE_BITRATE_STRING} == *[kK]b[/p]s* ]]
 	then
-		AUDIO_SOURCE_BITRATE=$(echo ${AUDIO_SOURCE_BITRATE_STRING} | sed 's/ //g' | sed 's/Kbps//g' | sed 's|Unknown/||')
-	elif  [[ ${AUDIO_SOURCE_BITRATE_STRING} == *Mbps* ]]
+		AUDIO_SOURCE_BITRATE=$(echo ${AUDIO_SOURCE_BITRATE_STRING} | sed 's/ //g' | sed 's|[kK]b[/p]s||g' | sed 's|Unknown/||')
+	elif  [[ ${AUDIO_SOURCE_BITRATE_STRING} == *[mM]b[/p]s* ]]
 	then
-		AUDIO_SOURCE_BITRATE=$(echo ${AUDIO_SOURCE_BITRATE_STRING} | sed 's/ //g' | sed 's/Mbps/000/g' | sed 's|Unknown/||')
+		AUDIO_SOURCE_BITRATE=$(echo ${AUDIO_SOURCE_BITRATE_STRING} | sed 's/ //g' | sed 's|[mM]b[/p]s|000|g' | sed 's|Unknown/||')
 	# If empty, put a big number to avoid stoopid errors #crap
 	elif  [[ ${AUDIO_SOURCE_BITRATE_STRING} == "" ]]
 	then
