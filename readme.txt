@@ -1,5 +1,5 @@
 The files contained in these directories are part of Wazzuf Ripper.
-Copyright (C) 2011-2016 Nicolas Perrin
+Copyright (C) 2011-2017 Nicolas Perrin
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
