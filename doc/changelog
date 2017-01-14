@@ -3,6 +3,17 @@
 # booloki@lokizone.net
 # Changelog file
 
+2017-01-14
+* Add support for Advanced Audio Coding (AAC) tracks
+* Copyright update
+
+2017-01-09
+* Improve AUDIO_SOURCE_BITRATE_STRING cleaning. Fix #1
+
+2016-03-28
+* BugFix: Makefile paths
+* Split Makefile in wazzuf-ripper and wazzuf-ripper-gui
+
 2016-02-27
 * Add basic Blu-ray iso generation (copy_bd2iso function)
 * Add input media title research (get_media_title function)
