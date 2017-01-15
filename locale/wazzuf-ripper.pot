@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: booloki@lokizone.net\n"
-"POT-Creation-Date: 2016-02-23 18:39+0100\n"
+"POT-Creation-Date: 2017-01-15 18:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,68 +67,68 @@ msgstr ""
 msgid "No more subtitle track choice. Next..."
 msgstr ""
 
-#: wazzuf-ripper:824
+#: wazzuf-ripper:823
 msgid ""
 "\\nManual killed script (Ctrl-C) during audio track(s) extraction/encoding"
 msgstr ""
 
-#: wazzuf-ripper:833
+#: wazzuf-ripper:832
 msgid "No more audio track choice, next..."
 msgstr ""
 
-#: wazzuf-ripper:904
+#: wazzuf-ripper:903
 msgid "\\nManual killed script (Ctrl-C) during video encoding"
 msgstr ""
 
-#: wazzuf-ripper:917
+#: wazzuf-ripper:916
 msgid "Provided TARGET_SIZE is not set to CD, DVD, or an integer ! Exiting."
 msgstr ""
 
-#: wazzuf-ripper:967
+#: wazzuf-ripper:966
 msgid ""
 "h264 video bitrate encoding estimation: %s kb/s.\\nManually adjust the "
 "XXRIP_VIDEO_BITRATE value if the final size does not suit you."
 msgstr ""
 
-#: wazzuf-ripper:985
+#: wazzuf-ripper:984
 msgid ""
 "Xvid video bitrate encoding estimation: %s kb/s.\\nManually adjust the "
 "XXRIP_VIDEO_BITRATE value if the final size does not suit you."
 msgstr ""
 
-#: wazzuf-ripper:1015
+#: wazzuf-ripper:1014
 msgid ""
 "Warning: VIDEO_CROP is empty ! Run wazzuf-conf-generator for crop detection."
 msgstr ""
 
-#: wazzuf-ripper:1029
+#: wazzuf-ripper:1028
 msgid "%s 2 pass %s encoding\\n"
 msgstr ""
 
-#: wazzuf-ripper:1060
+#: wazzuf-ripper:1059
 msgid "No image attachment. Skipping..."
 msgstr ""
 
-#: wazzuf-ripper:1141
+#: wazzuf-ripper:1140
 msgid "XML tags file generation error. Skipping..."
 msgstr ""
 
-#: wazzuf-ripper:1159
+#: wazzuf-ripper:1158
 msgid "\\nManual killed script (Ctrl-C) during final mkv merge"
 msgstr ""
 
-#: wazzuf-ripper:1161
+#: wazzuf-ripper:1160
 msgid "Final file merge"
 msgstr ""
 
-#: wazzuf-ripper:1217
+#: wazzuf-ripper:1216
 msgid "nfo file generation"
 msgstr ""
 
-#: wazzuf-ripper:1253
+#: wazzuf-ripper:1252
 msgid "Taking some screenshots"
 msgstr ""
 
-#: wazzuf-ripper:1279
+#: wazzuf-ripper:1278
 msgid "%s %s is finished"
 msgstr ""
