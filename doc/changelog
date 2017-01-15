@@ -3,6 +3,9 @@
 # booloki@lokizone.net
 # Changelog file
 
+2017-01-15
+* Change tsmuxer binary name
+
 2017-01-14
 * Add support for Advanced Audio Coding (AAC) tracks
 * Copyright update

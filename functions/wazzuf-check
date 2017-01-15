@@ -194,7 +194,7 @@ check_mkvmerge () {
 }
 
 check_tsmuxer () {
-	if [ ! -x "/usr/bin/tsMuxeR" ]; then
+	if [ ! -x "/usr/bin/tsmuxer" ]; then
 		SOFT_NAME="tsmuxer (CLI)"
 		soft_to_install_exit
 	fi

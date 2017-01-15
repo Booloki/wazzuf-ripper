@@ -59,7 +59,7 @@ subtitle_rip () {
 				echo -ne "\n ***********************************************\n"
 				echo " Demuxing subtitle ${SUBTITLE_SID} to ${SUBTITLE_FILE} "
 				echo -ne " ***********************************************\n"
-				ionice -c ${IONICENESS} nice -n ${NICENESS} tsMuxeR ${TSMUXER_METAFILE} .
+				ionice -c ${IONICENESS} nice -n ${NICENESS} tsmuxer ${TSMUXER_METAFILE} .
 				;;
 			CC )
 				# CC format - subtitle extraction in srt file
