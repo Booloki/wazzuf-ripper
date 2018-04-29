@@ -1,42 +1,42 @@
 ## IMDb function
-# thanks to https://github.com/bgr/imdb-cli
-# and http://www.imdbapi.com/
+# thanks to https://github.com/bgr/omdb-cli
+# and https://www.omdbapi.com/
 
 # need TITLE_NAME
-# return IMDB_RESPONSE ("True" or "False")
-get_imdb_response_title () {
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG imdbtool -t "${TITLE_NAME}" | sed -n '/^response/{n;p;}'"; fi
-	IMDB_RESPONSE=$(imdbtool -t "${TITLE_NAME}" | sed -n '/^response/{n;p;}')
+# return OMDB_RESPONSE ("True" or "False")
+get_omdb_response_title () {
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" | sed -n '/^response/{n;p;}'"; fi
+	OMDB_RESPONSE=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" | sed -n '/^response/{n;p;}')
 }
 
 # need TITLE_NAME
 #      DATE
-# return IMDB_RESPONSE ("True" or "False")
-get_imdb_response_title_date () {
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG imdbtool -t "${TITLE_NAME}" -y ${DATE} | sed -n '/^response/{n;p;}'"; fi
-	IMDB_RESPONSE=$(imdbtool -t "${TITLE_NAME}" -y ${DATE} | sed -n '/^response/{n;p;}')
+# return OMDB_RESPONSE ("True" or "False")
+get_omdb_response_title_date () {
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" -y ${DATE} | sed -n '/^response/{n;p;}'"; fi
+	IMDB_RESPONSE=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" -y ${DATE} | sed -n '/^response/{n;p;}')
 }
 
 # need IMDB_FILE
-# return IMDB_RESPONSE ("True" or "False")
-get_imdb_response_file () {
+# return OMDB_RESPONSE ("True" or "False")
+get_omdb_response_file () {
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG sed -n '/^response/{n;p;}' ${IMDB_FILE}"; fi
-	IMDB_RESPONSE=$(sed -n '/^response/{n;p;}' ${IMDB_FILE})
+	OMDB_RESPONSE=$(sed -n '/^response/{n;p;}' ${IMDB_FILE})
 }
 
 # need TITLE_NAME
 # return IMDB_ID
 get_imdb_id_title () {
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG imdbtool -t "${TITLE_NAME}" | sed -n '/^imdbid/{n;p;}'"; fi
-	IMDB_ID=$(imdbtool -t "${TITLE_NAME}" | sed -n '/^imdbid/{n;p;}')
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" | sed -n '/^imdbid/{n;p;}'"; fi
+	IMDB_ID=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" | sed -n '/^imdbid/{n;p;}')
 }
 
 # need TITLE_NAME
 #      DATE
 # return IMDB_ID
 get_imdb_id_title_date () {
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG imdbtool -t "${TITLE_NAME}" -y ${DATE} | sed -n '/^imdbid/{n;p;}'"; fi
-	IMDB_ID=$(imdbtool -t "${TITLE_NAME}" -y ${DATE} | sed -n '/^imdbid/{n;p;}')
+	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" -y ${DATE} | sed -n '/^imdbid/{n;p;}'"; fi
+	IMDB_ID=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" -y ${DATE} | sed -n '/^imdbid/{n;p;}')
 }
 
 # need IMDB_ID
@@ -47,7 +47,7 @@ download_imdb_poster () {
 		echo " cover.jpg exists. Skipping Download..." && sleep 1
 	else
 		# check if IMDb cover exists
-		IMDB_POSTER=$(imdbtool -i ${IMDB_ID} | sed -n '/^poster/{n;p;}')
+		IMDB_POSTER=$(omdbtool -i ${IMDB_ID} --apikey="${OMDB_API_KEY}" | sed -n '/^poster/{n;p;}')
 		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG IMDB_POSTER ${IMDB_POSTER}"; fi
 		if [[ ${IMDB_POSTER} == "N/A" ]]; then
 			echo "No IMBd cover found, Skipping..."
@@ -59,7 +59,7 @@ download_imdb_poster () {
 				echo " Skip IMDb cover download."
 				;;
 			* )
-				check_imdb
+				check_omdb
 				check_wget
 				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG wget ${IMDB_POSTER} -O cover.jpg"; fi
 				wget ${IMDB_POSTER} -O cover.jpg
@@ -81,8 +81,8 @@ download_imdb_poster () {
 #        IMDB_GENRE
 get_imdb_informations () {
 	IMDB_FILE="${BASE_WORKING_FILE}-imdb.txt"
-	imdbtool -i ${IMDB_ID} > ${IMDB_FILE}
-	get_imdb_response_file
+	omdbtool -i ${IMDB_ID} --apikey="${OMDB_API_KEY}" > ${IMDB_FILE}
+	get_omdb_response_file
 	if  [[ $IMDB_RESPONSE == "True" ]]; then
 		IMDB_DIRECTOR=$(sed -n '/^director/{n;p;}' ${IMDB_FILE})
 		IMDB_WRITER=$(sed -n '/^writer/{n;p;}' ${IMDB_FILE})

@@ -246,10 +246,10 @@ echo "DATE="\"${ZENITY_DATE}\""" >> ${CONF_FILE_TMP}
 TITLE_NAME="${ZENITY_TITLE}"
 DATE="${ZENITY_DATE}"
 
-get_imdb_response_title
-if [[ ${DEBUG} == "1" ]]; then echo "DEBUG IMDB_RESPONSE ${IMDB_RESPONSE}"; fi
+get_omdb_response_title
+if [[ ${DEBUG} == "1" ]]; then echo "DEBUG OMDB_RESPONSE ${OMDB_RESPONSE}"; fi
 
-if  [[ ${IMDB_RESPONSE} == "True" ]]; then
+if  [[ ${OMDB_RESPONSE} == "True" ]]; then
 	get_imdb_id_title
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG IMDB_ID ${IMDB_ID}"; fi
 	zenity --text-info --title "${ZEN_TITLE}" \
@@ -269,7 +269,7 @@ fi
 
 if  [[ ! ${IMDB_ID} == "" ]]; then
 	echo "IMDB_ID=\"${IMDB_ID}\"" >> ${CONF_FILE_TMP}
-	IMDB_URL_COVER=$(imdbtool -i ${IMDB_ID} | sed -n '/^poster/{n;p;}')
+	IMDB_URL_COVER=$(omdbtool -i ${IMDB_ID} --apikey="${OMDB_API_KEY}" | sed -n '/^poster/{n;p;}')
 	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG IMDB_URL_COVER ${IMDB_URL_COVER}"; fi
 	# check if url exists
 	if [[ ! ${IMDB_URL_COVER} == "N/A" ]]; then

@@ -530,17 +530,17 @@ time for ((i=${CHAPTER_FIRST}; i <= CHAPTER_LAST ; i++)); do
 			printf "${MESSAGE_NOIMDB}\n" && sleep 1
 		fi
 	else
-		check_imdb
-		MESSAGE_IMDBRET=$(gettext "Retrieving IMdb informations...")
+		check_omdb
+		MESSAGE_OMDBRET=$(gettext "Retrieving IMdb informations...")
 		if [[ ${WAZZUF_UI} == "GUI" ]]; then
 			( get_imdb_informations ) \
 			| zenity --info \
 				--title "${ZEN_TITLE}" \
-				--text "${MESSAGE_IMDBRET}" \
+				--text "${MESSAGE_OMDBRET}" \
 				--timeout=2
 			if [ $? = "1" ]; then wazzuf_quit; fi
 		else
-			printf "${MESSAGE_IMDBRET}\n"
+			printf "${MESSAGE_OMDBRET}\n"
 			get_imdb_informations
 		fi
 	fi

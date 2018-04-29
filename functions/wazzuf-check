@@ -60,9 +60,9 @@ check_integer () {
 }
 
 # check if missing softwares
-check_imdb () {
-	if [ ! -x /usr/bin/imdbtool ]; then
-		SOFT_NAME="imdb-cli"
+check_omdb () {
+	if [ ! -x /usr/bin/omdbtool ]; then
+		SOFT_NAME="omdb-cli"
 		soft_to_install_exit
 	fi
 }
