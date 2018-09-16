@@ -1,0 +1,151 @@
+stages:
+  - build
+  - test
+  - deb-deploy
+
+## Stage "package" for Ubuntu 18.04 LTS Bionic packaging
+build:deb-package:
+  stage: build
+  image: ubuntu:bionic
+  tags:
+    - ubuntu
+  only:
+    - tags
+  script:
+    # Update env
+    - apt-get update -qq
+    - apt-get install -qq -y git dh-make build-essential devscripts autoconf autotools-dev
+    # Copy Debian packaging files
+    - cp -r packaging/debian .
+    # Add changelog entry
+    - dch -v "${CI_COMMIT_TAG}-1" --force-distribution "New upstream release. See /usr/share/doc/wazzuf-ripper/changelog.gz"
+    # Changelog distro name fix
+    - sed -i 's/UNRELEASED/bionic/' debian/changelog
+    # Build package (whithout .orig.tar.gz file)
+    - dpkg-buildpackage -b -us -uc
+    - mkdir build
+    # Provides sources
+    #- mv ../*.orig.tar.gz build/
+    # Provides description file
+    #- mv ../*.dsc build/
+    # Provides packages
+    - mv ../*.deb build/
+    # Provides deb changelog 
+    - cp debian/changelog build/
+    # Test pushing new debian/changelog
+    #- cp debian/changelog packaging/debian/
+    #- git config user.email "ci-builder@git.lokizone.net"
+    #- git config user.name "CI Build User"
+    #- git commit -am "CI - Automatic changelog update"
+    #- url_host=$(git remote get-url origin | sed -e "s/https:\/\/gitlab-ci-token:.*@//g")
+    #- git remote set-url origin "https://gitlab-ci-token:${CI_TAG_UPLOAD_TOKEN}@${url_host}"
+    #- git push origin HEAD:master
+  artifacts:
+    # Archive name matches job name
+    name: "${CI_JOB_STAGE}"
+    paths:
+      - build/*
+
+## Stage "package" for Arch Linux packaging
+build:archlinux-package:
+  stage: build
+  image: archlinux/base:latest
+  tags:
+    - archlinux
+  only:
+    - tags
+  script:
+    # Update env
+    - pacman -Syu --noconfirm -q
+    - pacman -S --noconfirm -q git base-devel sudo pacman-contrib
+    # Need dedicated user for building
+    - useradd builduser -m # Create the builduser
+    - passwd -d builduser # Delete the buildusers password
+    - printf 'builduser ALL=(ALL) ALL\n' | tee -a /etc/sudoers # Allow the builduser passwordless sudo
+    # Clone, build and install package-query (dependancy for yaourt)
+    - sudo -u builduser bash -c 'cd ~ && git clone https://aur.archlinux.org/package-query.git && cd package-query && makepkg -si --noconfirm'
+    # Clone, build and install yaourt
+    - sudo -u builduser bash -c 'cd ~ && git clone https://aur.archlinux.org/yaourt.git && cd yaourt && makepkg -si --noconfirm'
+    # Package build
+    - sudo -u builduser bash -c "cd ~ && git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@git.lokizone.net/booloki/wazzuf-ripper.git && cd wazzuf-ripper && cp packaging/archlinux/PKGBUILD . && sed -i s/^pkgver=.*/pkgver=${CI_COMMIT_TAG}/ PKGBUILD && updpkgsums && makepkg -s"
+    # - sed -i "s/^pkgver=.*/pkgver=${CI_COMMIT_TAG}/" PKGBUILD
+    # - sed -i "s/^pkgrel=.*/pkgrel=1/" PKGBUILD
+    # Update PKGBUILD sums
+    #- updpkgsums
+    # Create .SRCINFO file
+    # Only for AUR
+    #- makepkg --printsrcinfo > .SRCINFO
+    # Build package
+    #- makepkg -s
+    - mkdir build
+    # Provides packages
+    - mv ~builduser/wazzuf-ripper/*.pkg.tar.xz build/
+    # Provides PKGBUILD file
+    - mv ~builduser/wazzuf-ripper/PKGBUILD build/
+  artifacts:
+    name: "$CI_JOB_STAGE"
+    paths:
+      - build/*
+
+## Stage "test" : Install/Uninstall deb packages
+test:deb-test:
+  stage: test
+  image: ubuntu:bionic
+  tags:
+    - ubuntu
+  only:
+    - tags
+  script:
+    # Add main repository
+    - echo "deb [trusted=yes] http://wazzuf-ripper.lokizone.net/ubuntu/ trusty main" > /etc/apt/sources.list.d/wazzuf-ripper.list
+    # Add testing repository
+    - echo "deb [trusted=yes] http://wazzuf-ripper.lokizone.net/ubuntu/ testing main" >> /etc/apt/sources.list.d/wazzuf-ripper.list
+    - apt-get update -qq
+    # dependency install
+    - apt-get install -qq gdebi
+    # Install tests
+    - gdebi --non-interactive build/wazzuf-ripper_*.deb
+    - gdebi --non-interactive build/wazzuf-ripper-gui_*.deb
+    # Uninstall test
+    - DEBIAN_FRONTEND=noninteractive apt-get -y remove wazzuf-ripper*
+  dependencies:
+    - build:deb-package
+
+## Stage "test" : Install/Uninstall ArchLinux packages
+test:archlinux-test:
+  stage: test
+  image: archlinux/base:latest
+  tags:
+    - archlinux
+  only:
+    - tags
+  script:
+    - pacman -Syu --noconfirm -q
+    - pacman -S --noconfirm -q git base-devel sudo
+    # Need dedicated user for building
+    - useradd builduser -m # Create the builduser
+    - passwd -d builduser # Delete the buildusers password
+    - printf 'builduser ALL=(ALL) ALL\n' | tee -a /etc/sudoers # Allow the builduser passwordless sudo
+    # Clone, build and install package-query (dependancy for yaourt)
+    - sudo -u builduser bash -c 'cd ~ && git clone https://aur.archlinux.org/package-query.git && cd package-query && makepkg -si --noconfirm'
+    # Clone, build and install yaourt
+    - sudo -u builduser bash -c 'cd ~ && git clone https://aur.archlinux.org/yaourt.git && cd yaourt && makepkg -si --noconfirm'
+    # AUR management with yaourt
+    # Install test
+    - sudo -u builduser bash -c 'yaourt -U --noconfirm build/*.pkg.tar.xz'
+    # Uninstall test
+    - yaourt -R --noconfirm -q wazzuf-ripper*
+  dependencies:
+    - build:archlinux-package
+
+## Stage "deploy": pushing to Ubuntu repository
+.deb-deploy:
+  stage: deploy
+  # Manual validation
+  when: manual
+  only:
+    - tags
+  script:
+    # Send to repo ?
+  dependencies:
+    - build:deb-package
