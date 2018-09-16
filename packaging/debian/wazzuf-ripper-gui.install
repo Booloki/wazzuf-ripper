@@ -1,0 +1,4 @@
+gui/desktop/*.desktop usr/share/applications
+gui/icons/wazzuf-ripper.svg usr/share/pixmaps
+locale/fr/LC_MESSAGES/wazzuf-conf-generator.mo usr/share/locale/fr/LC_MESSAGES/
+scripts/wazzuf-conf-generator usr/bin/

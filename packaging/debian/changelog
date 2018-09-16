@@ -1,0 +1,114 @@
+wazzuf-ripper (6.0.b5-2) trusty; urgency=medium
+
+  * New upstream release. See /usr/share/doc/wazzuf-ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Sun, 15 Jan 2017 17:30:36 +0100
+
+wazzuf-ripper (5.7-1) trusty; urgency=medium
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Sat, 23 May 2015 20:22:59 +0200
+
+wazzuf-ripper (5.6-1) trusty; urgency=medium
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Wed, 09 Apr 2014 12:15:59 +0200
+
+wazzuf-ripper (5.4-1) trusty; urgency=medium
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Sat, 29 Mar 2014 09:36:51 +0100
+
+wazzuf-ripper (5.3-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Wed, 26 Feb 2014 08:35:20 +0100
+
+wazzuf-ripper (5.2-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Sun, 04 Aug 2013 14:20:19 +0200
+
+wazzuf-ripper (5.1-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Wed, 19 Dec 2012 08:39:34 +0100
+
+wazzuf-ripper (5.0-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Sat, 08 Dec 2012 10:09:58 +0100
+
+wazzuf-ripper (4.2-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Tue, 27 Nov 2012 11:39:38 +0100
+
+wazzuf-ripper (4.1-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Sun, 25 Nov 2012 13:32:47 +0100
+
+wazzuf-ripper (4.0-1) quantal; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Thu, 15 Nov 2012 10:12:22 +0100
+
+wazzuf-ripper (3.5-1) precise; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Tue, 02 Oct 2012 17:14:26 +0200
+
+wazzuf-ripper (3.4-1) precise; urgency=low
+
+  * New upstream git snapshot. See /usr/share/doc/wazzuf-
+    ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Thu, 27 Sep 2012 18:35:27 +0200
+
+wazzuf-ripper (3.3-1) precise; urgency=low
+
+  * New upstream release. See /usr/share/doc/wazzuf-ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Mon, 24 Sep 2012 18:36:34 +0200
+
+wazzuf-ripper (3.2-1) quantal; urgency=low
+
+  * New upstream release. See /usr/share/doc/wazzuf-ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Thu, 20 Sep 2012 17:01:33 +0200
+
+wazzuf-ripper (3.1-1) quantal; urgency=low
+
+  * New upstream release. See /usr/share/doc/wazzuf-ripper/changelog.gz
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Tue, 18 Sep 2012 19:41:27 +0200
+
+wazzuf-ripper (3.0-1) quantal; urgency=low
+
+  * Initial release.
+
+ -- Nicolas Perrin <booloki@lokizone.net>  Wed, 12 Sep 2012 15:09:27 +0200
+

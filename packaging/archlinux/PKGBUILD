@@ -1,0 +1,38 @@
+# $Id$
+# Maintainer : Nicolas Perrin <booloki@lokizone.net>
+
+
+pkgbase=wazzuf-ripper
+pkgname=('wazzuf-ripper' 'wazzuf-ripper-gui')
+pkgver=VERSION
+pkgrel=1
+pkgdesc="Wazzuf Ripper is a software to rip various media as DVD and Blu-ray to .mkv file(s)."
+arch=(any)
+license=('GPL3')
+url="http://wazzuf-ripper.lokizone.net/"
+
+source=("https://git.lokizone.net/booloki/$pkgbase/-/archive/$pkgver/$pkgbase-$pkgver.tar.gz")
+md5sums=('SUM')
+
+package_wazzuf-ripper() {
+  depends=('mplayer' 'mencoder' 'omdb-cli' 'bdchapters' 'mkvtoolnix-cli' 'tsmuxer-ng-cli-bin' 'mediainfo' 'udisks2'
+	 'lame' 'vorbis-tools' 'ogmtools' 'p7zip' 'imagemagick' 'libdvdcss' 'lsdvd' 'wget' 'gettext')
+  optdepends=('wazzuf-ripper-gui: Wazzuf Ripper Graphical User Interface'
+            'vlc: video dumping support'
+            'vlc-nox: video dumping support (without X support)'
+            'cdrkit: genisoimage - DVD to iso file suppport'
+            'opus-tools: Opus audio support'
+            'ccextractor: Closed Captions subtitles extract support')
+
+  cd "${srcdir}/${pkgbase}-${pkgver}"
+
+  make DESTDIR="${pkgdir}/" -f Makefile.wazzuf-ripper install
+}
+
+package_wazzuf-ripper-gui() {
+  depends=('wazzuf-ripper' 'zenity')
+
+  cd "$srcdir/${pkgbase}-${pkgver}"
+
+  make DESTDIR="${pkgdir}/" -f Makefile.wazzuf-ripper-gui install
+}

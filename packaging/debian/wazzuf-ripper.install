@@ -1,0 +1,18 @@
+conf/wazzuf-ripper.conf usr/share/wazzuf-ripper
+conf/wazzuf-ripper-global.conf /etc/wazzuf-ripper
+functions/wazzuf-nfo usr/lib/wazzuf-ripper
+functions/wazzuf-coverart usr/lib/wazzuf-ripper
+functions/wazzuf-video usr/lib/wazzuf-ripper
+functions/wazzuf-subtitle usr/lib/wazzuf-ripper
+functions/wazzuf-audio usr/lib/wazzuf-ripper
+functions/wazzuf-check usr/lib/wazzuf-ripper
+functions/wazzuf-common usr/lib/wazzuf-ripper
+functions/wazzuf-xmltag usr/lib/wazzuf-ripper
+functions/wazzuf-pre usr/lib/wazzuf-ripper
+functions/wazzuf-imdb usr/lib/wazzuf-ripper
+locale/fr/LC_MESSAGES/wazzuf-ripper.mo usr/share/locale/fr/LC_MESSAGES/
+manpages/man1/*.1  usr/share/man/man1
+manpages/man4/*.4 usr/share/man/man4
+scripts/wazzuf-ripper usr/bin
+tag-templates/*.xml usr/share/wazzuf-ripper/tag-templates
+

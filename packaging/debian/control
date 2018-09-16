@@ -1,0 +1,25 @@
+Source: wazzuf-ripper
+Maintainer: Nicolas Perrin <booloki@lokizone.net>
+Section: video
+Priority: optional
+Homepage: http://wazzuf-ripper.lokizone.net
+Standards-Version: 3.9.5
+Build-Depends: debhelper (>= 9)
+
+Package: wazzuf-ripper
+Depends: ${misc:Depends}, mkvtoolnix, mplayer, mencoder, imdb-cli, ffmpeg, mediainfo, gettext, udisks2, wget
+Recommends: lame, vorbis-tools, ogmtools, lsdvd, p7zip-full, imagemagick, aacskeydb, bdchapters, tsmuxer
+Suggests: wazzuf-ripper-gui, vlc-nox, genisoimage, opus-tools, ccextractor
+Architecture: all
+Description: DVD/BD rip to mkv
+ Wazzuf Ripper is a software to rip various media as DVD (Digital Versatile Disc)
+ and BD (Blu-ray Disk) to .mkv file(s) (Matroska container).
+
+Package: wazzuf-ripper-gui
+Depends: ${misc:Depends}, wazzuf-ripper, zenity
+Architecture: all
+Description: DVD/BD rip to mkv (GUI part)
+ Wazzuf Ripper is a software to rip various media as DVD (Digital Versatile Disc)
+ and BD (Blu-ray Disk) to .mkv file(s) (Matroska container).
+ .
+ This package provides the Wazzuf Ripper Graphical User Interface
