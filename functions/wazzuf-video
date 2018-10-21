@@ -73,10 +73,10 @@ video_rip () {
     else
 
       # h264 first pass encoding
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc x264 -x264encopts bitrate=\"${VIDEO_BITRATE}\":frameref=\"${VIDEO_X264_FRAMEREF_PASS1}\":mixed_refs:bframes=\"${VIDEO_X264_BFRAMES_PASS1}\":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=\"${VIDEO_X264_SUBQ_PASS1}\":trellis=\"${VIDEO_X264_TRELLIS_PASS1}\":threads=\"${VIDEO_X264_THREADS}\":pass=1:log=1 -nosound -nosub"; fi
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" ${VIDEO_SKIP} -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc x264 -x264encopts bitrate=\"${VIDEO_BITRATE}\":frameref=\"${VIDEO_X264_FRAMEREF_PASS1}\":mixed_refs:bframes=\"${VIDEO_X264_BFRAMES_PASS1}\":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=\"${VIDEO_X264_SUBQ_PASS1}\":trellis=\"${VIDEO_X264_TRELLIS_PASS1}\":threads=\"${VIDEO_X264_THREADS}\":pass=1:log=1 -nosound -nosub"; fi
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
-          "${VIDEO_SKIP}" \
+          ${VIDEO_SKIP} \
           -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
           -ovc x264 -x264encopts \
           bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS1}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS1}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq="${VIDEO_X264_SUBQ_PASS1}":trellis="${VIDEO_X264_TRELLIS_PASS1}":threads="${VIDEO_X264_THREADS}":pass=1:log=1 \
@@ -86,7 +86,7 @@ video_rip () {
         if [ $? = "1" ]; then wazzuf_quit; fi
       else
         nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
-          "${VIDEO_SKIP}" \
+          ${VIDEO_SKIP} \
           -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
           -ovc x264 -x264encopts \
           bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS1}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS1}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq="${VIDEO_X264_SUBQ_PASS1}":trellis="${VIDEO_X264_TRELLIS_PASS1}":threads="${VIDEO_X264_THREADS}":pass=1:log=1 \
@@ -94,10 +94,10 @@ video_rip () {
       fi
 
       # h264 second pass encoding
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc x264 -x264encopts bitrate=\"${VIDEO_BITRATE}\":frameref=\"${VIDEO_X264_FRAMEREF_PASS2}\":mixed_refs:bframes=\"${VIDEO_X264_BFRAMES_PASS2}\":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=\"${VIDEO_X264_SUBQ_PASS2}\":trellis=\"${VIDEO_X264_TRELLIS_PASS2}\":threads=\"${VIDEO_X264_THREADS}\":pass=2:log=1 -nosound -nosub"; fi
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" ${VIDEO_SKIP} -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc x264 -x264encopts bitrate=\"${VIDEO_BITRATE}\":frameref=\"${VIDEO_X264_FRAMEREF_PASS2}\":mixed_refs:bframes=\"${VIDEO_X264_BFRAMES_PASS2}\":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=\"${VIDEO_X264_SUBQ_PASS2}\":trellis=\"${VIDEO_X264_TRELLIS_PASS2}\":threads=\"${VIDEO_X264_THREADS}\":pass=2:log=1 -nosound -nosub"; fi
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
-          "${VIDEO_SKIP}" \
+          ${VIDEO_SKIP} \
           -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
           -ovc x264 -x264encopts \
           bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS2}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS2}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq="${VIDEO_X264_SUBQ_PASS2}":trellis="${VIDEO_X264_TRELLIS_PASS2}":threads="${VIDEO_X264_THREADS}":pass=2:log=1 \
@@ -107,7 +107,7 @@ video_rip () {
         if [ $? = "1" ]; then wazzuf_quit; fi
       else
         nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
-          "${VIDEO_SKIP}" \
+          ${VIDEO_SKIP} \
           -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
           -ovc x264 -x264encopts \
           bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS2}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS2}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$"{VIDEO_X264_SUBQ_PASS2}":trellis="${VIDEO_X264_TRELLIS_PASS2}":threads="${VIDEO_X264_THREADS}":pass=2:log=1 \
@@ -148,10 +148,10 @@ video_rip () {
     else
       # Xvid first pass encoding
       # bitrate setting is ignored during first pass
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o /dev/null \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc xvid -xvidencopts pass=1:turbo:threads=\"${VIDEO_XVID_THREADS}\":autoaspect:vhq=\"${VIDEO_XVID_VHQ_PASS1}\" -nosound -nosub"; fi
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o /dev/null ${VIDEO_SKIP} -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc xvid -xvidencopts pass=1:turbo:threads=\"${VIDEO_XVID_THREADS}\":autoaspect:vhq=\"${VIDEO_XVID_VHQ_PASS1}\" -nosound -nosub"; fi
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o /dev/null \
-          "${VIDEO_SKIP}" \
+          ${VIDEO_SKIP} \
           -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
           -ovc xvid -xvidencopts pass=1:turbo:threads="${VIDEO_XVID_THREADS}":autoaspect:vhq="${VIDEO_XVID_VHQ_PASS1}" \
           -nosound -nosub 2>&1 \
@@ -179,7 +179,7 @@ video_rip () {
         if [ $? = "1" ]; then wazzuf_quit; fi
       else
         nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
-          "${VIDEO_SKIP}" \
+          ${VIDEO_SKIP} \
           -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
           -ovc xvid -xvidencopts pass=2:threads="${VIDEO_XVID_THREADS}":autoaspect:vhq="${VIDEO_XVID_VHQ_PASS2}":bitrate="${VIDEO_BITRATE}" \
           -nosound -nosub
