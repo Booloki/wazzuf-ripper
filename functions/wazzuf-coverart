@@ -1,118 +1,119 @@
+#!/bin/bash
 ##  Cover art management functions
 
 # convert imput image file in supported format (jpeg and png only)  + thumbnail
-# need 	SOURCE_DIRECTORY
-#	COVER
-#	COVER_FORMAT
-#	COVER_HEIGHT
-#	COVER_WIDTH
+# need SOURCE_DIRECTORY
+#      COVER
+#      COVER_FORMAT
+#      COVER_HEIGHT
+#      COVER_WIDTH
 # return MERGE_COVER
 cover_art_convert () {
-	COVER_SOURCE_PATH="${SOURCE_DIRECTORY}/${COVER}"
-	# detect size type (landscape, portrait or square)
-	if [[ ${COVER_HEIGHT} -gt ${COVER_WIDTH} ]]; then
-		# portrait
-		if [[ ${COVER_WIDTH} -gt 600 || ${COVER_HEIGHT} -gt 800 ]]; then
-			COVER_FORMAT="jpeg"
-			COVER_OUTPUT_SIMPLE="cover.jpg"
-			COVER_DIMENSION_SIMPLE="600x800"
-			COVER_OUTPUT_THUMB="small_cover.jpg"
-			COVER_DIMENSION_THUMB="120x160"
-		else
-			COVER_OUTPUT_SIMPLE="cover.${COVER_FORMAT}"
-			COVER_DIMENSION_SIMPLE=""
-			COVER_OUTPUT_THUMB="small_cover.jpg"
-			COVER_DIMENSION_THUMB="120x160"
-		fi
-	elif [[ ${COVER_HEIGHT} -eq ${COVER_WIDTH} ]]; then
-		# square
-		if [[ ${COVER_WIDTH} -gt 600 ]]; then
-			COVER_FORMAT="jpeg"
-			COVER_OUTPUT_SIMPLE="cover.jpg"
-			COVER_DIMENSION_SIMPLE="600x600"
-			COVER_OUTPUT_THUMB="small_cover.jpg"
-			COVER_DIMENSION_THUMB="120x120"
-		else
-			COVER_OUTPUT_SIMPLE="cover.${COVER_FORMAT}"
-			COVER_DIMENSION_SIMPLE=""
-			COVER_OUTPUT_THUMB="small_cover.jpg"
-			COVER_DIMENSION_THUMB="120x120"
-		fi		
-	else
-		# landscape
-		if [[ ${COVER_WIDTH} -gt 960 || ${COVER_HEIGHT} -gt 600 ]]; then
-			COVER_FORMAT="jpeg"
-			COVER_OUTPUT_SIMPLE="cover_land.jpg"
-			COVER_DIMENSION_SIMPLE="960x600"
-			COVER_OUTPUT_THUMB="small_cover_land.jpg"
-			COVER_DIMENSION_THUMB="192x120"
-		else
-			COVER_OUTPUT_SIMPLE="cover_land.${COVER_FORMAT}"
-			COVER_DIMENSION_SIMPLE=""
-			COVER_OUTPUT_THUMB="small_cover_land.jpg"
-			COVER_DIMENSION_THUMB="192x120"
-		fi
-	fi
+  COVER_SOURCE_PATH="${SOURCE_DIRECTORY}/${COVER}"
+  # detect size type (landscape, portrait or square)
+  if [[ "${COVER_HEIGHT}" -gt "${COVER_WIDTH}" ]]; then
+    # portrait
+    if [[ "${COVER_WIDTH}" -gt 600 || "${COVER_HEIGHT}" -gt 800 ]]; then
+      COVER_FORMAT="jpeg"
+      COVER_OUTPUT_SIMPLE="cover.jpg"
+      COVER_DIMENSION_SIMPLE="600x800"
+      COVER_OUTPUT_THUMB="small_cover.jpg"
+      COVER_DIMENSION_THUMB="120x160"
+    else
+      COVER_OUTPUT_SIMPLE="cover.${COVER_FORMAT}"
+      COVER_DIMENSION_SIMPLE=""
+      COVER_OUTPUT_THUMB="small_cover.jpg"
+      COVER_DIMENSION_THUMB="120x160"
+    fi
+  elif [[ "${COVER_HEIGHT}" -eq "${COVER_WIDTH}" ]]; then
+    # square
+    if [[ "${COVER_WIDTH}" -gt 600 ]]; then
+      COVER_FORMAT="jpeg"
+      COVER_OUTPUT_SIMPLE="cover.jpg"
+      COVER_DIMENSION_SIMPLE="600x600"
+      COVER_OUTPUT_THUMB="small_cover.jpg"
+      COVER_DIMENSION_THUMB="120x120"
+    else
+      COVER_OUTPUT_SIMPLE="cover.${COVER_FORMAT}"
+      COVER_DIMENSION_SIMPLE=""
+      COVER_OUTPUT_THUMB="small_cover.jpg"
+      COVER_DIMENSION_THUMB="120x120"
+    fi
+  else
+    # landscape
+    if [[ "${COVER_WIDTH}" -gt 960 || "${COVER_HEIGHT}" -gt 600 ]]; then
+      COVER_FORMAT="jpeg"
+      COVER_OUTPUT_SIMPLE="cover_land.jpg"
+      COVER_DIMENSION_SIMPLE="960x600"
+      COVER_OUTPUT_THUMB="small_cover_land.jpg"
+      COVER_DIMENSION_THUMB="192x120"
+    else
+      COVER_OUTPUT_SIMPLE="cover_land.${COVER_FORMAT}"
+      COVER_DIMENSION_SIMPLE=""
+      COVER_OUTPUT_THUMB="small_cover_land.jpg"
+      COVER_DIMENSION_THUMB="192x120"
+    fi
+  fi
 
-	if [[ $DEBUG == "1" ]]; then
-		echo "DEBUG COVER_FORMAT ${COVER_FORMAT}"
-		echo "DEBUG COVER_OUTPUT_SIMPLE ${COVER_OUTPUT_SIMPLE}"
-		echo "DEBUG COVER_DIMENSION_SIMPLE ${COVER_DIMENSION_SIMPLE}"
-		echo "DEBUG COVER_OUTPUT_THUMB ${COVER_OUTPUT_THUMB}"
-		echo "DEBUG COVER_DIMENSION_THUMB ${COVER_DIMENSION_THUMB}"
-	fi
+  if [[ "${DEBUG}" == "1" ]]; then
+    echo "DEBUG COVER_FORMAT ${COVER_FORMAT}"
+    echo "DEBUG COVER_OUTPUT_SIMPLE ${COVER_OUTPUT_SIMPLE}"
+    echo "DEBUG COVER_DIMENSION_SIMPLE ${COVER_DIMENSION_SIMPLE}"
+    echo "DEBUG COVER_OUTPUT_THUMB ${COVER_OUTPUT_THUMB}"
+    echo "DEBUG COVER_DIMENSION_THUMB ${COVER_DIMENSION_THUMB}"
+  fi
 
-	# cover creation
-	if [ -f ${COVER_OUTPUT_SIMPLE} ] && [[ ! ${WAZZUF_UI} == "GUI" ]]; then
-		FILE_NAME="${COVER_OUTPUT_SIMPLE} cover art"
-		file_exists	
-	else
-		COVER_DIMENSION=${COVER_DIMENSION_SIMPLE}
-		COVER_OUTPUT=${COVER_OUTPUT_SIMPLE}
-		if [[ ${COVER_DIMENSION} == "" ]]; then
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				cp "${COVER_SOURCE_PATH}" ${COVER_OUTPUT}
-			else
-				echo -ne "\n *************************************\n"
-				echo " Copying cover art..."
-				cp -v "${COVER_SOURCE_PATH}" ${COVER_OUTPUT}
-				echo -ne "\n *************************************\n"
-			fi
-		else
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				cover_art_resize
-			else
-				echo -ne "\n *************************************\n"
-				echo " Resizing cover art..."
-				cover_art_resize
-				echo -ne "\n *************************************\n"
-			fi
-		fi
-	fi
+  # cover creation
+  if [ -f "${COVER_OUTPUT_SIMPLE}" ] && [[ ! "${WAZZUF_UI}" == "GUI" ]]; then
+    FILE_NAME="${COVER_OUTPUT_SIMPLE} cover art"
+    file_exists
+  else
+    COVER_DIMENSION="${COVER_DIMENSION_SIMPLE}"
+    COVER_OUTPUT="${COVER_OUTPUT_SIMPLE}"
+    if [[ "${COVER_DIMENSION}" == "" ]]; then
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        cp "${COVER_SOURCE_PATH}" "${COVER_OUTPUT}"
+      else
+        echo -ne "\n *************************************\n"
+        echo " Copying cover art..."
+        cp -v "${COVER_SOURCE_PATH}" "${COVER_OUTPUT}"
+        echo -ne "\n *************************************\n"
+      fi
+    else
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        cover_art_resize
+      else
+        echo -ne "\n *************************************\n"
+        echo " Resizing cover art..."
+        cover_art_resize
+        echo -ne "\n *************************************\n"
+      fi
+    fi
+  fi
 
-	# thumbnail cover creation
-	if [ -f ${COVER_OUTPUT_THUMB} ] && [[ ! ${WAZZUF_UI} == "GUI" ]]; then
-		FILE_NAME="${COVER_OUTPUT_THUMB} cover art thumbnail"
-		file_exists
-	else
-		COVER_DIMENSION=${COVER_DIMENSION_THUMB}
-		COVER_OUTPUT=${COVER_OUTPUT_THUMB}
-		if [[ ${WAZZUF_UI} == "GUI" ]]; then
-			cover_art_resize
-		else
-			echo -ne "\n *************************************\n"
-			echo " Cover art thumbnail generation..."
-			cover_art_resize
-			echo -ne "\n *************************************\n"
-		fi
-	fi
+  # thumbnail cover creation
+  if [ -f "${COVER_OUTPUT_THUMB}" ] && [[ ! "${WAZZUF_UI}" == "GUI" ]]; then
+    FILE_NAME="${COVER_OUTPUT_THUMB} cover art thumbnail"
+    file_exists
+  else
+    COVER_DIMENSION="${COVER_DIMENSION_THUMB}"
+    COVER_OUTPUT="${COVER_OUTPUT_THUMB}"
+    if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+      cover_art_resize
+    else
+      echo -ne "\n *************************************\n"
+      echo " Cover art thumbnail generation..."
+      cover_art_resize
+      echo -ne "\n *************************************\n"
+    fi
+  fi
 }
 
 # dont_exists_warn
-# need  COVER_SOURCE_PATH
-#	COVER_DIMENSION
+# need COVER_SOURCE_PATH
+#      COVER_DIMENSION
 #
 # return COVER_OUTPUT
 cover_art_resize () {
-	convert "${COVER_SOURCE_PATH}" -resize ${COVER_DIMENSION}\> ${COVER_OUTPUT}
+  convert "${COVER_SOURCE_PATH}" -resize "${COVER_DIMENSION}"\> "${COVER_OUTPUT}"
 }

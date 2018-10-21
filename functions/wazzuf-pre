@@ -1,131 +1,131 @@
+#!/bin/bash
 ## pre-rip functions
 
 # Run cropdetect to establish the correct crop rectangle
 CROP_FRAMES=150
 cropdetect () {
-	case ${1} in
-	GUI )
-		case ${SOURCE} in
-		BD | ISO_BD )
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG mplayer br://${BD_LONGEST_TITLE_NUMBER} -bluray-device "${BD_MOUNT}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			( echo 10; mplayer br://${BD_LONGEST_TITLE_NUMBER} -bluray-device "${BD_MOUNT}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
-				--title="${ZEN_TITLE}" \
-				--text="Crop detection in progress" \
-				--cancel-label="Cancel" \
-				--pulsate \
-				--auto-close
-			if [ $? = "1" ]; then wazzuf_quit; fi
-			;;
-		M2TS )
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG mplayer "${M2TS_FILE_PATH}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			( echo 10; mplayer "${M2TS_FILE_PATH}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
-				--title="${ZEN_TITLE}" \
-				--text="Crop detection in progress" \
-				--cancel-label="Cancel" \
-				--pulsate \
-				--auto-close
-			if [ $? = "1" ]; then wazzuf_quit; fi
-			;;
-		DVD | ISO_DVD)
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG mplayer dvd://${DVD_TITLE_NUMBER} -dvd-device "${DVD_SOURCE}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			( echo 10; mplayer dvd://${DVD_TITLE_NUMBER} -dvd-device "${DVD_SOURCE}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
-				--title="${ZEN_TITLE}" \
-				--text="Crop detection in progress" \
-				--cancel-label="Cancel" \
-				--pulsate \
-				--auto-close
-			if [ $? = "1" ]; then wazzuf_quit; fi
-			;;
-		esac
-		;;
-	* )
-		echo -ne "...\n"
-		case ${SOURCE} in
-		BD | ISO_BD )
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG mplayer br://${BD_LONGEST_TITLE_NUMBER} -bluray-device "${BD_MOUNT}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			mplayer br://${BD_LONGEST_TITLE_NUMBER} -bluray-device "${BD_MOUNT}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out
-			wait
-			;;
-		M2TS )
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG mplayer "${M2TS_FILE_PATH}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
-			mplayer "${M2TS_FILE_PATH}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out
-			wait
-			;;
-		DVD | ISO_DVD )
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG mplayer dvd://${DVD_TITLE_NUMBER} -dvd-device "${DVD_SOURCE}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/	cropdetect.out"; fi
-			mplayer -dvd-device "${ISO_FILE}_PATH" dvd://${DVD_TITLE_NUMBER} -dvd-device "${DVD_SOURCE}" -vf cropdetect -nosound -vo null -frames ${CROP_FRAMES} -sstep 1 -nocache &> /tmp/cropdetect.out
-			wait
-			;;
-		esac
-		;;
-	esac
-	VIDEO_CROP=$(cat /tmp/cropdetect.out | tr '\r' '\n' | grep 'vf crop\=' | tail -1 | awk -F\= '{print $2}' | awk -F\) '{print $1}')
-	rm /tmp/cropdetect.out
+  case ${1} in
+  GUI )
+    case "${SOURCE}" in
+    BD | ISO_BD )
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG mplayer br://\"${BD_LONGEST_TITLE_NUMBER}\" -bluray-device \"${BD_MOUNT}\" -vf cropdetect -nosound -vo null -frames \"${CROP_FRAMES}\" -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+      ( echo 10; mplayer br://"${BD_LONGEST_TITLE_NUMBER}" -bluray-device "${BD_MOUNT}" -vf cropdetect -nosound -vo null -frames "${CROP_FRAMES}" -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
+        --title="${ZEN_TITLE}" \
+        --text="Crop detection in progress" \
+        --cancel-label="Cancel" \
+        --pulsate \
+        --auto-close
+      if [ $? = "1" ]; then wazzuf_quit; fi
+      ;;
+    M2TS )
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG mplayer \"${M2TS_FILE_PATH}\" -vf cropdetect -nosound -vo null -frames \"${CROP_FRAMES}\" -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+      ( echo 10; mplayer "${M2TS_FILE_PATH}" -vf cropdetect -nosound -vo null -frames "${CROP_FRAMES}" -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
+        --title="${ZEN_TITLE}" \
+        --text="Crop detection in progress" \
+        --cancel-label="Cancel" \
+        --pulsate \
+        --auto-close
+      if [ $? = "1" ]; then wazzuf_quit; fi
+      ;;
+    DVD | ISO_DVD)
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG mplayer dvd://\"${DVD_TITLE_NUMBER}\" -dvd-device \"${DVD_SOURCE}\" -vf cropdetect -nosound -vo null -frames \"${CROP_FRAMES}\" -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+      ( echo 10; mplayer dvd://"${DVD_TITLE_NUMBER}" -dvd-device "${DVD_SOURCE}" -vf cropdetect -nosound -vo null -frames "${CROP_FRAMES}" -sstep 1 -nocache &> /tmp/cropdetect.out ) | zenity --progress \
+        --title="${ZEN_TITLE}" \
+        --text="Crop detection in progress" \
+        --cancel-label="Cancel" \
+        --pulsate \
+        --auto-close
+      if [ $? = "1" ]; then wazzuf_quit; fi
+      ;;
+    esac
+    ;;
+  * )
+    echo -ne "...\n"
+    case "${SOURCE}" in
+    BD | ISO_BD )
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG mplayer br://\"${BD_LONGEST_TITLE_NUMBER}\" -bluray-device \"${BD_MOUNT}\" -vf cropdetect -nosound -vo null -frames \"${CROP_FRAMES}\" -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+      mplayer br://"${BD_LONGEST_TITLE_NUMBER}" -bluray-device "${BD_MOUNT}" -vf cropdetect -nosound -vo null -frames "${CROP_FRAMES}" -sstep 1 -nocache &> /tmp/cropdetect.out
+      wait
+      ;;
+    M2TS )
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG mplayer \"${M2TS_FILE_PATH}\" -vf cropdetect -nosound -vo null -frames \"${CROP_FRAMES}\" -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+      mplayer "${M2TS_FILE_PATH}" -vf cropdetect -nosound -vo null -frames "${CROP_FRAMES}" -sstep 1 -nocache &> /tmp/cropdetect.out
+      wait
+      ;;
+    DVD | ISO_DVD )
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG mplayer dvd://\"${DVD_TITLE_NUMBER}\" -dvd-device \"${DVD_SOURCE}\" -vf cropdetect -nosound -vo null -frames \"${CROP_FRAMES}\" -sstep 1 -nocache &> /tmp/cropdetect.out"; fi
+      mplayer -dvd-device "${ISO_FILE_PATH}" dvd://"${DVD_TITLE_NUMBER}" -dvd-device "${DVD_SOURCE}" -vf cropdetect -nosound -vo null -frames "${CROP_FRAMES}" -sstep 1 -nocache &> /tmp/cropdetect.out
+      wait
+      ;;
+    esac
+    ;;
+  esac
+  VIDEO_CROP=$(sed 's/\\r/\n/g' /tmp/cropdetect.out | grep 'vf crop\=' | tail -1 | awk -F'\=' '{print $2}' | awk -F'\)' '{print $1}')
+  rm /tmp/cropdetect.out
 }
 
 ## 'decode' avconv output file
 avconv_decode () {
-	while read LINE
-	do
-		ID_HEX=$(echo "${LINE}" | grep '^Stream' | cut -d '[' -f 2 | cut -d ']' -f 1)
-		if [[ ! ${ID_HEX} == "" ]]; then
-			echo "ID $((${ID_HEX})) - $(echo "${LINE}" | grep ^Stream | cut -d ' ' -f 3-)"
-		fi
-	done  < ${1}
+  while read -r LINE
+  do
+    ID_HEX=$(echo "${LINE}" | grep '^Stream' | cut -d '[' -f 2 | cut -d ']' -f 1)
+    if [[ ! "${ID_HEX}" == "" ]]; then
+      echo "ID $((ID_HEX - $(echo "${LINE}" | grep ^Stream | cut -d ' ' -f 3-)))"
+    fi
+  done < "${1}"
 }
 
 ## 'decode' lsdvd output file
 lsdvd_decode () {
-	while read LINE
-	do
-		ID_HEX=$(echo ${LINE} | grep -vE '^Title|VTS|Chapter' | grep -o '.\{5\}$' | sed 's/,//')
-		if [[ ! ${ID_HEX} == "" ]]; then
-			echo "ID $((${ID_HEX})) - $(echo ${LINE} | sed "s/', Stream id: ....'//" | sed "s/', Content: Undefined'//")"
-		fi
-	done  < ${1}
+  while read -r LINE
+  do
+    ID_HEX=$(echo "${LINE}" | grep -vE '^Title|VTS|Chapter' | grep -o '.\{5\}$' | sed 's/,//')
+    if [[ ! "${ID_HEX}" == "" ]]; then
+      echo "ID $((ID_HEX - $(echo "${LINE}" | sed "s/', Stream id: ....'//" | sed "s/', Content: Undefined'//")))"
+    fi
+  done < "${1}"
 }
 
-
 ## copy DVD to local iso file
-# need  ISO_FILE
-#	DVD_MOUNT_PATH
+# need ISO_FILE
+#      DVD_MOUNT_PATH
 copy_dvd2iso () {
-	check_genisoimage
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}""; fi
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		( genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}" 2>&1 \
-			| sed -u 's/.* \(.*[0-9]\)\.\([0-9]\+%\)\(.*\)/\1\n# iso file creation in progress\t\t\1.\2/' )\
-			| zenity --progress \
-			--title="${ZEN_TITLE}" \
-			--auto-close
-	else
-		genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}"
-	fi
+  check_genisoimage
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG genisoimage -allow-limited-size -dvd-video -o \"${ISO_FILE}\" \"${DVD_MOUNT_PATH}\""; fi
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    ( genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}" 2>&1 \
+      | sed -u 's/.* \(.*[0-9]\)\.\([0-9]\+%\)\(.*\)/\1\n# iso file creation in progress\t\t\1.\2/' )\
+      | zenity --progress \
+      --title="${ZEN_TITLE}" \
+      --auto-close
+  else
+    genisoimage -allow-limited-size -dvd-video -o "${ISO_FILE}" "${DVD_MOUNT_PATH}"
+  fi
 }
 
 ## copy BD to local iso file
-# need  ISO_FILE
-#	DEVICE_PATH_BASE
+# need ISO_FILE
+#      DEVICE_PATH_BASE
 copy_bd2iso () {
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG dd if=${DEVICE_PATH_BASE} of=${ISO_FILE}" 2>&1 > /dev/null; fi
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		( dd if=${DEVICE_PATH_BASE} of=${ISO_FILE} 2>&1 > /dev/null ) \
-			| zenity --progress \
-			--pulsate \
-			--title="${ZEN_TITLE}"
-	else
-		dd if=${DEVICE_PATH_BASE} of=${ISO_FILE}
-	fi
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG dd if=\"${DEVICE_PATH_BASE}\" of=\"${ISO_FILE}\"" > /dev/null 2>&1; fi
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    ( dd if="${DEVICE_PATH_BASE}" of="${ISO_FILE}" 2>&1 > /dev/null ) \
+      | zenity --progress \
+      --pulsate \
+      --title="${ZEN_TITLE}"
+  else
+    dd if="${DEVICE_PATH_BASE}" of="${ISO_FILE}"
+  fi
 }
 
 ## get BD longest Title
 # need BD-mplayer.info
-#RETURN	BD_LONGEST_TITLE_NUMBER
-#	BD_LONGEST_LENGTH
+#RETURN BD_LONGEST_TITLE_NUMBER
+#       BD_LONGEST_LENGTH
 bd_get_longest_title () {
-	BD_LONGEST_LENGTH=$(grep "^ID_BLURAY_TITLE_" BD-mplayer.info | grep _LENGTH | cut -d '=' -f 2 | sort -n | tail -1)
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG BD_LONGEST_LENGTH ${BD_LONGEST_LENGTH}"; fi
+  BD_LONGEST_LENGTH=$(grep "^ID_BLURAY_TITLE_" BD-mplayer.info | grep _LENGTH | cut -d '=' -f 2 | sort -n | tail -1)
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG BD_LONGEST_LENGTH ${BD_LONGEST_LENGTH}"; fi
 
-	BD_LONGEST_TITLE_NUMBER=$(grep ${BD_LONGEST_LENGTH} BD-mplayer.info | cut -d '_' -f 4 | head -n 1)
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG BD_LONGEST_TITLE_NUMBER ${BD_LONGEST_TITLE_NUMBER}"; fi
+  BD_LONGEST_TITLE_NUMBER=$(grep "${BD_LONGEST_LENGTH}" BD-mplayer.info | cut -d '_' -f 4 | head -n 1)
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG BD_LONGEST_TITLE_NUMBER ${BD_LONGEST_TITLE_NUMBER}"; fi
 }
