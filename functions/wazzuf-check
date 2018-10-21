@@ -1,229 +1,231 @@
+#!/bin/bash
 ## check functions
 
 checkandsource_wazzuf_conf () {
-	if [ ! -f ${CONF_FILE} ]; then
-		echo -ne "\n *************************************\n"
-		echo -ne " ${CONF_FILE} configuration file not found !\n"
-		echo -ne " Copying an example: please fill some informations in it !\n"
-		mkdir -p ${CONF_PATH_BASE}
-		cp -v ${CONF_FILE_EXAMPLE} ${CONF_FILE}
-		echo -ne " Exiting...\n"
-		echo -ne " *************************************\n"
-		exit 1
-	else
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG Sourcing ${CONF_FILE}..."; fi
-		source ${CONF_FILE}
-	fi
+  if [ ! -f "${CONF_FILE}" ]; then
+    echo -ne "\n *************************************\n"
+    echo -ne " ${CONF_FILE} configuration file not found !\n"
+    echo -ne " Copying an example: please fill some informations in it !\n"
+    mkdir -p "${CONF_PATH_BASE}"
+    cp -v "${CONF_FILE_EXAMPLE}" "${CONF_FILE}"
+    echo -ne " Exiting...\n"
+    echo -ne " *************************************\n"
+    exit 1
+  else
+    if [[ "${DEBUG}" == 1 ]]; then echo "DEBUG Sourcing ${CONF_FILE}..."; fi
+    # shellcheck source=conf/wazzuf-ripper.conf
+    source "${CONF_FILE}"
+  fi
 }
 
 checkandsource_wazzuf_files () {
-	for WFILE in ${WAZZUF_FILES}
-	do
-		if [ ! -f ${WFILE} ]; then
-			echo -ne "\n *************************************\n"
-			echo -ne " ${WFILE} file not found ! Exiting...\n"
-			echo -ne " *************************************\n"
-		        exit 1
-		else	
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG Sourcing ${WFILE}..."; fi
-			source ${WFILE}
-		fi
-	done
+  for WFILE in ${WAZZUF_FILES}; do
+    if [ ! -f "${WFILE}" ]; then
+      echo -ne "\n *************************************\n"
+      echo -ne " ${WFILE} file not found ! Exiting...\n"
+      echo -ne " *************************************\n"
+      exit 1
+    else
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG Sourcing ${WFILE}..."; fi
+      # shellcheck source=/dev/null
+      source "${WFILE}"
+    fi
+  done
 }
 
 # Check if user is not a super-user (root)
 check_user () {
-if [[ ${EUID} -eq 0 ]]; then
-	echo " ########################"
-	echo " # Do not run as root ! #"
-	echo " ########################"
-	exit 1
+if [[ "${EUID}" -eq 0 ]]; then
+  echo " ########################"
+  echo " # Do not run as root ! #"
+  echo " ########################"
+  exit 1
 fi
 } 
 
 # check if value is an integer
 # need  NUMBER_TO_CHECK
-#	MESSAGE
-#	WAZZUF_UI
+# MESSAGE
+# WAZZUF_UI
 #
 # return nothing
 check_integer () {
-	if echo ${NUMBER_TO_CHECK} | egrep -vq '^[0-9]+$'; then
-		if [[ ${WAZZUF_UI} == "GUI" ]]; then
-			zenity --error --title "${ZEN_TITLE}" \
-				--text "${MESSAGE} is not an integer ! Exiting."
-		else
-			echo -ne " Error ! ${MESSAGE} is not an integer ! Exiting.\n"
-		fi
-		exit 1
-	fi
+  if echo "${NUMBER_TO_CHECK}" | grep -vEq '^[0-9]+$'; then
+    if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+      zenity --error --title "${ZEN_TITLE}" \
+        --text "${MESSAGE} is not an integer ! Exiting."
+    else
+      echo -ne " Error ! ${MESSAGE} is not an integer ! Exiting.\n"
+    fi
+    exit 1
+  fi
 }
 
 # check if missing softwares
 check_omdb () {
-	if [ ! -x /usr/bin/omdbtool ]; then
-		SOFT_NAME="omdb-cli"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/omdbtool ]; then
+    SOFT_NAME="omdb-cli"
+    soft_to_install_exit
+  fi
 }
 
 check_nice () {
-	if [ ! -x "/usr/bin/nice" ]; then
-		SOFT_NAME="nice (coreutils)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/nice ]; then
+    SOFT_NAME="nice (coreutils)"
+    soft_to_install_exit
+  fi
 }
 
 check_ionice () {
-	if [ ! -x "/usr/bin/ionice" ]; then
-		SOFT_NAME="ionice (util-linux)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/ionice ]; then
+    SOFT_NAME="ionice (util-linux)"
+    soft_to_install_exit
+  fi
 }
 
 check_ogmtools () {
-	if [ ! -x "/usr/bin/dvdxchap" ]; then
-		SOFT_NAME="dvdxchap (ogmtools)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/dvdxchap ]; then
+    SOFT_NAME="dvdxchap (ogmtools)"
+    soft_to_install_exit
+  fi
 }
 
 check_bdchapters () {
-	if [ ! -x "/usr/bin/bdchapters" ]; then
-		SOFT_NAME="bdchapters"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/bdchapters ]; then
+    SOFT_NAME="bdchapters"
+    soft_to_install_exit
+  fi
 }
 
 check_lsdvd () {
-	if [ ! -x "/usr/bin/lsdvd" ]; then
-		SOFT_NAME="lsdvd"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/lsdvd ]; then
+    SOFT_NAME="lsdvd"
+    soft_to_install_exit
+  fi
 }
 
 check_mediainfo () {
-	if [ ! -x "/usr/bin/mediainfo" ]; then
-		SOFT_NAME="mediainfo"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/mediainfo ]; then
+    SOFT_NAME="mediainfo"
+    soft_to_install_exit
+  fi
 }
 
 check_avconv () {
-	if [ ! -x "/usr/bin/avconv" ]; then
-		SOFT_NAME="avconv (libav-tools)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/avconv ]; then
+    SOFT_NAME="avconv (libav-tools)"
+    soft_to_install_exit
+  fi
 }
 
 check_ffmpeg () {
-	if [ ! -x "/usr/bin/ffmpeg" ]; then
-		SOFT_NAME="ffmpeg"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/ffmpeg ]; then
+    SOFT_NAME="ffmpeg"
+    soft_to_install_exit
+  fi
 }
 
 check_7z () {
-	if [ ! -x "/usr/bin/7z" ]; then
-		SOFT_NAME="7z (p7zip-full)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/7z ]; then
+    SOFT_NAME="7z (p7zip-full)"
+    soft_to_install_exit
+  fi
 }
 
 check_genisoimage () {
-	if [ ! -x "/usr/bin/genisoimage" ]; then
-		SOFT_NAME="genisoimage"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/genisoimage ]; then
+    SOFT_NAME="genisoimage"
+    soft_to_install_exit
+  fi
 }
 
 check_mplayer () {
-	if [ ! -x "/usr/bin/mplayer" ]; then
-		SOFT_NAME="mplayer"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/mplayer ]; then
+    SOFT_NAME="mplayer"
+    soft_to_install_exit
+  fi
 }
 
 check_mencoder () {
-	if [ ! -x "/usr/bin/mencoder" ]; then
-		SOFT_NAME="mencoder"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/mencoder ]; then
+    SOFT_NAME="mencoder"
+    soft_to_install_exit
+  fi
 }
 
 check_cvlc () {
-	if [ ! -x "/usr/bin/cvlc" ]; then
-		SOFT_NAME="cvlc (vlc)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/cvlc ]; then
+    SOFT_NAME="cvlc (vlc)"
+    soft_to_install_exit
+  fi
 }
 
 check_oggenc () {
-	if [ ! -x "/usr/bin/oggenc" ]; then
-		SOFT_NAME="oggenc (vorbis-tools)"
-		soft_to_install_exit
-	fi	
+  if [ ! -x /usr/bin/oggenc ]; then
+    SOFT_NAME="oggenc (vorbis-tools)"
+    soft_to_install_exit
+  fi  
 }
 
 check_lame () {
-	if [ ! -x "/usr/bin/lame" ]; then
-		SOFT_NAME="lame"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/lame ]; then
+    SOFT_NAME="lame"
+    soft_to_install_exit
+  fi
 }
 
 check_opusenc () {
-        if [ ! -x "/usr/bin/opusenc" ]; then
-		SOFT_NAME="opusenc (opus-tools)"
-		soft_to_install_exit
-        fi
+    if [ ! -x /usr/bin/opusenc ]; then
+      SOFT_NAME="opusenc (opus-tools)"
+      soft_to_install_exit
+    fi
 }
 
 check_imagemagick () {
-	if [ ! -x "/usr/bin/convert" ]; then
-		SOFT_NAME="convert (imagemagick)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/convert ]; then
+    SOFT_NAME="convert (imagemagick)"
+    soft_to_install_exit
+  fi
 }
 
 check_mkvmerge () {
-	if [ ! -x "/usr/bin/mkvmerge" ]; then
-		SOFT_NAME="mkvmerge (mkvtoolnix)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/mkvmerge ]; then
+    SOFT_NAME="mkvmerge (mkvtoolnix)"
+    soft_to_install_exit
+  fi
 }
 
 check_tsmuxer () {
-	if [ ! -x "/usr/bin/tsmuxer" ]; then
-		SOFT_NAME="tsmuxer (CLI)"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/tsmuxer ]; then
+    SOFT_NAME="tsmuxer (CLI)"
+    soft_to_install_exit
+  fi
 }
 
 check_ccextractor () {
-	if [ ! -x "/usr/bin/ccextractor" ]; then
-		SOFT_NAME="ccextractor"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/ccextractor ]; then
+    SOFT_NAME="ccextractor"
+    soft_to_install_exit
+  fi
 }
 
 check_wget () {
-	if [ ! -x "/usr/bin/wget" ]; then
-		SOFT_NAME="wget"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/wget ]; then
+    SOFT_NAME="wget"
+    soft_to_install_exit
+  fi
 }
 
 check_md5sum () {
-	if [ ! -x "/usr/bin/md5sum" ]; then
-		SOFT_NAME="md5sum"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/md5sum ]; then
+    SOFT_NAME="md5sum"
+    soft_to_install_exit
+  fi
 }
 
 check_udisksctl () {
-	if [ ! -x "/usr/bin/udisksctl" ]; then
-		SOFT_NAME="udisksctl"
-		soft_to_install_exit
-	fi
+  if [ ! -x /usr/bin/udisksctl ]; then
+    SOFT_NAME="udisksctl"
+    soft_to_install_exit
+  fi
 }

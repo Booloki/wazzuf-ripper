@@ -1,298 +1,298 @@
+#!/bin/bash
 ## video encode function
 
 # video_dvd_chapters_extract
-# need 	TITLE_NUMBER
-#	DVDXCHAP_DEVICE
-#	DVDXCHAP_CHAPTERS
-#	WAZZUF_UI
+# need TITLE_NUMBER
+#      DVDXCHAP_DEVICE
+#      DVDXCHAP_CHAPTERS
+#      WAZZUF_UI
 #
 # return CHAPTERS_FILE_TXT
 video_dvd_chapters_extract () {
-	# Save chapters informations (DVD/ISO_DVD only)
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ( dvdxchap -t ${TITLE_NUMBER} ${DVDXCHAP_CHAPTERS} \"${DVDXCHAP_DEVICE}\" > ${CHAPTERS_FILE_TXT} ) | zenity --progress --pulsate --title \"${ZEN_TITLE}\" --text \"Creating ${CHAPTERS_FILE_TXT} from $SOURCE\" --auto-close"; fi
-		( dvdxchap -t ${TITLE_NUMBER} ${DVDXCHAP_CHAPTERS} "${DVDXCHAP_DEVICE}" > ${CHAPTERS_FILE_TXT} ) \
-			| zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Creating ${CHAPTERS_FILE_TXT} from $SOURCE" --auto-close --auto-kill
-	else
-		echo -ne "\n *************************************\n"
-		echo " Creating ${CHAPTERS_FILE_TXT} from $SOURCE..."
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG dvdxchap -t ${TITLE_NUMBER} ${DVDXCHAP_CHAPTERS} \"${DVDXCHAP_DEVICE}\" > ${CHAPTERS_FILE_TXT}"; fi
-		dvdxchap -t ${TITLE_NUMBER} ${DVDXCHAP_CHAPTERS} "${DVDXCHAP_DEVICE}" > ${CHAPTERS_FILE_TXT}
-	fi
+  # Save chapters informations (DVD/ISO_DVD only)
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ( dvdxchap -t \"${TITLE_NUMBER}\" \"${DVDXCHAP_CHAPTERS}\" \"${DVDXCHAP_DEVICE}\" > \"${CHAPTERS_FILE_TXT}\" ) | zenity --progress --pulsate --title \"${ZEN_TITLE}\" --text \"Creating ${CHAPTERS_FILE_TXT} from ${SOURCE}\" --auto-close"; fi
+    ( dvdxchap -t "${TITLE_NUMBER}" "${DVDXCHAP_CHAPTERS}" "${DVDXCHAP_DEVICE}" > "${CHAPTERS_FILE_TXT}" ) \
+      | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Creating ${CHAPTERS_FILE_TXT} from ${SOURCE}" --auto-close --auto-kill
+  else
+    echo -ne "\n *************************************\n"
+    echo " Creating ${CHAPTERS_FILE_TXT} from ${SOURCE}..."
+    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG dvdxchap -t \"${TITLE_NUMBER}\" \"${DVDXCHAP_CHAPTERS}\" \"${DVDXCHAP_DEVICE}\" > \"${CHAPTERS_FILE_TXT}\""; fi
+    dvdxchap -t "${TITLE_NUMBER}" "${DVDXCHAP_CHAPTERS}" "${DVDXCHAP_DEVICE}" > "${CHAPTERS_FILE_TXT}"
+  fi
 }
 
 # video_vob_dump
-# need 	TITLE_NUMBER
-#	MPLAYER_VOB_DUMP_DEVICE
-#	MPLAYER_VOB_DUMP_CHAPTERS
-#	WAZZUF_UI
+# need TITLE_NUMBER
+#      MPLAYER_VOB_DUMP_DEVICE
+#      MPLAYER_VOB_DUMP_CHAPTERS
+#      WAZZUF_UI
 #
 # return VOB_FILE
 video_vob_dump () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ( ionice -c ${IONICENESS} nice -n ${NICENESS} mplayer -nolirc -dvd-device \"${MPLAYER_VOB_DUMP_DEVICE}\" -dumpstream dvd://${TITLE_NUMBER} ${MPLAYER_VOB_DUMP_CHAPTERS} -dumpfile ${VOB_FILE} 2>/dev/null ) | zenity --progress --pulsate --title \"${ZEN_TITLE}\" --text \"Dumping ${VOB_FILE} from $SOURCE\" --auto-close"; fi
-		( echo 10; ionice -c ${IONICENESS} nice -n ${NICENESS} mplayer -nolirc -dvd-device "${MPLAYER_VOB_DUMP_DEVICE}" -dumpstream dvd://${TITLE_NUMBER} ${MPLAYER_VOB_DUMP_CHAPTERS} -dumpfile ${VOB_FILE} 1>/dev/null 2>/dev/null ) \
-			| zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Dumping ${VOB_FILE} from $SOURCE" --auto-close --auto-kill
-	else
-		echo -ne "\n *************************************\n"
-		echo " Dumping ${VOB_FILE} from $SOURCE..."
-		if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ionice -c ${IONICENESS} nice -n ${NICENESS} mplayer -nolirc -dvd-device \"${MPLAYER_VOB_DUMP_DEVICE}\" -dumpstream dvd://${TITLE_NUMBER} ${MPLAYER_VOB_DUMP_CHAPTERS} -dumpfile ${VOB_FILE}"; fi
-		ionice -c ${IONICENESS} nice -n ${NICENESS} mplayer -nolirc -dvd-device "${MPLAYER_VOB_DUMP_DEVICE}" -dumpstream dvd://${TITLE_NUMBER} ${MPLAYER_VOB_DUMP_CHAPTERS} -dumpfile ${VOB_FILE}
-	fi
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ( ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc -dvd-device \"${MPLAYER_VOB_DUMP_DEVICE}\" -dumpstream dvd://\"${TITLE_NUMBER}\" \"${MPLAYER_VOB_DUMP_CHAPTERS}\" -dumpfile \"${VOB_FILE}\" 2>/dev/null ) | zenity --progress --pulsate --title \"${ZEN_TITLE}\" --text \"Dumping ${VOB_FILE} from ${SOURCE}\" --auto-close"; fi
+    ( echo 10; ionice -c "${IONICENESS}" nice -n "${NICENESS}" mplayer -nolirc -dvd-device "${MPLAYER_VOB_DUMP_DEVICE}" -dumpstream dvd://"${TITLE_NUMBER}" "${MPLAYER_VOB_DUMP_CHAPTERS}" -dumpfile "${VOB_FILE}" 1>/dev/null 2>/dev/null ) \
+      | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Dumping ${VOB_FILE} from ${SOURCE}" --auto-close --auto-kill
+  else
+    echo -ne "\n *************************************\n"
+    echo " Dumping ${VOB_FILE} from ${SOURCE}..."
+    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc -dvd-device \"${MPLAYER_VOB_DUMP_DEVICE}\" -dumpstream dvd://\"${TITLE_NUMBER}\" \"${MPLAYER_VOB_DUMP_CHAPTERS}\" -dumpfile \"${VOB_FILE}\""; fi
+    ionice -c "${IONICENESS}" nice -n "${NICENESS}" mplayer -nolirc -dvd-device "${MPLAYER_VOB_DUMP_DEVICE}" -dumpstream dvd://"${TITLE_NUMBER}" "${MPLAYER_VOB_DUMP_CHAPTERS}" -dumpfile "${VOB_FILE}"
+  fi
 }
 
 # video_rip
-# need 	SOURCE_FILE
-#	VIDEO_CROP
-#	VIDEO_BITRATE
-#	VIDEO_NOSKIP_FORCE
-#	VIDEO_X264_FRAMEREF_PASS1
-#	VIDEO_X264_FRAMEREF_PASS2
-#	VIDEO_X264_SUBQ_PASS1
-#	VIDEO_X264_SUBQ_PASS2
-#	VIDEO_X264_THREADS
-#	VIDEO_XVID_THREADS
-#	H264_FILE
-#	XVID_FILE
+# need SOURCE_FILE
+#      VIDEO_CROP
+#      VIDEO_BITRATE
+#      VIDEO_NOSKIP_FORCE
+#      VIDEO_X264_FRAMEREF_PASS1
+#      VIDEO_X264_FRAMEREF_PASS2
+#      VIDEO_X264_SUBQ_PASS1
+#      VIDEO_X264_SUBQ_PASS2
+#      VIDEO_X264_THREADS
+#      VIDEO_XVID_THREADS
+#      H264_FILE
+#      XVID_FILE
 #
 # return VIDEO_FILE
 video_rip () {
-	# frames skipping or not
-	if [[ $VIDEO_NOSKIP_FORCE == "yes" ]]; then VIDEO_SKIP="-noskip"; else VIDEO_SKIP=""; fi
+  # frames skipping or not
+  if [[ "${VIDEO_NOSKIP_FORCE}" == "yes" ]]; then VIDEO_SKIP="-noskip"; else VIDEO_SKIP=""; fi
 
-	case $CODEC_VIDEO in
-	H264 )
-		# video h264 (2 pass) encode
-		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-x264.html
-		check_mencoder
-		VIDEO_FILE=$H264_FILE
-		if [ -f ${VIDEO_FILE} ]; then
-			FILE_NAME=${VIDEO_FILE}
-			file_exists
-		else
+  case "${CODEC_VIDEO}" in
+  H264 )
+    # video h264 (2 pass) encode
+    # doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-x264.html
+    check_mencoder
+    VIDEO_FILE="${H264_FILE}"
+    if [ -f "${VIDEO_FILE}" ]; then
+      FILE_NAME="${VIDEO_FILE}"
+      file_exists
+    else
 
-			# h264 first pass encoding
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} ${VIDEO_SKIP} -vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} -ovc x264 -x264encopts bitrate=${VIDEO_BITRATE}:frameref=${VIDEO_X264_FRAMEREF_PASS1}:mixed_refs:bframes=${VIDEO_X264_BFRAMES_PASS1}:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=${VIDEO_X264_SUBQ_PASS1}:trellis=${VIDEO_X264_TRELLIS_PASS1}:threads=${VIDEO_X264_THREADS}:pass=1:log=1 -nosound -nosub"; fi
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc x264 -x264encopts \
-					bitrate=${VIDEO_BITRATE}:frameref=${VIDEO_X264_FRAMEREF_PASS1}:mixed_refs:bframes=${VIDEO_X264_BFRAMES_PASS1}:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=${VIDEO_X264_SUBQ_PASS1}:trellis=${VIDEO_X264_TRELLIS_PASS1}:threads=${VIDEO_X264_THREADS}:pass=1:log=1 \
-					-nosound -nosub 2>&1 \
-					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
-					| zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - h264 1/2 pass encoding"
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc x264 -x264encopts \
-					bitrate=${VIDEO_BITRATE}:frameref=${VIDEO_X264_FRAMEREF_PASS1}:mixed_refs:bframes=${VIDEO_X264_BFRAMES_PASS1}:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=${VIDEO_X264_SUBQ_PASS1}:trellis=${VIDEO_X264_TRELLIS_PASS1}:threads=${VIDEO_X264_THREADS}:pass=1:log=1 \
-					-nosound -nosub
-			fi
+      # h264 first pass encoding
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc x264 -x264encopts bitrate=\"${VIDEO_BITRATE}\":frameref=\"${VIDEO_X264_FRAMEREF_PASS1}\":mixed_refs:bframes=\"${VIDEO_X264_BFRAMES_PASS1}\":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=\"${VIDEO_X264_SUBQ_PASS1}\":trellis=\"${VIDEO_X264_TRELLIS_PASS1}\":threads=\"${VIDEO_X264_THREADS}\":pass=1:log=1 -nosound -nosub"; fi
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc x264 -x264encopts \
+          bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS1}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS1}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq="${VIDEO_X264_SUBQ_PASS1}":trellis="${VIDEO_X264_TRELLIS_PASS1}":threads="${VIDEO_X264_THREADS}":pass=1:log=1 \
+          -nosound -nosub 2>&1 \
+          | awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
+          | zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - h264 1/2 pass encoding"
+        if [ $? = "1" ]; then wazzuf_quit; fi
+      else
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc x264 -x264encopts \
+          bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS1}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS1}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq="${VIDEO_X264_SUBQ_PASS1}":trellis="${VIDEO_X264_TRELLIS_PASS1}":threads="${VIDEO_X264_THREADS}":pass=1:log=1 \
+          -nosound -nosub
+      fi
 
-			# h264 second pass encoding
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} ${VIDEO_SKIP} -vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} -ovc x264 -x264encopts bitrate=${VIDEO_BITRATE}:frameref=${VIDEO_X264_FRAMEREF_PASS2}:mixed_refs:bframes=${VIDEO_X264_BFRAMES_PASS2}:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=${VIDEO_X264_SUBQ_PASS2}:trellis=${VIDEO_X264_TRELLIS_PASS2}:threads=${VIDEO_X264_THREADS}:pass=2:log=1 -nosound -nosub"; fi
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc x264 -x264encopts \
-					bitrate=${VIDEO_BITRATE}:frameref=${VIDEO_X264_FRAMEREF_PASS2}:mixed_refs:bframes=${VIDEO_X264_BFRAMES_PASS2}:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=${VIDEO_X264_SUBQ_PASS2}:trellis=${VIDEO_X264_TRELLIS_PASS2}:threads=${VIDEO_X264_THREADS}:pass=2:log=1 \
-					-nosound -nosub 2>&1 \
-					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
-					| zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - h264 2/2 pass encoding"
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc x264 -x264encopts \
-					bitrate=${VIDEO_BITRATE}:frameref=${VIDEO_X264_FRAMEREF_PASS2}:mixed_refs:bframes=${VIDEO_X264_BFRAMES_PASS2}:b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=${VIDEO_X264_SUBQ_PASS2}:trellis=${VIDEO_X264_TRELLIS_PASS2}:threads=${VIDEO_X264_THREADS}:pass=2:log=1 \
-					-nosound -nosub
-			fi
-		fi
-		;;
-	HEVC )
-		# HEVC / x265
-		VIDEO_FILE=${HEVC_FILE}
+      # h264 second pass encoding
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc x264 -x264encopts bitrate=\"${VIDEO_BITRATE}\":frameref=\"${VIDEO_X264_FRAMEREF_PASS2}\":mixed_refs:bframes=\"${VIDEO_X264_BFRAMES_PASS2}\":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=\"${VIDEO_X264_SUBQ_PASS2}\":trellis=\"${VIDEO_X264_TRELLIS_PASS2}\":threads=\"${VIDEO_X264_THREADS}\":pass=2:log=1 -nosound -nosub"; fi
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc x264 -x264encopts \
+          bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS2}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS2}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq="${VIDEO_X264_SUBQ_PASS2}":trellis="${VIDEO_X264_TRELLIS_PASS2}":threads="${VIDEO_X264_THREADS}":pass=2:log=1 \
+          -nosound -nosub 2>&1 \
+          | awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
+          | zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - h264 2/2 pass encoding"
+        if [ $? = "1" ]; then wazzuf_quit; fi
+      else
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc x264 -x264encopts \
+          bitrate="${VIDEO_BITRATE}":frameref="${VIDEO_X264_FRAMEREF_PASS2}":mixed_refs:bframes="${VIDEO_X264_BFRAMES_PASS2}":b_adapt:b_pyramid=strict:weight_b:partitions=all:8x8dct:me=umh:subq=$"{VIDEO_X264_SUBQ_PASS2}":trellis="${VIDEO_X264_TRELLIS_PASS2}":threads="${VIDEO_X264_THREADS}":pass=2:log=1 \
+          -nosound -nosub
+      fi
+    fi
+    ;;
+  HEVC )
+    # HEVC / x265
+    VIDEO_FILE="${HEVC_FILE}"
 
-		if [ -f ${VIDEO_FILE} ]
-		then
-			FILE_NAME=${VIDEO_FILE}
-			file_exists
-		else
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} ${CONV_PROJECT} -threads ${VIDEO_HEVC_THREADS} -analyzeduration 999999999 -probesize 999999999 -i "${SOURCE_FILE}" -an -sn -filter:v "crop=${VIDEO_CROP}" -c:v libx265 -preset ${VIDEO_X265_PRESET} -x265-params crf=${VIDEO_X265_CRF} ${VIDEO_FILE}"; fi
-			nice -n ${NICENESS} ${CONV_PROJECT} \
-				-threads ${VIDEO_HEVC_THREADS} \
-				-analyzeduration 999999999 -probesize 999999999 \
-				-i "${SOURCE_FILE}" \
-				-an -sn \
-				-filter:v "crop=${VIDEO_CROP}" \
-				-c:v libx265 -preset ${VIDEO_X265_PRESET} -x265-params crf=${VIDEO_X265_CRF} \
-				${VIDEO_FILE}
+    if [ -f "${VIDEO_FILE}" ]
+    then
+      FILE_NAME="${VIDEO_FILE}"
+      file_exists
+    else
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" \"${CONV_PROJECT}\" -threads \"${VIDEO_HEVC_THREADS}\" -analyzeduration 999999999 -probesize 999999999 -i \"${SOURCE_FILE}\" -an -sn -filter:v crop=\"${VIDEO_CROP}\" -c:v libx265 -preset \"${VIDEO_X265_PRESET}\" -x265-params crf=\"${VIDEO_X265_CRF}\" \"${VIDEO_FILE}\""; fi
+      nice -n "${NICENESS}" "${CONV_PROJECT}" \
+        -threads "${VIDEO_HEVC_THREADS}" \
+        -analyzeduration 999999999 -probesize 999999999 \
+        -i "${SOURCE_FILE}" \
+        -an -sn \
+        -filter:v crop="${VIDEO_CROP}" \
+        -c:v libx265 -preset "${VIDEO_X265_PRESET}" -x265-params crf="${VIDEO_X265_CRF}" \
+        "${VIDEO_FILE}"
 
-		fi
-		;;
-	XVID )	
-		# video xvid encode
-		# doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
-		check_mencoder
-		VIDEO_FILE=${XVID_FILE}
-		if [ -f ${VIDEO_FILE} ]
-		then
-			FILE_NAME=${VIDEO_FILE}
-			file_exists
-		else
-			# Xvid first pass encoding
-			# bitrate setting is ignored during first pass
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o /dev/null ${VIDEO_SKIP} -vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} -ovc xvid -xvidencopts pass=1:turbo:threads=${VIDEO_XVID_THREADS}:autoaspect:vhq=${VIDEO_XVID_VHQ_PASS1} -nosound -nosub"; fi
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o /dev/null \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc xvid -xvidencopts pass=1:turbo:threads=${VIDEO_XVID_THREADS}:autoaspect:vhq=${VIDEO_XVID_VHQ_PASS1} \
-					-nosound -nosub 2>&1 \
-					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
-					| zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - Xvid 1/2 pass encoding"
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o /dev/null \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc xvid -xvidencopts pass=1:turbo:threads=${VIDEO_XVID_THREADS}:autoaspect:vhq=${VIDEO_XVID_VHQ_PASS1} \
-					-nosound -nosub
-			fi
+    fi
+    ;;
+  XVID )  
+    # video xvid encode
+    # doc http://www.mplayerhq.hu/DOCS/HTML/fr/menc-feat-xvid.html
+    check_mencoder
+    VIDEO_FILE="${XVID_FILE}"
+    if [ -f "${VIDEO_FILE}" ]
+    then
+      FILE_NAME="${VIDEO_FILE}"
+      file_exists
+    else
+      # Xvid first pass encoding
+      # bitrate setting is ignored during first pass
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o /dev/null \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc xvid -xvidencopts pass=1:turbo:threads=\"${VIDEO_XVID_THREADS}\":autoaspect:vhq=\"${VIDEO_XVID_VHQ_PASS1}\" -nosound -nosub"; fi
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o /dev/null \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc xvid -xvidencopts pass=1:turbo:threads="${VIDEO_XVID_THREADS}":autoaspect:vhq="${VIDEO_XVID_VHQ_PASS1}" \
+          -nosound -nosub 2>&1 \
+          | awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
+          | zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - Xvid 1/2 pass encoding"
+        if [ $? = "1" ]; then wazzuf_quit; fi
+      else
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o /dev/null \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc xvid -xvidencopts pass=1:turbo:threads="${VIDEO_XVID_THREADS}":autoaspect:vhq="${VIDEO_XVID_VHQ_PASS1}" \
+          -nosound -nosub
+      fi
 
-			# Xvid second pass encoding
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} ${VIDEO_SKIP} -vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} -ovc xvid -xvidencopts pass=2:threads=${VIDEO_XVID_THREADS}:autoaspect:vhq=${VIDEO_XVID_VHQ_PASS2}:bitrate=${VIDEO_BITRATE} -nosound -nosub"; fi
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc xvid -xvidencopts pass=2:threads=${VIDEO_XVID_THREADS}:autoaspect:vhq=${VIDEO_XVID_VHQ_PASS2}:bitrate=${VIDEO_BITRATE} \
-					-nosound -nosub 2>&1 \
-					| awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
-					| zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - Xvid 2/2 pass encoding"
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				nice -n ${NICENESS} mencoder "${SOURCE_FILE}" -o ${VIDEO_FILE} \
-					${VIDEO_SKIP} \
-					-vf pp=ci,crop=${VIDEO_CROP}${MENCODER_SCALE} \
-					-ovc xvid -xvidencopts pass=2:threads=${VIDEO_XVID_THREADS}:autoaspect:vhq=${VIDEO_XVID_VHQ_PASS2}:bitrate=${VIDEO_BITRATE} \
-					-nosound -nosub
-			fi
-		fi
-		;;
-	DUMP )
-		# only dump video without transcoding
-		VIDEO_FILE=$DUMP_FILE
-		if [ -f ${VIDEO_FILE} ]
-		then
-			FILE_NAME=${VIDEO_FILE}
-			file_exists
-		 else
-			# raw dump/demux using vlc
-			check_cvlc
-			if [[ ! ${WAZZUF_UI} == "GUI" ]]; then
-				echo -ne "\n *************************************\n"
-				echo " Dumping ${VIDEO_FILE} from "${SOURCE_FILE}" ..."
-			fi
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG ionice -c ${IONICENESS} nice -n ${NICENESS} cvlc -I dummy "${SOURCE_FILE}" --sout \"#standard{access=file,mux=raw,dst=${VIDEO_FILE}}\" vlc://quit --no-repeat --no-sub-autodetect-file --no-sout-audio"; fi
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				ionice -c ${IONICENESS} nice -n ${NICENESS} cvlc -I dummy \
-					"${SOURCE_FILE}" --sout "#standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
-					vlc://quit \
-					--no-repeat --no-sub-autodetect-file --no-sout-audio \
-					| zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Dumping ${VIDEO_FILE} from "${SOURCE_FILE}"" --auto-close --auto-kill
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				ionice -c ${IONICENESS} nice -n ${NICENESS} cvlc -I dummy \
-					"${SOURCE_FILE}" --sout "#standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
-					vlc://quit \
-					--no-repeat --no-sub-autodetect-file --no-sout-audio
-			fi
-		fi
-		;;
-	DUMP_CROP )
-		# mpeg dump/demux with crop using vlc
-		check_cvlc
-		VIDEO_FILE=${DUMP_CROP_FILE}
-		if [ -f ${VIDEO_FILE} ]
-		then
-			FILE_NAME=${VIDEO_FILE}
-			file_exists
-		else
-			if [[ ! ${WAZZUF_UI} == "GUI" ]]; then
-				echo -ne "\n ********************************************************\n"
-				echo " Creating ${VIDEO_FILE} as MPEG2 ${VIDEO_BITRATE} kbs/s..." && sleep 1
-				echo -ne " **********************************************************\n"
-			fi
-			WIDTH_ORIG=$(mediainfo --Inform="Video;%Width%" "${SOURCE_FILE}")
-			HEIGHT_ORIG=$(mediainfo --Inform="Video;%Height%" "${SOURCE_FILE}")
+      # Xvid second pass encoding
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder \"${SOURCE_FILE}\" -o \"${VIDEO_FILE}\" \"${VIDEO_SKIP}\" -vf pp=ci,crop=\"${VIDEO_CROP}${MENCODER_SCALE}\" -ovc xvid -xvidencopts pass=2:threads=\"${VIDEO_XVID_THREADS}\":autoaspect:vhq=\"${VIDEO_XVID_VHQ_PASS2}\":bitrate=\"${VIDEO_BITRATE}\" -nosound -nosub"; fi
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc xvid -xvidencopts pass=2:threads="${VIDEO_XVID_THREADS}":autoaspect:vhq="${VIDEO_XVID_VHQ_PASS2}":bitrate="${VIDEO_BITRATE}" \
+          -nosound -nosub 2>&1 \
+          | awk -vRS="\r" '$1 ~ /Pos/ {gsub(/Pos:/," ");gsub(/%\)/," ");gsub(/ \(/," ");print $3"\n#Position :\\t"$1"\\nFrame :\\t"$2"\\nProgression :\\t"$3"%\\nFrame Rate :\\t"$4"\\nTime Remaining :\\t"$6; fflush();}' \
+          | zenity --progress --auto-kill --auto-close --title="${ZEN_TITLE} - Xvid 2/2 pass encoding"
+        if [ $? = "1" ]; then wazzuf_quit; fi
+      else
+        nice -n "${NICENESS}" mencoder "${SOURCE_FILE}" -o "${VIDEO_FILE}" \
+          "${VIDEO_SKIP}" \
+          -vf pp=ci,crop="${VIDEO_CROP}${MENCODER_SCALE}" \
+          -ovc xvid -xvidencopts pass=2:threads="${VIDEO_XVID_THREADS}":autoaspect:vhq="${VIDEO_XVID_VHQ_PASS2}":bitrate="${VIDEO_BITRATE}" \
+          -nosound -nosub
+      fi
+    fi
+    ;;
+  DUMP )
+    # only dump video without transcoding
+    VIDEO_FILE="$DUMP_FILE"
+    if [ -f "${VIDEO_FILE}" ]
+    then
+      FILE_NAME="${VIDEO_FILE}"
+      file_exists
+     else
+      # raw dump/demux using vlc
+      check_cvlc
+      if [[ ! "${WAZZUF_UI}" == "GUI" ]]; then
+        echo -ne "\n *************************************\n"
+        echo " Dumping ${VIDEO_FILE} from ${SOURCE_FILE}..."
+      fi
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" cvlc -I dummy \"${SOURCE_FILE}\" --sout \"#standard{access=file,mux=raw,dst=${VIDEO_FILE}}\" vlc://quit --no-repeat --no-sub-autodetect-file --no-sout-audio"; fi
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        ionice -c "${IONICENESS}" nice -n "${NICENESS}" cvlc -I dummy \
+          "${SOURCE_FILE}" --sout "#standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
+          vlc://quit \
+          --no-repeat --no-sub-autodetect-file --no-sout-audio \
+          | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Dumping ${VIDEO_FILE} from ${SOURCE_FILE}" --auto-close --auto-kill
+        if [ $? = "1" ]; then wazzuf_quit; fi
+      else
+        ionice -c "${IONICENESS}" nice -n "${NICENESS}" cvlc -I dummy \
+          "${SOURCE_FILE}" --sout "#standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
+          vlc://quit \
+          --no-repeat --no-sub-autodetect-file --no-sout-audio
+      fi
+    fi
+    ;;
+  DUMP_CROP )
+    # mpeg dump/demux with crop using vlc
+    check_cvlc
+    VIDEO_FILE="${DUMP_CROP_FILE}"
+    if [ -f "${VIDEO_FILE}" ]; then
+      FILE_NAME="${VIDEO_FILE}"
+      file_exists
+    else
+      if [[ ! "${WAZZUF_UI}" == "GUI" ]]; then
+        echo -ne "\n ********************************************************\n"
+        echo " Creating ${VIDEO_FILE} as MPEG2 ${VIDEO_BITRATE} kbs/s..." && sleep 1
+        echo -ne " **********************************************************\n"
+      fi
+      WIDTH_ORIG=$(mediainfo --Inform="Video;%Width%" "${SOURCE_FILE}")
+      HEIGHT_ORIG=$(mediainfo --Inform="Video;%Height%" "${SOURCE_FILE}")
 
-			VIDEO_CROP_W=$(echo ${VIDEO_CROP} | cut -d ':' -f 1)
-			VIDEO_CROP_H=$(echo ${VIDEO_CROP} | cut -d ':' -f 2)
-			VIDEO_CROP_X=$(echo ${VIDEO_CROP} | cut -d ':' -f 3)
-			VIDEO_CROP_Y=$(echo ${VIDEO_CROP} | cut -d ':' -f 4)
-			VLC_CROP_TOP=${VIDEO_CROP_Y}
-			VLC_CROP_BOTTOM=$(expr ${HEIGHT_ORIG} - ${VIDEO_CROP_Y} - ${VIDEO_CROP_H})
-			VLC_CROP_LEFT=${VIDEO_CROP_X}
-			VLC_CROP_RIGHT=$(expr ${WIDTH_ORIG} - ${VIDEO_CROP_X} - ${VIDEO_CROP_W})
+      VIDEO_CROP_W=$(echo "${VIDEO_CROP}" | cut -d ':' -f 1)
+      VIDEO_CROP_H=$(echo "${VIDEO_CROP}" | cut -d ':' -f 2)
+      VIDEO_CROP_X=$(echo "${VIDEO_CROP}" | cut -d ':' -f 3)
+      VIDEO_CROP_Y=$(echo "${VIDEO_CROP}" | cut -d ':' -f 4)
+      VLC_CROP_TOP="${VIDEO_CROP_Y}"
+      VLC_CROP_BOTTOM=$((HEIGHT_ORIG - VIDEO_CROP_Y - VIDEO_CROP_H))
+      VLC_CROP_LEFT="${VIDEO_CROP_X}"
+      VLC_CROP_RIGHT=$((WIDTH_ORIG - VIDEO_CROP_X - VIDEO_CROP_W))
 
-			if [[ ${DEBUG} == "1" ]]; then echo "DEBUG nice -n ${NICENESS} cvlc -I dummy "${SOURCE_FILE}" --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=${VLC_CROP_TOP},cropbottom=${VLC_CROP_BOTTOM},cropleft=$VLC_CROP_LEFT,cropright=${VLC_CROP_RIGHT}}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" vlc://quit --no-repeat --no-sub-autodetect-file --no-sout-audio"; fi
-			if [[ ${WAZZUF_UI} == "GUI" ]]; then
-				nice -n ${NICENESS} cvlc -I dummy \
-					"${SOURCE_FILE}" --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=${VLC_CROP_TOP},cropbottom=${VLC_CROP_BOTTOM},cropleft=$VLC_CROP_LEFT,cropright=${VLC_CROP_RIGHT}}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
-					vlc://quit \
-					--no-repeat --no-sub-autodetect-file --no-sout-audio \
-					| zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Creating ${VIDEO_FILE} as MPEG2 ${VIDEO_BITRATE} kbs/s" --auto-close --auto-kill
-				if [ $? = "1" ]; then wazzuf_quit; fi
-			else
-				nice -n ${NICENESS} cvlc -I dummy \
-					"${SOURCE_FILE}" --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=${VLC_CROP_TOP},cropbottom=${VLC_CROP_BOTTOM},cropleft=$VLC_CROP_LEFT,cropright=${VLC_CROP_RIGHT}}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
-					vlc://quit \
-					--no-repeat --no-sub-autodetect-file --no-sout-audio
-			fi
-		fi
-		;;
-	esac
+      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" cvlc -I dummy \"${SOURCE_FILE}\" --sout \"#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=${VLC_CROP_TOP},cropbottom=${VLC_CROP_BOTTOM},cropleft=${VLC_CROP_LEFT},cropright=${VLC_CROP_RIGHT}}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}\" vlc://quit --no-repeat --no-sub-autodetect-file --no-sout-audio"; fi
+      if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+        nice -n "${NICENESS}" cvlc -I dummy \
+          "${SOURCE_FILE}" --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=${VLC_CROP_TOP},cropbottom=${VLC_CROP_BOTTOM},cropleft=${VLC_CROP_LEFT},cropright=${VLC_CROP_RIGHT}}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
+          vlc://quit \
+          --no-repeat --no-sub-autodetect-file --no-sout-audio \
+          | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Creating ${VIDEO_FILE} as MPEG2 ${VIDEO_BITRATE} kbs/s" --auto-close --auto-kill
+        if [ $? = "1" ]; then wazzuf_quit; fi
+      else
+        nice -n "${NICENESS}" cvlc -I dummy \
+          "${SOURCE_FILE}" --sout "#transcode{vcodec=mp2v,vb=${VIDEO_BITRATE},vfilter=croppadd{croptop=${VLC_CROP_TOP},cropbottom=${VLC_CROP_BOTTOM},cropleft=${VLC_CROP_LEFT},cropright=${VLC_CROP_RIGHT}}}:standard{access=file,mux=raw,dst=${VIDEO_FILE}}" \
+          vlc://quit \
+          --no-repeat --no-sub-autodetect-file --no-sout-audio
+      fi
+    fi
+    ;;
+  esac
 }
 
 # get_video_bitrate
-# need 	SOURCE_FILE
-#	SOURCE
-#	DVDRIP_VIDEO_BITRATE
-#	BDRIP_VIDEO_BITRATE
-#	CODEC_VIDEO
+# need SOURCE_FILE
+#      SOURCE
+#      DVDRIP_VIDEO_BITRATE
+#      BDRIP_VIDEO_BITRATE
+#      CODEC_VIDEO
 #
 # return VIDEO_BITRATE
 get_video_bitrate () {
-	case $SOURCE in
-	DVD | ISO_DVD )
-		VIDEO_BITRATE_WANTED=${DVDRIP_VIDEO_BITRATE}
-		;;
-	BD | ISO_BD | M2TS )
-		VIDEO_BITRATE_WANTED=${BDRIP_VIDEO_BITRATE}
-		;;
-	esac
+  case "${SOURCE}" in
+  DVD | ISO_DVD )
+    VIDEO_BITRATE_WANTED="${DVDRIP_VIDEO_BITRATE}"
+    ;;
+  BD | ISO_BD | M2TS )
+    VIDEO_BITRATE_WANTED="${BDRIP_VIDEO_BITRATE}"
+    ;;
+  esac
 
-	if [ "${VIDEO_BITRATE_WANTED}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
-		VIDEO_BITRATE_STRING=$(mediainfo --Inform="Video;%OverallBitRate/String%" ${SOURCE_FILE})
-		# Could be in Mbps or Kbps...
-		if [[ ${VIDEO_BITRATE_STRING} == *Kbps* ]]
-		then
-			VIDEO_BITRATE=$(echo ${VIDEO_BITRATE_STRING} | sed 's/ //g' | sed 's/Kbps//g')
-		elif  [[ ${VIDEO_BITRATE_STRING} == *Mbps* ]]
-		then
-			VIDEO_BITRATE=$(echo ${VIDEO_BITRATE_STRING} | sed 's/ //g' | sed 's/Mbps/000/g')
-		else
-			# error
-			MESSAGE="Video bitrate ${VIDEO_BITRATE_STRING} (VIDEO_BITRATE_STRING)"
-			not_recognized_exit
-		fi
-	else
-		VIDEO_BITRATE=${VIDEO_BITRATE_WANTED}
-	fi
+  if [ "${VIDEO_BITRATE_WANTED}" = "orig" ] || [ "${CODEC_VIDEO}" = "DUMP_CROP" ]; then
+    VIDEO_BITRATE_STRING=$(mediainfo --Inform="Video;%OverallBitRate/String%" "${SOURCE_FILE}")
+    # Could be in Mbps or Kbps
+    if [[ "${VIDEO_BITRATE_STRING}" == *Kbps* ]]
+    then
+      VIDEO_BITRATE=$(echo "${VIDEO_BITRATE_STRING}" | sed 's/ //g' | sed 's/Kbps//g')
+    elif  [[ "${VIDEO_BITRATE_STRING}" == *Mbps* ]]
+    then
+      VIDEO_BITRATE=$(echo "${VIDEO_BITRATE_STRING}" | sed 's/ //g' | sed 's/Mbps/000/g')
+    else
+      # error
+      MESSAGE="Video bitrate ${VIDEO_BITRATE_STRING} (VIDEO_BITRATE_STRING)"
+      not_recognized_exit
+    fi
+  else
+    VIDEO_BITRATE="${VIDEO_BITRATE_WANTED}"
+  fi
 }

@@ -1,9 +1,10 @@
+#!/bin/bash
 ## common functions
 
 # Wazzuf Ripper script usage
 wazzuf_usage () {
-	echo -ne "\n Usage : $0 [ Video Codec ] [ Audio 1 Codec ] [ Audio 2 Codec ] [GUI]\n"
-	exit 1
+  echo -ne "\n Usage : $0 [ Video Codec ] [ Audio 1 Codec ] [ Audio 2 Codec ] [GUI]\n"
+  exit 1
 }
 
 # Iso file management
@@ -13,59 +14,59 @@ wazzuf_usage () {
 # first argument: "mount" or "umount"
 # second argument: "GUI" or empty
 iso_manage () {
-	case ${1} in
-	mount )
-		# Check if iso file already mounted
-		if [[ $(mount | grep udf | grep "${ISO_FILE_PATH}" | wc -l) == "1" ]]; then
-			echo "${ISO_FILE_PATH} already mounted"
-			# Get mount point
-			ISO_MOUNT_POINT=$(mount | grep udf | grep "${ISO_FILE_PATH}" | sed 's/ type udf //g'  | cut -d '(' -f 1 | awk '{print $NF}')
-		else
-			# mount iso file
-			# udisksctl does not require root privileges
-			check_udisksctl
-			if [[ ${2} == "GUI" ]]; then
-				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
-				udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
-			else
-				echo "Mount iso file"
-				if [[ ${DEBUG} == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
-				udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
-			fi
-			# Get mount point
-			ISO_MOUNT_POINT=$(mount | grep udf | sed 's/ type udf //g'  | cut -d '(' -f 1 | awk '{print $NF}')
-		fi
-		;;
-	umount )
-		# No specific privilege required (if mounted with udisksctl)
-		if [[ ${2} == "GUI" ]]; then
-			umount "${ISO_FILE_PATH}"
-		else
-			echo "Umount iso file"
-			umount "${ISO_FILE_PATH}"
-		fi
-		;;
-	esac
+  case ${1} in
+  mount )
+    # Check if iso file already mounted
+    if [[ $(mount | grep udf | grep -c "${ISO_FILE_PATH}") == "1" ]]; then
+      echo "${ISO_FILE_PATH} already mounted"
+      # Get mount point
+      ISO_MOUNT_POINT=$(mount | grep udf | grep "${ISO_FILE_PATH}" | sed 's/ type udf //g'  | cut -d '(' -f 1 | awk '{print $NF}')
+    else
+      # mount iso file
+      # udisksctl does not require root privileges
+      check_udisksctl
+      if [[ ${2} == "GUI" ]]; then
+        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
+        udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
+      else
+        echo "Mount iso file"
+        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
+        udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
+      fi
+      # Get mount point
+      ISO_MOUNT_POINT=$(mount | grep udf | sed 's/ type udf //g'  | cut -d '(' -f 1 | awk '{print $NF}')
+    fi
+    ;;
+  umount )
+    # No specific privilege required (if mounted with udisksctl)
+    if [[ ${2} == "GUI" ]]; then
+      umount "${ISO_FILE_PATH}"
+    else
+      echo "Umount iso file"
+      umount "${ISO_FILE_PATH}"
+    fi
+    ;;
+  esac
 }
 
 # Get the type of the mounted media device
-# need  MOUNT_PATH
+# need MOUNT_PATH
 #
 # return MEDIA_DEVICE_TYPE
 get_media_device_type () {
-	check_mediainfo
-	MEDIA_FORMAT_FULL=$(mediainfo --Inform="General;%Format%" "${MOUNT_PATH}" 2> /dev/null)
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_FORMAT_FULL ${MEDIA_FORMAT_FULL}";fi
+  check_mediainfo
+  MEDIA_FORMAT_FULL=$(mediainfo --Inform="General;%Format%" "${MOUNT_PATH}" 2> /dev/null)
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_FORMAT_FULL ${MEDIA_FORMAT_FULL}";fi
 
-	if [[ $(echo ${MEDIA_FORMAT_FULL} | grep Blu-ray) ]]; then
-		MEDIA_DEVICE_TYPE="BD"
-	elif [[ $(echo ${MEDIA_FORMAT_FULL} | grep DVD) ]]; then
-		MEDIA_DEVICE_TYPE="DVD"
-	else
-		# Not a DVD nor BD
-		MEDIA_DEVICE_TYPE="UNKNOWN"
-	fi
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_DEVICE_TYPE ${MEDIA_DEVICE_TYPE}";fi
+  if echo "${MEDIA_FORMAT_FULL}" | grep -q Blu-ray; then
+    MEDIA_DEVICE_TYPE="BD"
+  elif echo "${MEDIA_FORMAT_FULL}" | grep -q DVD; then
+    MEDIA_DEVICE_TYPE="DVD"
+  else
+    # Not a DVD nor BD
+    MEDIA_DEVICE_TYPE="UNKNOWN"
+  fi
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_DEVICE_TYPE ${MEDIA_DEVICE_TYPE}";fi
 }
 
 # Get the name of the mounted media device
@@ -73,113 +74,113 @@ get_media_device_type () {
 #
 # return MEDIA_TITLE
 get_media_title () {
-	MEDIA_TITLE=$(echo ${MOUNT_PATH} | awk 'BEGIN {FS = "/"} ; {print $NF}')
-	if [[ ${DEBUG} == "1" ]]; then echo "DEBUG MEDIA_TITLE ${MEDIA_TITLE}";fi
+  MEDIA_TITLE=$(echo "${MOUNT_PATH}" | awk 'BEGIN {FS = "/"} ; {print $NF}')
+  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_TITLE ${MEDIA_TITLE}";fi
 }
 
 # soft_to_install_exit
-# need  SOFT_NAME
-#	WAZZUF_UI
+# need SOFT_NAME
+#      WAZZUF_UI
 #
 # return nothing
 soft_to_install_exit () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --error --title "${ZEN_TITLE}" \
-			--text "Please install ${SOFT_NAME} ! Exiting."
-	else
-		echo -ne "\n *************************************\n"
-		echo -ne " Please install ${SOFT_NAME} ! Exiting. \n"
-		echo -ne " *************************************\n"
-	fi
-	exit 1
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --error --title "${ZEN_TITLE}" \
+      --text "Please install ${SOFT_NAME} ! Exiting."
+  else
+    echo -ne "\n *************************************\n"
+    echo -ne " Please install ${SOFT_NAME} ! Exiting. \n"
+    echo -ne " *************************************\n"
+  fi
+  exit 1
 }
 
 # file_exists
-# need  FILE_NAME
-#	WAZZUF_UI
+# need FILE_NAME
+#      WAZZUF_UI
 #
 # return nothing
 file_exists () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --info --title "${ZEN_TITLE}" \
-			--text "${FILE_NAME} file exists. Next..." \
-			--timeout=2
-	else
-		echo -ne "\n *************************************\n"
-		echo " ${FILE_NAME} file exists. Next..."  && sleep 1
-		echo -ne " *************************************\n"
-	fi
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --info --title "${ZEN_TITLE}" \
+      --text "${FILE_NAME} file exists. Next..." \
+      --timeout=2
+  else
+    echo -ne "\n *************************************\n"
+    echo " ${FILE_NAME} file exists. Next..."  && sleep 1
+    echo -ne " *************************************\n"
+  fi
 }
 
 # dont_exists_warn
-# need  FILE_NAME
-#	SOURCE_NAME
-#	WAZZUF_UI
+# need FILE_NAME
+#      SOURCE_NAME
+#      WAZZUF_UI
 #
 # return nothing
 dont_exists_warn () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --warning --title "${ZEN_TITLE}" \
-			--text "${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Skipping..." \
-			--timeout=2
-	else
-		echo -ne "\n *************************************\n"
-		echo " Warning: ${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Skipping..." && sleep 2
-		echo -ne " *************************************\n"
-	fi
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --warning --title "${ZEN_TITLE}" \
+      --text "${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Skipping..." \
+      --timeout=2
+  else
+    echo -ne "\n *************************************\n"
+    echo " Warning: ${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Skipping..." && sleep 2
+    echo -ne " *************************************\n"
+  fi
 }
 
 # dont_exists_exit
-# need  FILE_NAME
-#	SOURCE_NAME
-#	WAZZUF_UI
+# need FILE_NAME
+#      SOURCE_NAME
+#      WAZZUF_UI
 #
 # return nothing
 dont_exists_exit () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --error --title "${ZEN_TITLE}" \
-			--text "${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Exiting..." \
-			--timeout=2
-	else
-		echo -ne "\n *************************************\n"
-		echo " Error: ${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Exiting..." && sleep 2
-		echo -ne " *************************************\n"
-	fi
-	exit 1
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --error --title "${ZEN_TITLE}" \
+      --text "${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Exiting..." \
+      --timeout=2
+  else
+    echo -ne "\n *************************************\n"
+    echo " Error: ${FILE_NAME} file does not exists in ${SOURCE_NAME} ! Exiting..." && sleep 2
+    echo -ne " *************************************\n"
+  fi
+  exit 1
 }
 
 # not_recognized_exit
-# need  MESSAGE
-#	WAZZUF_UI
+# need MESSAGE
+#      WAZZUF_UI
 #
 # return nothing
 not_recognized_exit () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --error --title "${ZEN_TITLE}" \
-			--text "${MESSAGE} not recognized ! Exiting."
-	else
-		echo -ne "\n *************************************\n"
-		echo -ne " Error: ${MESSAGE} not recognized ! Exiting. \n"
-		echo -ne " *************************************\n"
-	fi
-	exit 1
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --error --title "${ZEN_TITLE}" \
+      --text "${MESSAGE} not recognized ! Exiting."
+  else
+    echo -ne "\n *************************************\n"
+    echo -ne " Error: ${MESSAGE} not recognized ! Exiting. \n"
+    echo -ne " *************************************\n"
+  fi
+  exit 1
 }
 
 # empty_exit
-# need  MESSAGE
-#	WAZZUF_UI
+# need MESSAGE
+#      WAZZUF_UI
 #
 # return nothing
 empty_exit () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --error --title "${ZEN_TITLE}" \
-			--text "${MESSAGE} is empty ! Exiting."
-	else
-		echo -ne "\n *************************************\n"
-		echo -ne " Error: ${MESSAGE} is empty ! Exiting. \n"
-		echo -ne " *************************************\n"
-	fi
-	exit 1
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --error --title "${ZEN_TITLE}" \
+      --text "${MESSAGE} is empty ! Exiting."
+  else
+    echo -ne "\n *************************************\n"
+    echo -ne " Error: ${MESSAGE} is empty ! Exiting. \n"
+    echo -ne " *************************************\n"
+  fi
+  exit 1
 }
 
 # wazzuf_quit
@@ -187,25 +188,25 @@ empty_exit () {
 #
 # return nothing
 wazzuf_quit () {
-	zenity --info --title "${ZEN_TITLE}" \
-		--text "${ZEN_TITLE} will now quit."
-	exit 0
+  zenity --info --title "${ZEN_TITLE}" \
+    --text "${ZEN_TITLE} will now quit."
+  exit 0
 }
 
 # wazzuf_disk_full
-# need  MESSAGE
-#	WAZZUF_UI
+# need MESSAGE
+#      WAZZUF_UI
 #
 # return nothing
 disk_full_quit () {
-	if [[ ${WAZZUF_UI} == "GUI" ]]; then
-		zenity --info --title "${ZEN_TITLE}" \
-			--text "Insufficient disk space in ${MESSAGE} ! Exiting."
-	else
-		echo -ne "\n *************************************\n"
-		echo -ne " Error: Insufficient disk space in ${MESSAGE} ! Exiting. \n"
-		echo -ne " *************************************\n"
-	fi
-	exit 1
+  if [[ "${WAZZUF_UI}" == "GUI" ]]; then
+    zenity --info --title "${ZEN_TITLE}" \
+      --text "Insufficient disk space in ${MESSAGE} ! Exiting."
+  else
+    echo -ne "\n *************************************\n"
+    echo -ne " Error: Insufficient disk space in ${MESSAGE} ! Exiting. \n"
+    echo -ne " *************************************\n"
+  fi
+  exit 1
 }
 
