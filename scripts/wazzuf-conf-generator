@@ -61,20 +61,6 @@ touch "${CONF_FILE_TMP}"
 } > "${CONF_FILE_TMP}"
 
 
-# CONV_PROJECT detection
-# Better set in wazzuf-ripper-global.conf file - but need rights
-if [[ "${CONV_PROJECT}" == "avconv" ]] && [ ! -x /usr/bin/avconv ] && [ -x /usr/bin/ffmpeg ]; then
-  # Linux distribution seems not to be Debian-based
-  { echo ""
-    echo "# Dirty ffmpeg/libav hack"
-    echo "# You should manually set CONV_PROJECT=\"ffmpeg\" in ${GLOBAL_CONF_FILE} !"
-    echo "CONV_PROJECT=\"ffmpeg\""
-  } >> "${CONF_FILE_TMP}"
-
-  # apply parameter
-  CONV_PROJECT="ffmpeg"
-fi
-
 ## MEDIA INFORMATIONS
 { echo ""
   echo ""
