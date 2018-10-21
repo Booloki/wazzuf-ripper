@@ -14,7 +14,8 @@ GLOBAL_CONF_FILE="/etc/wazzuf-ripper/wazzuf-ripper-global.conf"
 source "${GLOBAL_CONF_FILE}"
 
 # basic error catching
-trap '$(printf "$(gettext "\nWazzuf Ripper failed !")") && exit 1' 15
+ERROR_MESSAGE=$(gettext "\nWazzuf Ripper failed !")
+trap '$(printf "$(${ERROR_MESSAGE})") && exit 1' 15
 
 # check wazzuf files
 # shellcheck source=functions/wazzuf-check
@@ -552,7 +553,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
     # Extract full working file (.vob or .m2ts)
     # Save chapters informations and set chapters merge informations
     check_mplayer
-    trap '$(printf "$(gettext "\nManual killed script (Ctrl-C) during extracting working file")") && exit 1' 2
+    ERROR_MESSAGE=$(gettext "\nManual killed script (Ctrl-C) during extracting working file")
+    trap '$(printf "$(${ERROR_MESSAGE})") && exit 1' 2
     case "${SOURCE}" in
       DVD | ISO_DVD )
         # extract local working file + chapters file from DVD or DVD iso
@@ -680,7 +682,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
 
 
     ## subtitle file(s) check/extract/copy
-    trap '$(printf "$(gettext "\nManual killed script (Ctrl-C) during checking/extracting subtitles")") && exit 1' 2
+    ERROR_MESSAGE=$(gettext "\nManual killed script (Ctrl-C) during checking/extracting subtitles")
+    trap '$(printf "$(${ERROR_MESSAGE})") && exit 1' 2
     TOTAL_SUBTITLE_SIZE=0
     MERGE_SUBTITLES_FULL=""
     SUB_COUNTER=1
@@ -822,7 +825,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
 
 
     ## Audio track(s) extraction/encoding
-    trap '$(printf "$(gettext "\nManual killed script (Ctrl-C) during audio track(s) extraction/encoding")") && exit 1' 2
+    ERROR_MESSAGE=$(gettext "\nManual killed script (Ctrl-C) during audio track(s) extraction/encoding")
+    trap '$(printf "$(${ERROR_MESSAGE})") && exit 1' 2
     TOTAL_AUDIO_SIZE=0
     MERGE_AUDIO_FULL=""
     AUDIO_COUNTER=1
@@ -902,7 +906,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
 
 
     ## video encoding
-    trap '$(printf "$(gettext "\nManual killed script (Ctrl-C) during video encoding")") && exit 1' 2
+    ERROR_MESSAGE=$(gettext "\nManual killed script (Ctrl-C) during video encoding")
+    trap '$(printf "$(${ERROR_MESSAGE})") && exit 1' 2
 
     # change video bitrate if maximum target size provided
     if [[ ! "${TARGET_SIZE}" == "" ]]; then
@@ -1157,7 +1162,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
 
 
     ## merge
-    trap '$(printf "$(gettext "\nManual killed script (Ctrl-C) during final mkv merge")") && exit 1' 2
+    ERROR_MESSAGE=$(gettext "\nManual killed script (Ctrl-C) during final mkv merge")
+    trap '$(printf "$(${ERROR_MESSAGE})") && exit 1' 2
     
     MESSAGE_FINALMERGE=$(gettext "Final file merge")
     
