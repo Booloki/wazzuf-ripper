@@ -681,14 +681,14 @@ M2TS )
     --auto-close
 
   # extract informations from associated mpls or clpi file
-  MPLS_FILE_PATH="${M2TS_FILE_PATH//m2ts$/mpls}"
+  MPLS_FILE_PATH="${M2TS_FILE_PATH/%m2ts/mpls}"
   check_mediainfo
   if [ -f "${MPLS_FILE_PATH}" ]; then
     mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "${MPLS_FILE_PATH}" 1>/dev/null
     if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from mpls file"; fi
   else
     if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG no associated mpls file found"; fi
-    CLPI_FILE_PATH="${M2TS_FILE_PATH//m2ts$/clpi}"
+    CLPI_FILE_PATH="${M2TS_FILE_PATH/%m2ts/clpi}"
     if [ -f "${CLPI_FILE_PATH}" ]; then
       mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "${CLPI_FILE_PATH}" 1>/dev/null
       if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from clpi file"; fi
