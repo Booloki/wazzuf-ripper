@@ -55,10 +55,8 @@ audio_rip () {
     not_recognized_exit
     ;;
   esac
-  if [[ "${DEBUG}" == "1" ]]; then
-    echo "DEBUG AUDIO_SOURCE_FILE ${AUDIO_SOURCE_FILE}"
-    echo "DEBUG AUDIO_SOURCE_BITRATE ${AUDIO_SOURCE_BITRATE}"
-  fi
+  debug "AUDIO_SOURCE_FILE ${AUDIO_SOURCE_FILE}"
+  debug "AUDIO_SOURCE_BITRATE ${AUDIO_SOURCE_BITRATE}"
 
   # Audio dump/demux from local working file
   case "${CODEC_AUDIO}" in
@@ -73,7 +71,7 @@ audio_rip () {
         echo -ne "\n *************************************\n"
         echo " Dumping ${AUDIO_SOURCE_FILE}..."
       fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc \"${SOURCE_FILE}\" -aid \"${AUDIO_AID}\" -dumpaudio -dumpfile \"${AUDIO_SOURCE_FILE}\""; fi
+      debug "ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc \"${SOURCE_FILE}\" -aid \"${AUDIO_AID}\" -dumpaudio -dumpfile \"${AUDIO_SOURCE_FILE}\""
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( ionice -c "${IONICENESS}" nice -n "${NICENESS}" mplayer -nolirc "${SOURCE_FILE}" -aid "${AUDIO_AID}" -dumpaudio -dumpfile "${AUDIO_SOURCE_FILE}" 2>&1 ) \
           | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Dumping ${AUDIO_SOURCE_FILE}" --auto-close
@@ -95,7 +93,7 @@ audio_rip () {
       fi
       # get PCM source map
       SOURCE_PCM_BLURAY_ID=$(mediainfo '--Inform=Audio;%MenuID% %Format%\n' "${SOURCE_FILE}" | grep PCM | cut -d ' ' -f1)
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" \"${CONV_PROJECT}\" -i \"${SOURCE_FILE}\" -map 0:\"${SOURCE_PCM_BLURAY_ID}\" \"${WAV_FILE}\""; fi
+      debug "ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" \"${CONV_PROJECT}\" -i \"${SOURCE_FILE}\" -map 0:\"${SOURCE_PCM_BLURAY_ID}\" \"${WAV_FILE}\""
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( ionice -c "${IONICENESS}" nice -n "${NICENESS}" "${CONV_PROJECT}" -i "${SOURCE_FILE}" -map 0:"${SOURCE_PCM_BLURAY_ID}" "${WAV_FILE}" ) \
           | zenity --progress --title="${ZEN_TITLE}" --text="Extracting ${WAV_FILE}" --auto-close --auto-kill --pulsate
@@ -115,7 +113,7 @@ audio_rip () {
         echo -ne "\n *************************************\n"
         echo " Dumping ${WAV_FILE}..."
       fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc \"${SOURCE_FILE}\" -aid \"${AUDIO_AID}\" -ao pcm:waveheader:fast:file=\"${WAV_FILE}\" -vc dummy -vo null"; fi
+      debug "ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc \"${SOURCE_FILE}\" -aid \"${AUDIO_AID}\" -ao pcm:waveheader:fast:file=\"${WAV_FILE}\" -vc dummy -vo null"
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( ionice -c "${IONICENESS}" nice -n "${NICENESS}" mplayer -nolirc "${SOURCE_FILE}" -aid "${AUDIO_AID}" -ao pcm:waveheader:fast:file="${WAV_FILE}" -vc dummy -vo null 2>/dev/null ) \
           | zenity --progress --title="${ZEN_TITLE}" --text="Extracting ${WAV_FILE}" --auto-close --auto-kill --pulsate
@@ -177,7 +175,7 @@ audio_rip () {
         echo -ne "\n *************************************\n"
         echo " Convert ${AUDIO_SOURCE_FILE} to ${AUDIO_FILE}..."
       fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" \"${CONV_PROJECT}\" -threads \"${AUDIO_AC3_THREADS}\" -i \"${AUDIO_SOURCE_FILE}\" -acodec ac3 -ab \"${AUDIO_AC3_QUAL}\" -y \"${AUDIO_FILE}\""; fi
+      debug "nice -n \"${NICENESS}\" \"${CONV_PROJECT}\" -threads \"${AUDIO_AC3_THREADS}\" -i \"${AUDIO_SOURCE_FILE}\" -acodec ac3 -ab \"${AUDIO_AC3_QUAL}\" -y \"${AUDIO_FILE}\""
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( nice -n "${NICENESS}" "${CONV_PROJECT}" -threads "${AUDIO_AC3_THREADS}" -i "${AUDIO_SOURCE_FILE}" -acodec ac3 -ab "${AUDIO_AC3_QUAL}" -y "${AUDIO_FILE}" ) \
           | zenity --progress --title="${ZEN_TITLE}" --text="Encoding ${AUDIO_FILE}" --auto-close --auto-kill --pulsate
@@ -199,7 +197,7 @@ audio_rip () {
         echo -ne "\n *************************************\n"
         echo " Convert ${WAV_FILE} to ${AUDIO_FILE}..."
       fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" oggenc \"${WAV_FILE}\" -q \"${AUDIO_OGG_QUAL}\" -o \"${AUDIO_FILE}\" -a \"${TITLE_NAME}\" -t \"${AUDIO_NAME}\" -l \"${MERGE_TITLE}\" -G Soundtrack -d \"${DATE}\""; fi
+      debug "nice -n \"${NICENESS}\" oggenc \"${WAV_FILE}\" -q \"${AUDIO_OGG_QUAL}\" -o \"${AUDIO_FILE}\" -a \"${TITLE_NAME}\" -t \"${AUDIO_NAME}\" -l \"${MERGE_TITLE}\" -G Soundtrack -d \"${DATE}\""
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( nice -n "${NICENESS}" oggenc "${WAV_FILE}" -q "${AUDIO_OGG_QUAL}" -o "${AUDIO_FILE}" -a "${TITLE_NAME}" -t "${AUDIO_NAME}" -l "${MERGE_TITLE}" -G Soundtrack -d "${DATE}" 2>&1  \
           | awk -vRS='\r' '(NR>1){gsub(/%/," ");print $2; fflush();}' ) \
@@ -240,7 +238,7 @@ audio_rip () {
         echo -ne "\n *************************************\n"
         echo " Convert ${WAV_FILE} to ${AUDIO_FILE}..."
       fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" lame --scale \"${AUDIO_MP3_VOL}\" \"${AUDIO_MP3_MODE_OPTION}\" --ta \"${TITLE_NAME}\" --tt \"${AUDIO_NAME}\" --tl \"${MERGE_TITLE}\" --tg 24 --ty \"${DATE}\" --tc \"${COMMENT}\" -h \"${WAV_FILE}\" \"${AUDIO_FILE}\""; fi
+      debug "nice -n \"${NICENESS}\" lame --scale \"${AUDIO_MP3_VOL}\" \"${AUDIO_MP3_MODE_OPTION}\" --ta \"${TITLE_NAME}\" --tt \"${AUDIO_NAME}\" --tl \"${MERGE_TITLE}\" --tg 24 --ty \"${DATE}\" --tc \"${COMMENT}\" -h \"${WAV_FILE}\" \"${AUDIO_FILE}\""
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( nice -n "${NICENESS}" lame --scale "${AUDIO_MP3_VOL}" "${AUDIO_MP3_MODE_OPTION}" \
           --ta "${TITLE_NAME}" --tt "${AUDIO_NAME}" --tl "${MERGE_TITLE}" \
@@ -288,8 +286,7 @@ audio_rip () {
         echo -ne "\n *************************************\n"
         echo " Encoding ${WAV_FILE} to ${AUDIO_FILE}..."
       fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" opusenc --bitrate \"${AUDIO_OPUS_BITRATE}\" \"${AUDIO_OPUS_MODE_OPTION}\" \
-        --artist \"${TITLE_NAME}\" --title \"${AUDIO_NAME}\" \"${WAV_FILE}\" \"${AUDIO_FILE}\""; fi
+      debug "nice -n \"${NICENESS}\" opusenc --bitrate \"${AUDIO_OPUS_BITRATE}\" \"${AUDIO_OPUS_MODE_OPTION}\" --artist \"${TITLE_NAME}\" --title \"${AUDIO_NAME}\" \"${WAV_FILE}\" \"${AUDIO_FILE}\""
       if [[ "${WAZZUF_UI}" == "GUI" ]]; then
         ( echo 10; nice -n "${NICENESS}" opusenc --bitrate "${AUDIO_OPUS_BITRATE}" "${AUDIO_OPUS_MODE_OPTION}" --artist "${TITLE_NAME}" --title "${AUDIO_NAME}" "${WAV_FILE}" "${AUDIO_FILE}" 2>/dev/null ) \
           | zenity --progress --pulsate --title "${ZEN_TITLE}" --text "Encoding ${WAV_FILE} to ${AUDIO_FILE}" --auto-close --auto-kill
@@ -309,7 +306,7 @@ audio_rip () {
 # return AUDIO_SOURCE_BITRATE
 get_audio_bitrate () {
   AUDIO_SOURCE_BITRATE_STRING=$(mediainfo --Inform="Audio;%ID/String%:%BitRate/String%\n" "${SOURCE_FILE}" | grep "${AUDIO_AID}" | cut -d':' -f2)
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG AUDIO_SOURCE_BITRATE_STRING ${AUDIO_SOURCE_BITRATE_STRING}"; fi
+  debug "AUDIO_SOURCE_BITRATE_STRING ${AUDIO_SOURCE_BITRATE_STRING}"
   if [[ "${AUDIO_SOURCE_BITRATE_STRING}" == *[kK]b[/p]s* ]]
   then
     AUDIO_SOURCE_BITRATE=$(echo "${AUDIO_SOURCE_BITRATE_STRING}" | sed 's/ //g' | sed 's|[kK]b[/p]s||g' | sed 's|Unknown/||')

@@ -71,10 +71,8 @@ touch "${CONF_FILE_TMP}"
 # zenity height
 ZENITY_SOURCE_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * 5))
 ZENITY_SOURCE_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_SOURCE_HEIGHT_COMPONENTS))
-if [[ "${DEBUG}" == "1" ]]; then
-  echo "DEBUG ZENITY_SOURCE_HEIGHT_COMPONENTS ${ZENITY_SOURCE_HEIGHT_COMPONENTS}"
-  echo "DEBUG ZENITY_SOURCE_HEIGHT ${ZENITY_SOURCE_HEIGHT}"
-fi
+debug "ZENITY_SOURCE_HEIGHT_COMPONENTS ${ZENITY_SOURCE_HEIGHT_COMPONENTS}"
+debug "ZENITY_SOURCE_HEIGHT ${ZENITY_SOURCE_HEIGHT}"
 
 ZENITY_SOURCE=$(zenity --list --radiolist \
   --title="${ZEN_TITLE}" \
@@ -101,10 +99,10 @@ zenity --info --title "${ZEN_TITLE}" \
   --text "$(gettext "Please select your <b>source directory</b>
 (m2ts/ts, iso, external subtitles, cover image, episodes list,...).")"
 ZENITY_SOURCE_DIRECTORY_BASE="${HOME}"
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SOURCE_DIRECTORY_BASE ${ZENITY_SOURCE_DIRECTORY_BASE}"; fi
+debug "ZENITY_SOURCE_DIRECTORY_BASE ${ZENITY_SOURCE_DIRECTORY_BASE}"
 ZENITY_SOURCE_DIRECTORY=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "${ZENITY_SOURCE_DIRECTORY_BASE}"/ --directory)
 if [ $? = "1" ]; then wazzuf_quit; fi
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SOURCE_DIRECTORY ${ZENITY_SOURCE_DIRECTORY}"; fi
+debug "ZENITY_SOURCE_DIRECTORY ${ZENITY_SOURCE_DIRECTORY}"
 echo "SOURCE_DIRECTORY=\"${ZENITY_SOURCE_DIRECTORY}\"" >> "${CONF_FILE_TMP}"
 
 case "${SOURCE}" in
@@ -113,19 +111,19 @@ BD | DVD )
   zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>Disc Directory</b>. ")" --ok-label "${ZEN_LABEL_NEXT}"
   ZENITY_DISC_DIR=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "/media/" --directory)
   if [ $? = "1" ]; then wazzuf_quit; fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_DISC_DIR ${ZENITY_DISC_DIR}"; fi
+  debug "ZENITY_DISC_DIR ${ZENITY_DISC_DIR}"
   ;;
 ISO_BD | ISO_DVD )
   zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>iso file</b> (source directory only). ")" --ok-label "${ZEN_LABEL_NEXT}"
   ZENITY_ISO_FILE=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "${ZENITY_SOURCE_DIRECTORY}"/)
   if [ $? = "1" ]; then exit 0; fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_ISO_FILE ${ZENITY_ISO_FILE}"; fi
+  debug "ZENITY_ISO_FILE ${ZENITY_ISO_FILE}"
   # Test if really in source directory
   if [[ $(echo "${ZENITY_ISO_FILE}" | grep -c "${ZENITY_SOURCE_DIRECTORY}")  == "1" ]]; then
     # from full path to filename
     # shellcheck disable=SC2001
     ISO_FILE=$(echo "${ZENITY_ISO_FILE}" | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%)
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ISO_FILE ${ISO_FILE}"; fi
+    debug "ISO_FILE ${ISO_FILE}"
     if [[ "${ISO_FILE}" == "" ]]; then
       MESSAGE="Iso file"
       empty_exit
@@ -146,13 +144,13 @@ M2TS )
   zenity --info --title "${ZEN_TITLE}" --text "$(gettext "Please select your <b>m2ts/ts file</b> (source directory only). ")" --ok-label "${ZEN_LABEL_NEXT}"
   ZENITY_M2TS_FILE=$(zenity --file-selection --title "${ZEN_TITLE}" --filename "${ZENITY_SOURCE_DIRECTORY}"/)
   if [ $? = "1" ]; then wazzuf_quit; fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_M2TS_FILE ${ZENITY_M2TS_FILE}"; fi
+  debug "ZENITY_M2TS_FILE ${ZENITY_M2TS_FILE}"
   # Test if really in source directory
   if [[ $(echo "${ZENITY_M2TS_FILE}" | grep -c "${ZENITY_SOURCE_DIRECTORY}")  == "1" ]]; then
     # from full path to filename
     # shellcheck disable=SC2001
     M2TS_FILE=$(echo "${ZENITY_M2TS_FILE}" | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%)
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS_FILE ${M2TS_FILE}"; fi
+    debug "M2TS_FILE ${M2TS_FILE}"
     # Test if "empty"
     if [[ "${M2TS_FILE}" == "" ]]; then
       MESSAGE="m2ts/ts file"
@@ -188,7 +186,7 @@ cd "${SOURCE_DIRECTORY}" || exit 1
 # zenity height
 ZENITY_VIDEO_TYPE_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * 3))
 ZENITY_VIDEO_TYPE_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_VIDEO_TYPE_HEIGHT_COMPONENTS))
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_VIDEO_TYPE_HEIGHT ${ZENITY_VIDEO_TYPE_HEIGHT}"; fi
+debug "ZENITY_VIDEO_TYPE_HEIGHT ${ZENITY_VIDEO_TYPE_HEIGHT}"
 
 ZENITY_VIDEO_TYPE=$(zenity --list --radiolist \
   --title="${ZEN_TITLE}" \
@@ -231,7 +229,7 @@ fi
 
 # test ZENITY_DATE integer
 if echo "${ZENITY_DATE}" | grep -vEq '^[0-9]+$'; then
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG Warning ! Provided date is not an integer !"; fi
+  debug "Warning ! Provided date is not an integer !"
 fi
 echo "DATE=\"${ZENITY_DATE}\"" >> "${CONF_FILE_TMP}"
 
@@ -240,11 +238,11 @@ TITLE_NAME="${ZENITY_TITLE}"
 DATE="${ZENITY_DATE}"
 
 get_omdb_response_title
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG OMDB_RESPONSE ${OMDB_RESPONSE}"; fi
+debug "OMDB_RESPONSE ${OMDB_RESPONSE}"
 
 if [[ "${OMDB_RESPONSE}" == "True" ]]; then
   get_imdb_id_title
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG IMDB_ID ${IMDB_ID}"; fi
+  debug "IMDB_ID ${IMDB_ID}"
   zenity --text-info --title "${ZEN_TITLE}" \
     --height "520" \
     --width "700" \
@@ -256,14 +254,14 @@ if [[ "${OMDB_RESPONSE}" == "True" ]]; then
     imdb_id_ask_gui
   fi
 else
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG No IMdb informations found !"; fi
+  debug "No IMdb informations found !"
   imdb_id_ask_gui
 fi
 
 if [[ ! "${IMDB_ID}" == "" ]]; then
   echo "IMDB_ID=\"${IMDB_ID}\"" >> "${CONF_FILE_TMP}"
   IMDB_URL_COVER=$(omdbtool -i "${IMDB_ID}" --apikey="${OMDB_API_KEY}" | sed -n '/^poster/{n;p;}')
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG IMDB_URL_COVER ${IMDB_URL_COVER}"; fi
+  debug "IMDB_URL_COVER ${IMDB_URL_COVER}"
   # check if url exists
   if [[ ! "${IMDB_URL_COVER}" == "N/A" ]]; then
     check_wget
@@ -274,17 +272,17 @@ if [[ ! "${IMDB_ID}" == "" ]]; then
       --pulsate \
       --auto-close
     if [ $? = "1" ]; then
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG Cover download cancelled !"; fi
+      debug "Cover download cancelled !"
       echo "COVER=\"\"" >> "${CONF_FILE_TMP}"
     else
       echo "COVER=\"cover.jpg\"" >> "${CONF_FILE_TMP}"
     fi
   else
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG No cover available !"; fi
+    debug "No cover available !"
     echo "COVER=\"\"" >> "${CONF_FILE_TMP}"
   fi
 else
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG No ID so no cover"; fi
+  debug "No ID so no cover"
   echo "IMDB_ID=\"\"" >> "${CONF_FILE_TMP}"
   echo "COVER=\"\"" >> "${CONF_FILE_TMP}"
 fi
@@ -301,7 +299,7 @@ ZENITY_TAGS=$(zenity --forms \
   --add-entry="$(gettext "Comment")" \
   --separator="|")
 if [ $? = "1" ]; then wazzuf_quit; fi
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_TAGS ${ZENITY_TAGS}"; fi
+debug "ZENITY_TAGS ${ZENITY_TAGS}"
 { echo "TAG_RIP=\"$(echo "${ZENITY_TAGS}" | cut -d "|" -f1)\""
   echo "TAG_AUDIO=\"$(echo "${ZENITY_TAGS}" | cut -d "|" -f2)\""
   echo "TAG_SIGNATURE=\"$(echo "${ZENITY_TAGS}" | cut -d "|" -f3)\""
@@ -348,7 +346,7 @@ SHOW )
   # zenity height
   ZENITY_EPISODES_FILE_CHOICE_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * 3))
   ZENITY_EPISODES_FILE_CHOICE_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_EPISODES_FILE_CHOICE_HEIGHT_COMPONENTS))
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_EPISODES_FILE_CHOICE_HEIGHT ${ZENITY_EPISODES_FILE_CHOICE_HEIGHT}"; fi
+  debug "ZENITY_EPISODES_FILE_CHOICE_HEIGHT ${ZENITY_EPISODES_FILE_CHOICE_HEIGHT}"
 
   ZENITY_EPISODES_FILE_CHOICE=$(zenity --list --radiolist \
     --title="${ZEN_TITLE}" \
@@ -376,13 +374,11 @@ SHOW )
       # from full path to filename
       # shellcheck disable=SC2001
       EPISODES_FILE=$(echo "${ZENITY_EPISODES_FILE}" | sed s%"${ZENITY_SOURCE_DIRECTORY}"/%%)
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG EPISODES_FILE ${EPISODES_FILE}"; fi
+      debug "EPISODES_FILE ${EPISODES_FILE}"
       # Test if "empty"
       if [[ "${EPISODES_FILE}" == "" ]]; then
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG No episode file !"
-          echo "EPISODES_FILE=\"\"" >> "${CONF_FILE_TMP}"
-        fi
+        debug "No episode file !"
+        echo "EPISODES_FILE=\"\"" >> "${CONF_FILE_TMP}"
       else
         echo "EPISODES_FILE=\"${EPISODES_FILE}\"" >> "${CONF_FILE_TMP}"
       fi
@@ -427,12 +423,12 @@ BD | ISO_BD )
   # If an iso, mount the device
   if [[ "${SOURCE}" == "ISO_BD" ]]; then
     iso_manage mount GUI
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"; fi
+    debug "ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"
     BD_MOUNT="${ISO_MOUNT_POINT}"
   else
     BD_MOUNT="${BD_PATH}"
   fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG BD_MOUNT ${BD_MOUNT}"; fi
+  debug "BD_MOUNT ${BD_MOUNT}"
 
   # Compare the provided media device type with the detected one
   MOUNT_PATH="${BD_MOUNT}"
@@ -482,7 +478,7 @@ BD | ISO_BD )
     DVD_EPISODES_ORG="TITLES"
     echo "DVD_EPISODES_ORG="\"${DVD_EPISODES_ORG}\""" >> "${CONF_FILE_TMP}"
     BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES "${MEDIA_TITLE}-mplayer.info" | cut -d'=' -f2)
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG BD_TOTAL_TITLES ${BD_TOTAL_TITLES}"; fi
+    debug "BD_TOTAL_TITLES ${BD_TOTAL_TITLES}"
 
     # Titles
     TITLE=1
@@ -491,13 +487,11 @@ BD | ISO_BD )
       BD_TITLE_CHAPTERS[$TITLE]=$(grep ^ID_BLURAY_TITLE_${TITLE}_CHAPTERS "${MEDIA_TITLE}-mplayer.info" | cut -d'=' -f2)
       BD_TITLE_PLAYLIST_POSITION[${TITLE}]=$(grep ^ID_BLURAY_TITLE_${TITLE}_PLAYLIST "${MEDIA_TITLE}-mplayer.info" | cut -d'=' -f2)
       BD_TITLE_ANGLES[${TITLE}]=$(grep ^ID_BLURAY_TITLE_${TITLE}_ANGLE "${MEDIA_TITLE}-mplayer.info" | cut -d'=' -f2)
-      if [[ "${DEBUG}" == "1" ]]; then
-        echo "DEBUG TITLE ${TITLE}"
-        echo "DEBUG BD_TITLE_LENGTH[${TITLE}] ${BD_TITLE_LENGTH[$TITLE]}"
-        echo "DEBUG BD_TITLE_CHAPTERS[${TITLE}] ${BD_TITLE_CHAPTERS[$TITLE]}"
-        echo "DEBUG BD_TITLE_PLAYLIST_POSITION[$TITLE] ${BD_TITLE_PLAYLIST_POSITION[$TITLE]}"
-        echo "DEBUG BD_TITLE_ANGLES[${TITLE}] ${BD_TITLE_ANGLES[$TITLE]}"
-      fi
+      debug "TITLE ${TITLE}"
+      debug "BD_TITLE_LENGTH[${TITLE}] ${BD_TITLE_LENGTH[$TITLE]}"
+      debug "BD_TITLE_CHAPTERS[${TITLE}] ${BD_TITLE_CHAPTERS[$TITLE]}"
+      debug "BD_TITLE_PLAYLIST_POSITION[$TITLE] ${BD_TITLE_PLAYLIST_POSITION[$TITLE]}"
+      debug "BD_TITLE_ANGLES[${TITLE}] ${BD_TITLE_ANGLES[$TITLE]}"
       TITLE=$((TITLE + 1))
     done
 
@@ -506,7 +500,7 @@ BD | ISO_BD )
     ZENITY_TITLES_COMPONENTS="${TITLE}"
     ZENITY_TITLES_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * ZENITY_TITLES_COMPONENTS))
     ZENITY_TITLES_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_TITLES_HEIGHT_COMPONENTS))
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_TITLES_HEIGHT ${ZENITY_TITLES_HEIGHT}"; fi
+    debug "ZENITY_TITLES_HEIGHT ${ZENITY_TITLES_HEIGHT}"
 
     # Display all Titles but don't check Titles with DVD_TITLE_LENGTH < 5 min
     ZENITY_TITLES=$(
@@ -521,7 +515,7 @@ BD | ISO_BD )
         --text="$(gettext "BD Title(s) choice")"
     )
     if [ $? = "1" ]; then wazzuf_quit; fi
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_TITLES ${ZENITY_TITLES}"; fi
+    debug "ZENITY_TITLES ${ZENITY_TITLES}"
 
     BD_TITLE_LIST="${ZENITY_TITLES}"
     echo "BD_TITLE_LIST=\"${BD_TITLE_LIST}\"" >> "${CONF_FILE_TMP}"
@@ -531,12 +525,9 @@ BD | ISO_BD )
     bd_get_longest_title
     BD_LONGEST_TITLE_CHAPTERS=$(grep "^ID_BLURAY_TITLE_${BD_LONGEST_TITLE_NUMBER}_CHAPTERS" "${MEDIA_TITLE}-mplayer.info" | cut -d '=' -f2)
     BD_TOTAL_TITLES=$(grep ^ID_BLURAY_TITLES "${MEDIA_TITLE}-mplayer.info" | cut -d '=' -f2)
-
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG BD_LONGEST_TITLE_NUMBER ${BD_LONGEST_TITLE_NUMBER}"
-      echo "DEBUG BD_TOTAL_TITLES ${BD_TOTAL_TITLES}"
-      echo "DEBUG BD_LONGEST_TITLE_CHAPTERS ${BD_LONGEST_TITLE_CHAPTERS}"
-    fi
+    debug "BD_LONGEST_TITLE_NUMBER ${BD_LONGEST_TITLE_NUMBER}"
+    debug "BD_TOTAL_TITLES ${BD_TOTAL_TITLES}"
+    debug "BD_LONGEST_TITLE_CHAPTERS ${BD_LONGEST_TITLE_CHAPTERS}"
 
     zenity --info --title "${ZEN_TITLE}" --text "$(printf "$(gettext "The longest track is <b>Title %s</b> / %s (Chapters: %s).
 This one will be use for cropping detection.")" "${BD_LONGEST_TITLE_NUMBER}" "${BD_TOTAL_TITLES}" "${BD_LONGEST_TITLE_CHAPTERS}")" --ok-label "${ZEN_LABEL_NEXT}"
@@ -550,12 +541,12 @@ DVD | ISO_DVD )
     # If an iso, mount the device
     if [[ "${SOURCE}" == "ISO_DVD" ]]; then
       iso_manage mount GUI
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"; fi
+      debug "ISO_MOUNT_POINT ${ISO_MOUNT_POINT}"
       DVD_MOUNT_PATH="${ISO_MOUNT_POINT}"
     else
       DVD_MOUNT_PATH="${DVD_PATH}"
     fi
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG BD_MOUNT ${BD_MOUNT}"; fi
+    debug "BD_MOUNT ${BD_MOUNT}"
 
     # Compare the provided media device type with the detected one
     MOUNT_PATH="${DVD_MOUNT_PATH}"
@@ -586,7 +577,7 @@ DVD | ISO_DVD )
     DVD_SOURCE="${ISO_FILE_PATH}"
 
     MEDIA_TITLE=$(echo "${ISO_FILE_PATH}" | awk 'BEGIN {FS = "/"} ; {print $NF}' | sed 's/.iso//')
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_TITLE ${MEDIA_TITLE}";fi
+    debug "MEDIA_TITLE ${MEDIA_TITLE}"
   fi
 
   ( lsdvd -acsv "${DVD_SOURCE}" 2>/dev/null > "${MEDIA_TITLE}-lsdvd.info" ) | zenity --progress \
@@ -598,7 +589,7 @@ DVD | ISO_DVD )
   if [[ $? == "1" ]]; then wazzuf_quit; fi
 
   if [[ "${ZENITY_VIDEO_TYPE}" == "SHOW" ]]; then
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG Warning ! Assume DVD_EPISODES_ORG is TITLES !"; fi
+    debug "Warning ! Assume DVD_EPISODES_ORG is TITLES !"
     # Episodes are classified on DVD CHAPTERS ("CHAPTERS") *or* on DVD TITLES ("TITLES")
     # Default: Titles
     DVD_EPISODES_ORG="TITLES"
@@ -619,14 +610,12 @@ DVD | ISO_DVD )
         DVD_TITLE_CHAPTERS[$i]=$(echo "${LINE}" | cut -d ',' -f2 | cut -d '.' -f2 | cut -d ':' -f2 | sed s/\ //)
         DVD_TITLE_TRACKS_AUDIO[$i]=$(echo "${LINE}" | cut -d ',' -f4 | cut -d ':' -f2 | sed s/\ //)
         DVD_TITLE_TRACKS_SUBTITLES[$i]=$(echo "${LINE}" | cut -d ',' -f5 | cut -d ':' -f2 | sed s/\ //)
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG i $i"
-          echo "DEBUG DVD_TITLE_ID[$i] ${DVD_TITLE_ID[$i]}"
-          echo "DEBUG DVD_TITLE_LENGTH[$i] ${DVD_TITLE_LENGTH[$i]}"
-          echo "DEBUG DVD_TITLE_CHAPTERS[$i] ${DVD_TITLE_CHAPTERS[$i]}"
-          echo "DEBUG DVD_TITLE_TRACKS_AUDIO[$i] ${DVD_TITLE_TRACKS_AUDIO[$i]}"
-          echo "DEBUG DVD_TITLE_TRACKS_SUBTITLES[$i] ${DVD_TITLE_TRACKS_SUBTITLES[$i]}"
-        fi
+        debug "i $i"
+        debug "DVD_TITLE_ID[$i] ${DVD_TITLE_ID[$i]}"
+        debug "DVD_TITLE_LENGTH[$i] ${DVD_TITLE_LENGTH[$i]}"
+        debug "DVD_TITLE_CHAPTERS[$i] ${DVD_TITLE_CHAPTERS[$i]}"
+        debug "DVD_TITLE_TRACKS_AUDIO[$i] ${DVD_TITLE_TRACKS_AUDIO[$i]}"
+        debug "DVD_TITLE_TRACKS_SUBTITLES[$i] ${DVD_TITLE_TRACKS_SUBTITLES[$i]}"
       done < "${MEDIA_TITLE}-Titles-lsdvd.info"
 
       # zenity height
@@ -634,7 +623,7 @@ DVD | ISO_DVD )
       ZENITY_TITLES_COMPONENTS=$((i + 1))
       ZENITY_TITLES_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * ZENITY_TITLES_COMPONENTS))
       ZENITY_TITLES_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_TITLES_HEIGHT_COMPONENTS))
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_TITLES_HEIGHT ${ZENITY_TITLES_HEIGHT}"; fi
+      debug "ZENITY_TITLES_HEIGHT ${ZENITY_TITLES_HEIGHT}"
 
       # Display all Titles but don't check Titles with DVD_TITLE_LENGTH < "00:01:00"
       ZENITY_TITLES=$(
@@ -649,7 +638,7 @@ DVD | ISO_DVD )
         --text="$(gettext "DVD Title(s) choice")"
       )
       if [ $? = "1" ]; then wazzuf_quit; fi
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_TITLES ${ZENITY_TITLES}"; fi
+      debug "ZENITY_TITLES ${ZENITY_TITLES}"
 
       DVD_TITLE_LIST="${ZENITY_TITLES}"
       echo "DVD_TITLE_LIST=\"${DVD_TITLE_LIST}\"" >> "${CONF_FILE_TMP}"
@@ -685,15 +674,15 @@ M2TS )
   check_mediainfo
   if [ -f "${MPLS_FILE_PATH}" ]; then
     mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "${MPLS_FILE_PATH}" 1>/dev/null
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from mpls file"; fi
+    debug "M2TS-mediainfo.info extracted from mpls file"
   else
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG no associated mpls file found"; fi
+    debug "No associated mpls file found"
     CLPI_FILE_PATH="${M2TS_FILE_PATH/%m2ts/clpi}"
     if [ -f "${CLPI_FILE_PATH}" ]; then
       mediainfo --Language=raw --LogFile=M2TS-mediainfo.info "${CLPI_FILE_PATH}" 1>/dev/null
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS-mediainfo.info extracted from clpi file"; fi
+      debug "M2TS-mediainfo.info extracted from clpi file"
     else
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG no associated clpi file found"; fi
+      debug "No associated clpi file found"
     fi
   fi
 
@@ -723,23 +712,23 @@ M2TS )
   # Check file to analyse
   # CLPI first, then MPLS, finaly SOURCE
   if [[ -f "${CLPI_FILE_PATH}" ]]; then
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG CLPI file found."; fi
+    debug "CLPI file found."
     M2TS_FILE_TOANALYSE="${CLPI_FILE_PATH}"
   elif [[ -f "${MPLS_FILE_PATH}" ]]; then
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MPLS file found."; fi
+    debug "MPLS file found."
     M2TS_FILE_TOANALYSE="${MPLS_FILE_PATH}"
   else
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG No available MPLS or CLPI file found."; fi
+    debug "No available MPLS or CLPI file found."
     M2TS_FILE_TOANALYSE="${M2TS_FILE_PATH}"
   fi
 
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS_FILE_TOANALYSE ${M2TS_FILE_TOANALYSE}"; fi
+  debug "M2TS_FILE_TOANALYSE ${M2TS_FILE_TOANALYSE}"
 
 
   # Audio
 
   M2TS_AUDIOS_NUMBER=$(mediainfo --Inform="General;%AudioCount%" "${M2TS_FILE_TOANALYSE}")
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS_AUDIOS_NUMBER ${M2TS_AUDIOS_NUMBER}"; fi
+  debug "M2TS_AUDIOS_NUMBER ${M2TS_AUDIOS_NUMBER}"
 
   M2TS_CONF_AUDIOS_PATH="/tmp/wazzuf-conf-audio.txt"
   M2TS_CONF_AUDIOS_FINAL_PATH="/tmp/wazzuf-conf-audio-final.txt"
@@ -757,7 +746,7 @@ M2TS )
     i=0
     while read -r LINE; do
       i=$((i + 1))
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG i $i"; fi
+      debug "i $i"
 
       M2TS_AUDIO_ID[$i]=$(echo "${LINE}" | cut -d '|' -f 1)
       M2TS_AUDIO_FORMAT[$i]=$(echo "${LINE}" | cut -d '|' -f 2)
@@ -784,25 +773,23 @@ M2TS )
         M2TS_AUDIO_BITRATE[$i]=$(echo "${LINE}" | cut -d '|' -f 5)
       fi
 
-      if [[ "${DEBUG}" == "1" ]]; then
-        echo "DEBUG M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
-        echo "DEBUG M2TS_AUDIO_LANG[$i] ${M2TS_AUDIO_LANG[$i]}"
-        echo "DEBUG M2TS_AUDIO_FORMAT[$i] ${M2TS_AUDIO_FORMAT[$i]}"
-        echo "DEBUG M2TS_AUDIO_CHANNELS[$i] ${M2TS_AUDIO_CHANNELS[$i]}"
-        echo "DEBUG M2TS_AUDIO_BITRATE[$i] ${M2TS_AUDIO_BITRATE[$i]}"
-      fi
+      debug "M2TS_AUDIO_ID[$i] ${M2TS_AUDIO_ID[$i]}"
+      debug "M2TS_AUDIO_LANG[$i] ${M2TS_AUDIO_LANG[$i]}"
+      debug "M2TS_AUDIO_FORMAT[$i] ${M2TS_AUDIO_FORMAT[$i]}"
+      debug "M2TS_AUDIO_CHANNELS[$i] ${M2TS_AUDIO_CHANNELS[$i]}"
+      debug "M2TS_AUDIO_BITRATE[$i] ${M2TS_AUDIO_BITRATE[$i]}"
     done < "${M2TS_CONF_AUDIOS_FINAL_PATH}"
   else
     echo "Error ! No audio track(s) found !"
     exit 1
   fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG i $i"; fi
+  debug "i $i"
 
   # Add checklist header to component number
   ZENITY_AUDIO_TRACKS_COMPONENTS=$((i + 1))
   ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * ZENITY_AUDIO_TRACKS_COMPONENTS))
   ZENITY_AUDIO_TRACKS_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS))
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS_HEIGHT ${ZENITY_AUDIO_TRACKS_HEIGHT}"; fi
+  debug "ZENITY_AUDIO_TRACKS_HEIGHT ${ZENITY_AUDIO_TRACKS_HEIGHT}"
 
   ZENITY_AUDIO_TRACKS=$(
     for ((l=1; l <= i ; l++)); do echo TRUE; echo "${M2TS_AUDIO_ID[l]}"; echo "${M2TS_AUDIO_LANG[l]}"; echo "${M2TS_AUDIO_FORMAT[l]}"; echo "${M2TS_AUDIO_CHANNELS[l]}"; echo "${M2TS_AUDIO_BITRATE[l]}"; done | zenity --list --checklist \
@@ -816,16 +803,16 @@ M2TS )
       --text="$(gettext "Audio track(s) choice")"
   )
   if [[ $? == "1" ]]; then wazzuf_quit; fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS ${ZENITY_AUDIO_TRACKS}"; fi
+  debug "ZENITY_AUDIO_TRACKS ${ZENITY_AUDIO_TRACKS}"
 
   j=0
   for ZENITY_AUDIO_TRACK in ${ZENITY_AUDIO_TRACKS}; do
     j=$((j + 1))
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG j -> $j - ZENITY_AUDIO_TRACK ${ZENITY_AUDIO_TRACK}"; fi
+    debug "j -> $j - ZENITY_AUDIO_TRACK ${ZENITY_AUDIO_TRACK}"
     # loop on origin lines number (i)
     for ((k=1; k <= i ; k++)); do
       if [[ "${M2TS_AUDIO_ID[$k]}" == "${ZENITY_AUDIO_TRACK}" ]]; then
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG k -> $k - AID ${M2TS_AUDIO_ID[$k]}"; fi
+        debug "k -> $k - AID ${M2TS_AUDIO_ID[$k]}"
         echo "" >> "${CONF_FILE_TMP}"
 
         if [[ "${M2TS_AUDIO_LANG[$k]}" == "unknown" || "${M2TS_AUDIO_LANG[$k]}" == "" ]]; then
@@ -863,7 +850,7 @@ M2TS )
 
   # subtitles
   M2TS_SUBS_NUMBER=$(mediainfo --Inform="General;%TextCount%" "${M2TS_FILE_TOANALYSE}")
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS_SUBS_NUMBER ${M2TS_SUBS_NUMBER}"; fi
+  debug "M2TS_SUBS_NUMBER ${M2TS_SUBS_NUMBER}"
 
   M2TS_CONF_SUBS_PATH="/tmp/wazzuf-conf-subs.txt"
   M2TS_CONF_SUBS_FINAL_PATH="/tmp/wazzuf-conf-subs-final.txt"
@@ -881,15 +868,15 @@ M2TS )
     i=0
     while read -r LINE; do
       i=$((i + 1))
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG i $i"; fi
+      debug "i $i"
       SID=$(echo "${LINE}" | cut -d '|' -f 1)
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG SID ${SID}"; fi
+      debug "SID ${SID}"
 
       if echo "${SID}" | grep -vEq '^[0-9]+$'; then
         # Check if a CC sub
         M2TS_SUB_FORMAT[$i]=$(echo "${LINE}" | cut -d '|' -f 2)
         if [[ "${M2TS_SUB_FORMAT[$i]}" == "EIA-608" ]]; then
-          if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG SID ${SID} recognized as CC subtitle track"; fi
+          debug "SID ${SID} recognized as CC subtitle track"
           M2TS_SUB_ID[$i]="${SID}"
           M2TS_SUB_LANG[$i]="unknown"
         else
@@ -903,11 +890,9 @@ M2TS )
         M2TS_SUB_FORMAT[$i]=$(echo "${LINE}" | cut -d '|' -f 2)
       fi
 
-      if [[ "${DEBUG}" == "1" ]]; then
-        echo "DEBUG M2TS_SUB_ID[$i] ${M2TS_SUB_ID[$i]}"
-        echo "DEBUG M2TS_SUB_LANG[$i] ${M2TS_SUB_LANG[$i]}"
-        echo "DEBUG M2TS_SUB_FORMAT[$i] ${M2TS_SUB_FORMAT[$i]}"
-      fi
+      debug "M2TS_SUB_ID[$i] ${M2TS_SUB_ID[$i]}"
+      debug "M2TS_SUB_LANG[$i] ${M2TS_SUB_LANG[$i]}"
+      debug "M2TS_SUB_FORMAT[$i] ${M2TS_SUB_FORMAT[$i]}"
     done < "${M2TS_CONF_SUBS_FINAL_PATH}"
 
     # zenity height
@@ -915,7 +900,7 @@ M2TS )
     ZENITY_SUBTITLE_TRACKS_COMPONENTS=$((i + 1))
     ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * ZENITY_SUBTITLE_TRACKS_COMPONENTS))
     ZENITY_SUBTITLE_TRACKS_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS))
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS_HEIGHT ${ZENITY_SUBTITLE_TRACKS_HEIGHT}"; fi
+    debug "ZENITY_SUBTITLE_TRACKS_HEIGHT ${ZENITY_SUBTITLE_TRACKS_HEIGHT}"
 
     ZENITY_SUBTITLE_TRACKS=$(
       for ((l=1; l <= i ; l++)); do echo TRUE; echo "${M2TS_SUB_ID[l]}"; echo "${M2TS_SUB_LANG[l]}"; echo "${M2TS_SUB_FORMAT[l]} "; done | zenity --list --checklist \
@@ -929,16 +914,16 @@ M2TS )
       --text="$(gettext "Subtitle track(s) choice")"
     )
     if [[ $? == "1" ]]; then wazzuf_quit; fi
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS ${ZENITY_SUBTITLE_TRACKS}"; fi
+    debug "ZENITY_SUBTITLE_TRACKS ${ZENITY_SUBTITLE_TRACKS}"
 
     j=0
     for ZENITY_SUBTITLE_TRACK in ${ZENITY_SUBTITLE_TRACKS}; do
       j=$((j + 1))
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG j -> $j - ZENITY_SUBTITLE_TRACK ${ZENITY_SUBTITLE_TRACK}"; fi
+      debug "j -> $j - ZENITY_SUBTITLE_TRACK ${ZENITY_SUBTITLE_TRACK}"
       # loop on original lines number (i)
       for ((k=1; k <= i ; k++)); do
         if [[ "${M2TS_SUB_ID[$k]}" == "${ZENITY_SUBTITLE_TRACK}" ]]; then
-          if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG k -> $k - SID ${M2TS_SUB_ID[$k]}"; fi
+          debug "k -> $k - SID ${M2TS_SUB_ID[$k]}"
           echo "" >> "${CONF_FILE_TMP}"
 
           if [[ "${M2TS_SUB_FORMAT[$k]}" == "pgssub" || "${M2TS_SUB_FORMAT[$k]}" == "PGS" ]]; then
@@ -1031,16 +1016,14 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
       DVD_AUDIO_CHANNELS[$i]=$(echo "${LINE}" | cut -d ',' -f6 | cut -d ':' -f2 | sed s/\ //)
     fi
   done  < "${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-audio.info"
-  if [[ "${DEBUG}" == "1" ]]; then
-    echo "DEBUG DVD_AUDIO_ID_[X] ${DVD_AUDIO_ID[1]} ${DVD_AUDIO_ID[2]} ${DVD_AUDIO_ID[3]} ${DVD_AUDIO_ID[4]}"
-  fi
+  debug "DVD_AUDIO_ID_[X] ${DVD_AUDIO_ID[1]} ${DVD_AUDIO_ID[2]} ${DVD_AUDIO_ID[3]} ${DVD_AUDIO_ID[4]}"
 
   # zenity height
   # Add checklist header to component number
   ZENITY_AUDIO_TRACKS_COMPONENTS=$((i + 1))
   ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * ZENITY_AUDIO_TRACKS_COMPONENTS))
   ZENITY_AUDIO_TRACKS_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_AUDIO_TRACKS_HEIGHT_COMPONENTS))
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS_HEIGHT ${ZENITY_AUDIO_TRACKS_HEIGHT}"; fi
+  debug "ZENITY_AUDIO_TRACKS_HEIGHT ${ZENITY_AUDIO_TRACKS_HEIGHT}"
 
   ZENITY_AUDIO_TRACKS=$(
     for ((l=1; l <= i ; l++)); do echo TRUE; echo "${DVD_AUDIO_ID[l]}"; echo "${DVD_AUDIO_LANG[l]}"; echo "${DVD_AUDIO_FORMAT[l]}"; echo "${DVD_AUDIO_CHANNELS[l]} "; done | zenity --list --checklist \
@@ -1054,20 +1037,20 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
     --text="$(gettext "Audio track(s) choice")"
   )
   if [[ $? == "1" ]]; then wazzuf_quit; fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACKS ${ZENITY_AUDIO_TRACKS}"; fi
+  debug "ZENITY_AUDIO_TRACKS ${ZENITY_AUDIO_TRACKS}"
 
   j=0
   for ZENITY_AUDIO_TRACK in ${ZENITY_AUDIO_TRACKS}; do
     j=$((j + 1))
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG j -> $j - ZENITY_AUDIO_TRACK ${ZENITY_AUDIO_TRACK}"; fi
+    debug "j -> $j - ZENITY_AUDIO_TRACK ${ZENITY_AUDIO_TRACK}"
     # loop on original lines number (i)
     for ((k=1; k <= i ; k++)); do
       if [[ "${DVD_AUDIO_ID[$k]}" == "${ZENITY_AUDIO_TRACK}" ]]; then
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG k -> $k - AID ${DVD_AUDIO_ID[$k]}"; fi
+        debug "k -> $k - AID ${DVD_AUDIO_ID[$k]}"
         echo "" >> "${CONF_FILE_TMP}"
 
         ZENITY_AUDIO_TRACK_LANG=$(echo "${DVD_AUDIO_LANG[$k]}" | cut -d '|' -f2 | cut -d '-' -f1 | sed s/\ //)
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_AUDIO_TRACK_LANG ${ZENITY_AUDIO_TRACK_LANG}"; fi
+        debug "ZENITY_AUDIO_TRACK_LANG ${ZENITY_AUDIO_TRACK_LANG}"
         if [[ "${ZENITY_AUDIO_TRACK_LANG}" == "xx" || "${ZENITY_AUDIO_TRACK_LANG}" == "��" ]]; then
           # replace xx or �� by und (Undetermined)
           echo "AUDIO_${j}_LANG=\"und\"" >> "${CONF_FILE_TMP}"
@@ -1126,16 +1109,14 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
         DVD_SUB_LANG[$i]=$(echo "${LINE}" | cut -d ',' -f2 | cut -d ':' -f2 | sed s/\ //)
       fi
     done < "${MEDIA_TITLE}-lsdvd-T${DVD_TITLE_NUMBER}-sub.info"
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG DVD_SUB_ID[X] ${DVD_SUB_ID[1]} ${DVD_SUB_ID[2]} ${DVD_SUB_ID[3]} ${DVD_SUB_ID[4]}"
-    fi
+    debug "DVD_SUB_ID[X] ${DVD_SUB_ID[1]} ${DVD_SUB_ID[2]} ${DVD_SUB_ID[3]} ${DVD_SUB_ID[4]}"
 
     # zenity height
     # Add checklist header to component number
     ZENITY_SUBTITLE_TRACKS_COMPONENTS=$((i + 1))
     ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * ZENITY_SUBTITLE_TRACKS_COMPONENTS))
     ZENITY_SUBTITLE_TRACKS_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_SUBTITLE_TRACKS_HEIGHT_COMPONENTS))
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS_HEIGHT ${ZENITY_SUBTITLE_TRACKS_HEIGHT}"; fi
+    debug "ZENITY_SUBTITLE_TRACKS_HEIGHT ${ZENITY_SUBTITLE_TRACKS_HEIGHT}"
 
     ZENITY_SUBTITLE_TRACKS=$(
       for ((l=1; l <= i ; l++)); do echo FALSE; echo "${DVD_SUB_ID[l]}"; echo "${DVD_SUB_LANG[l]} "; done | zenity --list --checklist \
@@ -1149,20 +1130,20 @@ This is the biggest one. Crop detection for all choosen Titles are in conf file 
       --text="$(gettext "Subtitle track(s) choice")"
     )
     if [[ $? == "1" ]]; then wazzuf_quit; fi
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACKS ${ZENITY_SUBTITLE_TRACKS}"; fi
+    debug "ZENITY_SUBTITLE_TRACKS ${ZENITY_SUBTITLE_TRACKS}"
 
     j=0
     for ZENITY_SUBTITLE_TRACK in ${ZENITY_SUBTITLE_TRACKS}; do
       j=$((j + 1))
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG j -> $j - ZENITY_SUBTITLE_TRACK ${ZENITY_SUBTITLE_TRACK}"; fi
+      debug "j -> $j - ZENITY_SUBTITLE_TRACK ${ZENITY_SUBTITLE_TRACK}"
       # loop on original lines number (i)
       for ((k=1; k <= i ; k++)); do
         if [[ "${DVD_SUB_ID[$k]}" == "${ZENITY_SUBTITLE_TRACK}" ]]; then
-          if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG k -> $k - SID ${DVD_SUB_ID[$k]}"; fi
+          debug "k -> $k - SID ${DVD_SUB_ID[$k]}"
           echo "" >> "${CONF_FILE_TMP}"
 
           ZENITY_SUBTITLE_TRACK_LANG=$(echo "${DVD_SUB_LANG[$k]}" | cut -d '|' -f2 | cut -d '-' -f1 | sed s/\ //)
-          if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_SUBTITLE_TRACK_LANG ${ZENITY_SUBTITLE_TRACK_LANG}"; fi
+          debug "ZENITY_SUBTITLE_TRACK_LANG ${ZENITY_SUBTITLE_TRACK_LANG}"
           if [[ "${ZENITY_SUBTITLE_TRACK_LANG}" == "xx" || "${ZENITY_SUBTITLE_TRACK_LANG}" == "��" ]]; then
             # replace xx or �� by und (Undetermined)
             echo "SUBTITLE_${j}_LANG=\"und\"" >> "${CONF_FILE_TMP}"
@@ -1189,7 +1170,7 @@ esac
 
 ZENITY_OTHERS_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * 4))
 ZENITY_OTHERS_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_OTHERS_HEIGHT_COMPONENTS))
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_OTHERS_HEIGHT ${ZENITY_OTHERS_HEIGHT}"; fi
+debug "ZENITY_OTHERS_HEIGHT ${ZENITY_OTHERS_HEIGHT}"
 
 ZENITY_OTHERS=$(zenity --list --checklist \
   --title="${ZEN_TITLE}" \
@@ -1206,7 +1187,7 @@ ZENITY_OTHERS=$(zenity --list --checklist \
   FALSE "$(gettext "Debug")" DEBUG \
 )
 if [[ $? == "1" ]]; then wazzuf_quit; fi
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_OTHERS ${ZENITY_OTHERS}"; fi
+debug "ZENITY_OTHERS ${ZENITY_OTHERS}"
 
 for ZENITY_OTHER in ${ZENITY_OTHERS}; do
   case "${ZENITY_OTHER}" in
@@ -1232,7 +1213,7 @@ done
 # zenity height
 ZENITY_CODEC_VIDEO_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * 5))
 ZENITY_CODEC_VIDEO_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_CODEC_VIDEO_HEIGHT_COMPONENTS))
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_CODEC_VIDEO_HEIGHT ${ZENITY_CODEC_VIDEO_HEIGHT}"; fi
+debug "ZENITY_CODEC_VIDEO_HEIGHT ${ZENITY_CODEC_VIDEO_HEIGHT}"
 
 # default codecs
 ZENITY_CODEC_VIDEO=$(zenity --list --radiolist \
@@ -1257,7 +1238,7 @@ echo "DEFAULT_CODEC_VIDEO=\"${ZENITY_CODEC_VIDEO}\"" >> "${CONF_FILE_TMP}"
 # zenity height
 ZENITY_CODEC_AUDIO_HEIGHT_COMPONENTS=$((ZEN_HEIGHT_COMPONENT * 5))
 ZENITY_CODEC_AUDIO_HEIGHT=$((ZEN_HEIGHT_BASE + ZENITY_CODEC_AUDIO_HEIGHT_COMPONENTS))
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ZENITY_CODEC_AUDIO_HEIGHT ${ZENITY_CODEC_AUDIO_HEIGHT}"; fi
+debug "ZENITY_CODEC_AUDIO_HEIGHT ${ZENITY_CODEC_AUDIO_HEIGHT}"
 
 ZENITY_CODEC_AUDIO=$(zenity --list --radiolist \
   --title="${ZEN_TITLE}" \

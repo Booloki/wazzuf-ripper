@@ -80,7 +80,7 @@ case $2 in
     wazzuf_usage
     ;;
 esac
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG CODEC_AUDIO_1 ${CODEC_AUDIO_1}"; fi
+debug "CODEC_AUDIO_1 ${CODEC_AUDIO_1}"
 
 # audio 2 codec choice check
 if [[ ! "${AUDIO_2_LANG}" == "" ]]; then
@@ -112,7 +112,7 @@ if [[ ! "${AUDIO_2_LANG}" == "" ]]; then
 else
   CODEC_AUDIO_2=""
 fi
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG CODEC_AUDIO_2 ${CODEC_AUDIO_2}"; fi
+debug "CODEC_AUDIO_2 ${CODEC_AUDIO_2}"
 
 # others audio track(s) codec
 # max audio tracks arbitrary set to 20
@@ -124,14 +124,12 @@ for AUDIO_TRACK_NUMBER in $(seq 3 20); do
   else
     eval "${CODEC_AUDIO_VARNAME}"="${DEFAULT_CODEC_AUDIO}"
     CODEC_AUDIO_VALUE="${!CODEC_AUDIO_VARNAME}"
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ${CODEC_AUDIO_VARNAME} ${CODEC_AUDIO_VALUE}"; fi
+    debug "${CODEC_AUDIO_VARNAME} ${CODEC_AUDIO_VALUE}"
   fi
 done
-if [[ "${DEBUG}" == "1" ]]; then
-  echo "DEBUG CODEC_AUDIO_3 ${CODEC_AUDIO_3}"
-  echo "DEBUG CODEC_AUDIO_4 ${CODEC_AUDIO_4}"
-  echo "DEBUG CODEC_AUDIO_5 ${CODEC_AUDIO_5}"
-fi
+debug "CODEC_AUDIO_3 ${CODEC_AUDIO_3}"
+debug "CODEC_AUDIO_4 ${CODEC_AUDIO_4}"
+debug "CODEC_AUDIO_5 ${CODEC_AUDIO_5}"
 
 # Check if set to GUI
 for ARG in $1 $2 $3 $4; do
@@ -140,7 +138,7 @@ for ARG in $1 $2 $3 $4; do
     ZEN_TITLE="Wazzuf Ripper"
   fi
 done
-if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG WAZZUF_UI ${WAZZUF_UI}"; fi
+debug "WAZZUF_UI ${WAZZUF_UI}"
 
 # enter working directory
 mkdir -p "${WORKING_PATH_BASE}/${TAG_TITLE_NAME}"
@@ -240,11 +238,9 @@ case "${SOURCE}" in
     ;;
 esac
 
-if [[ "${DEBUG}" == "1" ]]; then
-  echo "DEBUG TITLE_LIST ${TITLE_LIST}"
-  echo "DEBUG CHAPTER_FIRST ${CHAPTER_FIRST}"
-  echo "DEBUG CHAPTER_LAST ${CHAPTER_LAST}"
-fi
+debug "TITLE_LIST ${TITLE_LIST}"
+debug "CHAPTER_FIRST ${CHAPTER_FIRST}"
+debug "CHAPTER_LAST ${CHAPTER_LAST}"
 
 # Introduction message
 MESSAGE_INTRO="$(printf "$(gettext " Start %s %s :\n%s\nwith %s video codec\nand %s %s audio codec(s)")" "${VIDEO_TYPE}" "${TAG_RIP}" "${TITLE_LONG}" "${CODEC_VIDEO}" "${CODEC_AUDIO_1}" "${CODEC_AUDIO_2}")"
@@ -283,7 +279,7 @@ case "${SOURCE}" in
     ;;
   ISO_BD )
     ISO_FILE_PATH="${SOURCE_DIRECTORY}/${ISO_FILE}"
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ISO_FILE_PATH ${ISO_FILE_PATH}"; fi
+    debug "ISO_FILE_PATH ${ISO_FILE_PATH}"
 
     # Check if file exists
     if [ ! -f "${ISO_FILE_PATH}" ]; then
@@ -315,7 +311,7 @@ case "${SOURCE}" in
     ;;
   M2TS )
     M2TS_FILE_PATH="${SOURCE_DIRECTORY}/${M2TS_FILE}"
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS_FILE_PATH ${M2TS_FILE_PATH}"; fi
+    debug "M2TS_FILE_PATH ${M2TS_FILE_PATH}"
 
     # Check if file exists
     if [ ! -f "${M2TS_FILE_PATH}" ]; then
@@ -346,7 +342,7 @@ case "${SOURCE}" in
     ;;
   ISO_DVD )
     ISO_FILE_PATH="${SOURCE_DIRECTORY}/${ISO_FILE}"
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG ISO_FILE_PATH ${ISO_FILE_PATH}"; fi
+    debug "ISO_FILE_PATH ${ISO_FILE_PATH}"
 
     # Check if file exists
     if [ ! -f "${ISO_FILE_PATH}" ]; then
@@ -457,7 +453,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         else
           BASE_WORKING_FILE="${TAG_TITLE_NAME}.${SEASON_TYPE}${SEASON_NUMBER}.T${TITLE_NUMBER}"   
         fi
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG CHAPTERS ${CHAPTERS}"; fi
+        debug "CHAPTERS ${CHAPTERS}"
         VOB_FILE="${BASE_WORKING_FILE}.vob"
         CHAPTERS_FILE_TXT="${BASE_WORKING_FILE}-${CHAPTERS_FILENAME_SUFFIX}.txt"
         CHAPTERS_FILE_XML="${BASE_WORKING_FILE}-${CHAPTERS_FILENAME_SUFFIX}.xml"
@@ -516,7 +512,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
       fi
       ;;
     esac
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MERGE_OUTPUT ${MERGE_OUTPUT}"; fi
+    debug "MERGE_OUTPUT ${MERGE_OUTPUT}"
 
 
     # Retrieve IMdb informations
@@ -600,7 +596,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         if [ ! -f "${M2TS_FILE}" ]; then
           printf "${WAZZUF_SEPARATOR_HEAD}"
           printf "$(gettext "Extracting %s from %s ")" "${M2TS_FILE}" "${ISO_FILE}"
-          if [[ "${DEBUG}" == "1" ]]; then echo "ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc -bluray-device \"${MOUNT_PATH}\" -dumpstream br://\"${TITLE_NUMBER}\" -dumpfile \"${SOURCE_DIRECTORY}/T${TITLE_NUMBER}-${M2TS_FILE}\""; fi
+          debug "ionice -c \"${IONICENESS}\" nice -n \"${NICENESS}\" mplayer -nolirc -bluray-device \"${MOUNT_PATH}\" -dumpstream br://\"${TITLE_NUMBER}\" -dumpfile \"${SOURCE_DIRECTORY}/T${TITLE_NUMBER}-${M2TS_FILE}\""
           ionice -c "${IONICENESS}" nice -n "${NICENESS}" mplayer -nolirc -bluray-device "${MOUNT_PATH}" -dumpstream br://"${TITLE_NUMBER}" -dumpfile "${SOURCE_DIRECTORY}/T${TITLE_NUMBER}-${M2TS_FILE}"
           printf "${WAZZUF_SEPARATOR_FOOT}"
         else
@@ -636,7 +632,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
           MPLS_FILE="${M2TS_FILE_PATH//m2ts$/mpls}"
           if [ -f "${MPLS_FILE}" ]; then
             check_bdchapters
-            if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG bdchapters -i \"${MPLS_FILE}\" -o \"${CHAPTERS_FILE_XML}\""; fi
+            debug "bdchapters -i \"${MPLS_FILE}\" -o \"${CHAPTERS_FILE_XML}\""
             if [[ "${WAZZUF_UI}" == "GUI" ]]; then
               ( echo 10; bdchapters -i "${MPLS_FILE}" -o "${CHAPTERS_FILE_XML}" 1>/dev/null ) \
               | zenity --progress --pulsate --auto-close \
@@ -667,18 +663,16 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
           fi
         fi
         if [[ ! "${WAZZUF_UI}" == "GUI" ]]; then printf "${WAZZUF_SEPARATOR_FOOT}"; fi
-        if [[ "${DEBUG}" == "1" ]] && [ -f "${CHAPTERS_FILE_XML}" ]; then
-          echo "DEBUG Chapters count: $(grep -c ChapterString "${CHAPTERS_FILE_XML}")"
-          echo "DEBUG Last chapter begin: $(grep ChapterTimeStart "${CHAPTERS_FILE_XML}" | tail -n1 | cut -d'>' -f2 | cut -d '.' -f1)"
+        if [ -f "${CHAPTERS_FILE_XML}" ]; then
+          debug "Chapters count: $(grep -c ChapterString "${CHAPTERS_FILE_XML}")"
+          debug "Last chapter begin: $(grep ChapterTimeStart "${CHAPTERS_FILE_XML}" | tail -n1 | cut -d'>' -f2 | cut -d '.' -f1)"
         fi
         ;;
     esac
     get_video_bitrate
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG MERGE_CHAPTERS ${MERGE_CHAPTERS}"
-      echo "DEBUG SOURCE_FILE ${SOURCE_FILE}"
-      echo "DEBUG VIDEO_BITRATE ${VIDEO_BITRATE}"
-    fi
+    debug "MERGE_CHAPTERS ${MERGE_CHAPTERS}"
+    debug "SOURCE_FILE ${SOURCE_FILE}"
+    debug "VIDEO_BITRATE ${VIDEO_BITRATE}"
 
 
     ## subtitle file(s) check/extract/copy
@@ -719,21 +713,20 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         SUBTITLE_FILE_FORCE=$(eval "echo ${SUBTITLE_FILE_FORCE_VARNAME}")
         SUBTITLE_FILE_FORCE_PATH="${SOURCE_DIRECTORY}/${SUBTITLE_FILE_FORCE}"
 
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG SUB_COUNTER ${SUB_COUNTER}"
-          echo "DEBUG SUBTITLE_NAME ${SUBTITLE_NAME}"
-          echo "DEBUG SUBTITLE_SID ${SUBTITLE_SID}"
-          echo "DEBUG SUBTITLE_SOURCE ${SUBTITLE_SOURCE}"
-          echo "DEBUG SUBTITLE_FILE_FORCE_VARNAME ${SUBTITLE_FILE_FORCE_VARNAME}"
-          echo "DEBUG SUBTITLE_FILE_FORCE ${SUBTITLE_FILE_FORCE}"
-          echo "DEBUG SUBTITLE_FILE_FORCE_PATH ${SUBTITLE_FILE_FORCE_PATH}"
-        fi
+        debug "SUB_COUNTER ${SUB_COUNTER}"
+        debug "SUBTITLE_NAME ${SUBTITLE_NAME}"
+        debug "SUBTITLE_SID ${SUBTITLE_SID}"
+        debug "SUBTITLE_SOURCE ${SUBTITLE_SOURCE}"
+        debug "SUBTITLE_FILE_FORCE_VARNAME ${SUBTITLE_FILE_FORCE_VARNAME}"
+        debug "SUBTITLE_FILE_FORCE ${SUBTITLE_FILE_FORCE}"
+        debug "SUBTITLE_FILE_FORCE_PATH ${SUBTITLE_FILE_FORCE_PATH}"
+
         # subtitle file (force external or not)
         if [[ "${SUBTITLE_FILE_FORCE}" == "" ]]; then
 
           if [[ "${SOURCE}" == "M2TS" ]]; then
             M2TS_FILE_WE=$(echo "${M2TS_FILE}" | sed 's/.m2ts//' | sed 's/.ts//')
-            if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG M2TS_FILE_WE ${M2TS_FILE_WE}"; fi
+            debug "M2TS_FILE_WE ${M2TS_FILE_WE}"
             case "${SUBTITLE_SOURCE}" in
             PGS )
               # Default output filename could not be changed with tsMuxeR.
@@ -796,11 +789,9 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         fi
         TOTAL_SUBTITLE_SIZE=$((TOTAL_SUBTITLE_SIZE + SUBTITLE_SIZE))
 
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG SUBTITLE_FILE ${SUBTITLE_FILE}"
-          echo "DEBUG SUBTITLE_FILE_SUB ${SUBTITLE_FILE_SUB}"
-          echo "DEBUG SUBTITLE_SIZE ${SUBTITLE_SIZE}"
-        fi
+        debug "SUBTITLE_FILE ${SUBTITLE_FILE}"
+        debug "SUBTITLE_FILE_SUB ${SUBTITLE_FILE_SUB}"
+        debug "SUBTITLE_SIZE ${SUBTITLE_SIZE}"
    
         # Force no default subtitle (or not)
         case "${SUBTITLE_NODEFAULT_FORCE}" in
@@ -811,17 +802,15 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
             MERGE_SUBTITLE="--language 0:${SUBTITLE_LANG} --track-name 0:${SUBTITLE_NAME} ${MERGE_SUBTITLE_CHARSET} ${SUBTITLE_FILE}"
             ;;
         esac
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MERGE_SUBTITLE ${MERGE_SUBTITLE}"; fi
+        debug "MERGE_SUBTITLE ${MERGE_SUBTITLE}"
         MERGE_SUBTITLES_FULL="${MERGE_SUBTITLES_FULL} ${MERGE_SUBTITLE}"
 
         SUB_COUNTER=$((SUB_COUNTER + 1))
       fi
     done
 
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG MERGE_SUBTITLES_FULL ${MERGE_SUBTITLES_FULL}"
-      echo "DEBUG TOTAL_SUBTITLE_SIZE ${TOTAL_SUBTITLE_SIZE}"
-    fi
+    debug "MERGE_SUBTITLES_FULL ${MERGE_SUBTITLES_FULL}"
+    debug "TOTAL_SUBTITLE_SIZE ${TOTAL_SUBTITLE_SIZE}"
 
 
     ## Audio track(s) extraction/encoding
@@ -875,15 +864,13 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         THD_FILE="${BASE_WORKING_FILE}.${AUDIO_AID}-${AUDIO_LANG}.thd"
         WAV_FILE="${BASE_WORKING_FILE}.${AUDIO_AID}-${AUDIO_LANG}.wav"
 
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG AUDIO_COUNTER ${AUDIO_COUNTER}"
-          echo "DEBUG AUDIO_NAME ${AUDIO_NAME}"
-        fi
+        debug "AUDIO_COUNTER ${AUDIO_COUNTER}"
+        debug "AUDIO_NAME ${AUDIO_NAME}"
 
         audio_rip
 
         AUDIO_SIZE=$(stat -c %s "${AUDIO_FILE}")
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG AUDIO_SIZE ${AUDIO_SIZE}"; fi
+        debug "AUDIO_SIZE ${AUDIO_SIZE}"
         TOTAL_AUDIO_SIZE=$((TOTAL_AUDIO_SIZE + AUDIO_SIZE))
 
         # merge with or without audio sync
@@ -892,17 +879,15 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         else  
           MERGE_AUDIO="--language 0:${AUDIO_LANG} --track-name 0:${AUDIO_NAME} -y 0:${AUDIO_SYNC} ${AUDIO_FILE}"
         fi
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MERGE_AUDIO ${MERGE_AUDIO}"; fi
+        debug "MERGE_AUDIO ${MERGE_AUDIO}"
         MERGE_AUDIO_FULL="${MERGE_AUDIO_FULL} ${MERGE_AUDIO}"
 
         AUDIO_COUNTER=$((AUDIO_COUNTER + 1))
       fi
     done
     
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG TOTAL_AUDIO_SIZE ${TOTAL_AUDIO_SIZE}"
-      echo "DEBUG MERGE_AUDIO_FULL ${MERGE_AUDIO_FULL}"
-    fi
+    debug "TOTAL_AUDIO_SIZE ${TOTAL_AUDIO_SIZE}"
+    debug "MERGE_AUDIO_FULL ${MERGE_AUDIO_FULL}"
 
 
     ## video encoding
@@ -943,11 +928,9 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
       OTHER_TRACKS_SIZE=$((TOTAL_AUDIO_SIZE + TOTAL_SUBTITLE_SIZE + TOTAL_IMAGE_SIZE))
       MAX_VIDEO_SIZE=$((MAX_TARGET_SIZE - OTHER_TRACKS_SIZE))
 
-      if [[ "${DEBUG}" == "1" ]]; then
-        echo "DEBUG MAX_TARGET_SIZE ${MAX_TARGET_SIZE}"
-        echo "DEBUG MAX_TARGET_SIZE ${MAX_TARGET_SIZE}"
-        echo "DEBUG MAX_VIDEO_SIZE: ${MAX_VIDEO_SIZE}"
-      fi
+      debug "MAX_TARGET_SIZE ${MAX_TARGET_SIZE}"
+      debug "MAX_TARGET_SIZE ${MAX_TARGET_SIZE}"
+      debug "MAX_VIDEO_SIZE: ${MAX_VIDEO_SIZE}"
 
       case "${CODEC_VIDEO}" in
         H264 )
@@ -1035,14 +1018,14 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
       printf "$(gettext "%s 2 pass %s encoding\n")" "${SOURCE_FILE}" "${CODEC_VIDEO}"
       printf "${WAZZUF_SEPARATOR_FOOT}"
     fi
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG VIDEO_BITRATE ${VIDEO_BITRATE}"
-      echo "DEBUG VIDEO_SCALE ${VIDEO_SCALE}"
-      echo "DEBUG VIDEO_CROP ${VIDEO_CROP}"
-    fi
+
+    debug "VIDEO_BITRATE ${VIDEO_BITRATE}"
+    debug "VIDEO_SCALE ${VIDEO_SCALE}"
+    debug "VIDEO_CROP ${VIDEO_CROP}"
+
     video_rip
     VIDEO_SIZE=$(stat -c %s "${VIDEO_FILE}")
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG VIDEO_SIZE ${VIDEO_SIZE}"; fi
+    debug "VIDEO_SIZE ${VIDEO_SIZE}"
 
     if [[ "${VIDEO_RATIO_FORCE}" == "" ]]; then
       MERGE_VIDEO="${VIDEO_FILE} "
@@ -1087,15 +1070,13 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         # "The pictures should only use the JPEG and PNG picture formats", Matroska Cover Art Guidelines
         # List of officially recognized image MIME types at the IANA homepage http://www.iana.org/assignments/media-types/image/index.html
         COVER_FORMAT_TEST=$(file "${SOURCE_DIRECTORY}/${COVER}" | cut -d ':' -f 2 | cut -d ' ' -f 2)
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG COVER_FORMAT_TEST ${COVER_FORMAT_TEST}"; fi
+        debug "COVER_FORMAT_TEST ${COVER_FORMAT_TEST}"
         if [[ "${COVER_FORMAT_TEST}" == "JPEG" ]]; then
           COVER_FORMAT="jpeg"
           COVER_HEIGHT=$(convert "${SOURCE_DIRECTORY}/${COVER}" -print "%h" /dev/null)
           COVER_WIDTH=$(convert "${SOURCE_DIRECTORY}/${COVER}" -print "%w" /dev/null)
-          if [[ "${DEBUG}" == "1" ]]; then
-            echo "DEBUG COVER_HEIGHT ${COVER_HEIGHT}"
-            echo "DEBUG COVER_WIDTH ${COVER_WIDTH}"
-          fi
+          debug "COVER_HEIGHT ${COVER_HEIGHT}"
+          debug "COVER_WIDTH ${COVER_WIDTH}"
           cover_art_convert
           MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/${COVER_FORMAT} --attach-file ${COVER_OUTPUT_SIMPLE} --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file ${COVER_OUTPUT_THUMB}"
         else
@@ -1103,10 +1084,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
             COVER_FORMAT="png"
             COVER_HEIGHT=$(file "${SOURCE_DIRECTORY}/${COVER}" | cut -d "," -f 2 | cut -d " " -f 4)
             COVER_WIDTH=$(file "${SOURCE_DIRECTORY}/${COVER}" | cut -d "," -f 2 | cut -d " " -f 2)
-            if [[ "${DEBUG}" == "1" ]]; then
-              echo "DEBUG COVER_HEIGHT ${COVER_HEIGHT}"
-              echo "DEBUG COVER_WIDTH ${COVER_WIDTH}"
-            fi
+            debug "COVER_HEIGHT ${COVER_HEIGHT}"
+            debug "COVER_WIDTH ${COVER_WIDTH}"
             cover_art_convert
             MERGE_COVER="--attachment-description \"cover-art\" --attachment-mime-type image/${COVER_FORMAT} --attach-file ${COVER_OUTPUT_SIMPLE} --attachment-description \"cover-thumbnail\" --attachment-mime-type image/jpeg --attach-file ${COVER_OUTPUT_THUMB}"
           else
@@ -1116,7 +1095,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
         fi
       fi
     fi
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MERGE_COVER ${MERGE_COVER}"; fi
+    debug "MERGE_COVER ${MERGE_COVER}"
 
 
     ## XML tags
@@ -1158,7 +1137,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
       fi
       MERGE_XMLTAGS=""
     fi
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MERGE_XMLTAGS ${MERGE_XMLTAGS}"; fi
+    debug "MERGE_XMLTAGS ${MERGE_XMLTAGS}"
 
 
     ## merge
@@ -1176,11 +1155,9 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
     TOTAL_TRACKS_SIZE=$((TOTAL_AUDIO_SIZE + TOTAL_SUBTITLE_SIZE + TOTAL_IMAGE_SIZE + VIDEO_SIZE))
     LOCAL_AVAILABLE_DISK_SIZE=$(( $(df -k . | awk '/[0-9]%/{print $(NF-2)}') * 1024 ))
 
-    if [[ "${DEBUG}" == "1" ]]; then
-      echo "DEBUG TOTAL_TRACKS_SIZE ${TOTAL_TRACKS_SIZE}"
-      echo "DEBUG LOCAL_AVAILABLE_DISK_SIZE ${LOCAL_AVAILABLE_DISK_SIZE}"
-      echo "DEBUG ionice -c ${IONICENESS} nice -n ${NICENESS} mkvmerge -o ${MERGE_OUTPUT} --title \"${MERGE_TITLE}\" ${MERGE_VIDEO} ${MERGE_AUDIO_FULL} ${MERGE_SUBTITLES_FULL} ${MERGE_CHAPTERS} ${MERGE_COVER} ${MERGE_XMLTAGS}"
-    fi
+    debug "TOTAL_TRACKS_SIZE ${TOTAL_TRACKS_SIZE}"
+    debug "LOCAL_AVAILABLE_DISK_SIZE ${LOCAL_AVAILABLE_DISK_SIZE}"
+    debug "ionice -c ${IONICENESS} nice -n ${NICENESS} mkvmerge -o ${MERGE_OUTPUT} --title \"${MERGE_TITLE}\" \"${MERGE_VIDEO}\" \"${MERGE_AUDIO_FULL}\" \"${MERGE_SUBTITLES_FULL}\" \"${MERGE_CHAPTERS}\" \"${MERGE_COVER}\" \"${MERGE_XMLTAGS}\""
 
     if [[ "${TOTAL_TRACKS_SIZE}" -gt "${LOCAL_AVAILABLE_DISK_SIZE}" ]]; then
       MESSAGE="$(pwd)"
@@ -1252,13 +1229,11 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
       done
       SCREENSHOT_BASENAME="${MERGE_OUTPUT//.mkv$/}"
 
-      if [[ "${DEBUG}" == "1" ]]; then
-        echo "DEBUG OUTPUT_DURATION_MS ${OUTPUT_DURATION_MS}"
-        echo "DEBUG OUTPUT_DURATION_M ${OUTPUT_DURATION_M}"
-        echo "DEBUG SCREENSHOT_BASETIME ${SCREENSHOT_BASETIME}"
-        echo "DEBUG TIMER_LIST ${TIMER_LIST}"
-        echo "DEBUG SCREENSHOT_BASENAME ${SCREENSHOT_BASENAME}"
-      fi
+      debug "OUTPUT_DURATION_MS ${OUTPUT_DURATION_MS}"
+      debug "OUTPUT_DURATION_M ${OUTPUT_DURATION_M}"
+      debug "SCREENSHOT_BASETIME ${SCREENSHOT_BASETIME}"
+      debug "TIMER_LIST ${TIMER_LIST}"
+      debug "SCREENSHOT_BASENAME ${SCREENSHOT_BASENAME}"
 
       MESSAGE_SCREENSHOTS=$(gettext "Taking some screenshots")
       SCREENSHOTS_DEFAULT_FILENAME="00000001.png"
