@@ -7,6 +7,14 @@ wazzuf_usage () {
   exit 1
 }
 
+# Debug display
+function debug() {
+  if ${DEBUG}; then
+    echo "$(date "+%Y-%m-%d %H:%M:%S") [DEBUG] ${*}"
+  fi
+  return 0
+}
+
 # Iso file management
 # need ISO_FILE_PATH
 #
@@ -26,11 +34,11 @@ iso_manage () {
       # udisksctl does not require root privileges
       check_udisksctl
       if [[ ${2} == "GUI" ]]; then
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
+        debug "udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\""
         udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
       else
         echo "Mount iso file"
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\"";fi
+        debug "udisksctl loop-setup -r -f \"${ISO_FILE_PATH}\""
         udisksctl loop-setup -r -f "${ISO_FILE_PATH}"
       fi
       # Get mount point
@@ -56,7 +64,7 @@ iso_manage () {
 get_media_device_type () {
   check_mediainfo
   MEDIA_FORMAT_FULL=$(mediainfo --Inform="General;%Format%" "${MOUNT_PATH}" 2> /dev/null)
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_FORMAT_FULL ${MEDIA_FORMAT_FULL}";fi
+  debug "MEDIA_FORMAT_FULL ${MEDIA_FORMAT_FULL}"
 
   if echo "${MEDIA_FORMAT_FULL}" | grep -q Blu-ray; then
     MEDIA_DEVICE_TYPE="BD"
@@ -66,7 +74,7 @@ get_media_device_type () {
     # Not a DVD nor BD
     MEDIA_DEVICE_TYPE="UNKNOWN"
   fi
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_DEVICE_TYPE ${MEDIA_DEVICE_TYPE}";fi
+  debug "MEDIA_DEVICE_TYPE ${MEDIA_DEVICE_TYPE}"
 }
 
 # Get the name of the mounted media device
@@ -75,7 +83,7 @@ get_media_device_type () {
 # return MEDIA_TITLE
 get_media_title () {
   MEDIA_TITLE=$(echo "${MOUNT_PATH}" | awk 'BEGIN {FS = "/"} ; {print $NF}')
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG MEDIA_TITLE ${MEDIA_TITLE}";fi
+  debug "MEDIA_TITLE ${MEDIA_TITLE}"
 }
 
 # soft_to_install_exit

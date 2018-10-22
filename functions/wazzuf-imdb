@@ -6,7 +6,7 @@
 # need TITLE_NAME
 # return OMDB_RESPONSE ("True" or "False")
 get_omdb_response_title () {
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" | sed -n '/^response/{n;p;}'"; fi
+  debug "omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" | sed -n '/^response/{n;p;}'"
   OMDB_RESPONSE=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" | sed -n '/^response/{n;p;}')
 }
 
@@ -14,21 +14,21 @@ get_omdb_response_title () {
 #      DATE
 # return OMDB_RESPONSE ("True" or "False")
 get_omdb_response_title_date () {
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" -y \"${DATE}\" | sed -n '/^response/{n;p;}'"; fi
+  debug "omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" -y \"${DATE}\" | sed -n '/^response/{n;p;}'"
   IMDB_RESPONSE=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" -y "${DATE}" | sed -n '/^response/{n;p;}')
 }
 
 # need IMDB_FILE
 # return OMDB_RESPONSE ("True" or "False")
 get_omdb_response_file () {
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG sed -n '/^response/{n;p;}' \"${IMDB_FILE}\""; fi
+  debug "sed -n '/^response/{n;p;}' \"${IMDB_FILE}\""
   OMDB_RESPONSE=$(sed -n '/^response/{n;p;}' "${IMDB_FILE}")
 }
 
 # need TITLE_NAME
 # return IMDB_ID
 get_imdb_id_title () {
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" | sed -n '/^imdbid/{n;p;}'"; fi
+  debug "omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" | sed -n '/^imdbid/{n;p;}'"
   IMDB_ID=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" | sed -n '/^imdbid/{n;p;}')
 }
 
@@ -36,7 +36,7 @@ get_imdb_id_title () {
 #      DATE
 # return IMDB_ID
 get_imdb_id_title_date () {
-  if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" -y \"${DATE}\" | sed -n '/^imdbid/{n;p;}'"; fi
+  debug "omdbtool -t \"${TITLE_NAME}\" --apikey=\"${OMDB_API_KEY}\" -y \"${DATE}\" | sed -n '/^imdbid/{n;p;}'"
   IMDB_ID=$(omdbtool -t "${TITLE_NAME}" --apikey="${OMDB_API_KEY}" -y "${DATE}" | sed -n '/^imdbid/{n;p;}')
 }
 
@@ -49,7 +49,7 @@ download_imdb_poster () {
   else
     # check if IMDb cover exists
     IMDB_POSTER=$(omdbtool -i "${IMDB_ID}" --apikey="${OMDB_API_KEY}" | sed -n '/^poster/{n;p;}')
-    if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG IMDB_POSTER ${IMDB_POSTER}"; fi
+    debug "IMDB_POSTER ${IMDB_POSTER}"
     if [[ "${IMDB_POSTER}" == "N/A" ]]; then
       echo "No IMBd cover found, Skipping..."
     else
@@ -62,7 +62,7 @@ download_imdb_poster () {
       * )
         check_omdb
         check_wget
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG wget \"${IMDB_POSTER}\" -O cover.jpg"; fi
+        debug "wget \"${IMDB_POSTER}\" -O cover.jpg"
         wget "${IMDB_POSTER}" -O cover.jpg
         ;;
       esac
@@ -113,7 +113,7 @@ imdb_id_ask_gui () {
     IMDB_ID=""
   else
     if [[ "${ZENITY_IMDBID}" == "" || "${ZENITY_IMDBID}" == "tt" ]]; then
-      if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG Wrong IMdb ID provided !"; fi
+      debug "Wrong IMdb ID provided !"
       IMDB_ID=""
     else
       IMDB_ID="${ZENITY_IMDBID}"

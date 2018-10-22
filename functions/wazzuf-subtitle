@@ -22,7 +22,7 @@ subtitle_rip () {
         echo -ne "\n *************************************\n"
         echo " Extracting subtitle ${SUBTITLE_SID} to ${SUBTITLE_FILE} "
         echo -ne " *************************************\n"
-        if [[ "${DEBUG}" == "1" ]]; then echo "DEBUG nice -n \"${NICENESS}\" mencoder -dvd-device \"${MPLAYER_DEVICE}\" dvd://\"${TITLE_NUMBER}\" \"${MPLAYER_CHAPTERS}\" -vobsubout \"${SUB_FILE}\" -vobsuboutindex 0 -sid \"${SUBTITLE_SID}\" -o /dev/null -nosound -ovc frameno"; fi
+        debug "nice -n \"${NICENESS}\" mencoder -dvd-device \"${MPLAYER_DEVICE}\" dvd://\"${TITLE_NUMBER}\" \"${MPLAYER_CHAPTERS}\" -vobsubout \"${SUB_FILE}\" -vobsuboutindex 0 -sid \"${SUBTITLE_SID}\" -o /dev/null -nosound -ovc frameno"
         nice -n "${NICENESS}" mencoder -dvd-device "${MPLAYER_DEVICE}" dvd://"${TITLE_NUMBER}" "${MPLAYER_CHAPTERS}" \
           -vobsubout "${SUB_FILE}" -vobsuboutindex 0 -sid "${SUBTITLE_SID}" \
           -o /dev/null -nosound -ovc frameno
@@ -92,27 +92,21 @@ subtitle_srt_check () {
       iso-8859-1 )
         SUBTITLE_CHARSET="ISO-8859-1"
         MERGE_SUBTITLE_CHARSET="--sub-charset 0:${SUBTITLE_CHARSET}"
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG SUBTITLE_MIME ${SUBTITLE_MIME}"
-          echo "DEBUG SUBTITLE_CHARSET ${SUBTITLE_CHARSET}"
-        fi
+        debug "SUBTITLE_MIME ${SUBTITLE_MIME}"
+        debug "SUBTITLE_CHARSET ${SUBTITLE_CHARSET}"
         ;;
       unknown-8bit )
         SUBTITLE_CHARSET="WINDOWS-1252"
         MERGE_SUBTITLE_CHARSET="--sub-charset 0:${SUBTITLE_CHARSET}"
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG SUBTITLE_MIME ${SUBTITLE_MIME}"
-          echo "DEBUG SUBTITLE_CHARSET ${SUBTITLE_CHARSET}"
-        fi
+        debug "SUBTITLE_MIME ${SUBTITLE_MIME}"
+        debug "SUBTITLE_CHARSET ${SUBTITLE_CHARSET}"
         ;;
       * )
         # unrecognized charset
         SUBTITLE_CHARSET=""
         MERGE_SUBTITLE_CHARSET=""
-        if [[ "${DEBUG}" == "1" ]]; then
-          echo "DEBUG SUBTITLE_MIME ${SUBTITLE_MIME}"
-          echo "DEBUG SUBTITLE_CHARSET TODO"
-        fi
+        debug "SUBTITLE_MIME ${SUBTITLE_MIME}"
+        debug "SUBTITLE_CHARSET TODO"
         if [[ "${WAZZUF_UI}" == "GUI" ]]; then
           zenity --warning --title "${ZEN_TITLE}" \
             --text "Provided subtitle is not Unicode and unrecognized." \
