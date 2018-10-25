@@ -3,6 +3,27 @@
 # booloki@lokizone.net
 # Changelog file
 
+2018-10-25
+* Remove unused *_decode functions
+
+2018-10-22
+* Debug factorization
+
+2018-10-21
+* Add Global bash lint (Shellcheck)
+* Add translation update script
+* Use nproc for usable CPU numbers
+* Copyright update
+* Default use of ffmpeg instead of avconv
+* Fix wrong variables
+
+2018-09-16
+* Add Gitlab-CI packaging pipelines
+* Add packaging files for deb and archlinux packages
+
+2018-04-29
+* Change from imdb-cli to omdb-cli
+
 2017-01-15
 * Change tsmuxer binary name
 
