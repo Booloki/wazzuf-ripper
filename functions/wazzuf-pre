@@ -64,28 +64,6 @@ cropdetect () {
   rm /tmp/cropdetect.out
 }
 
-## 'decode' avconv output file
-avconv_decode () {
-  while read -r LINE
-  do
-    ID_HEX=$(echo "${LINE}" | grep '^Stream' | cut -d '[' -f 2 | cut -d ']' -f 1)
-    if [[ ! "${ID_HEX}" == "" ]]; then
-      echo "ID $((ID_HEX - $(echo "${LINE}" | grep ^Stream | cut -d ' ' -f 3-)))"
-    fi
-  done < "${1}"
-}
-
-## 'decode' lsdvd output file
-lsdvd_decode () {
-  while read -r LINE
-  do
-    ID_HEX=$(echo "${LINE}" | grep -vE '^Title|VTS|Chapter' | grep -o '.\{5\}$' | sed 's/,//')
-    if [[ ! "${ID_HEX}" == "" ]]; then
-      echo "ID $((ID_HEX - $(echo "${LINE}" | sed "s/', Stream id: ....'//" | sed "s/', Content: Undefined'//")))"
-    fi
-  done < "${1}"
-}
-
 ## copy DVD to local iso file
 # need ISO_FILE
 #      DVD_MOUNT_PATH
