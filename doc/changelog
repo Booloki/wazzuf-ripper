@@ -5,6 +5,7 @@
 
 2018-10-25
 * Remove unused *_decode functions
+* Fix mkvmerge options
 
 2018-10-22
 * Debug factorization

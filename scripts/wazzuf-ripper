@@ -1157,7 +1157,7 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
 
     debug "TOTAL_TRACKS_SIZE ${TOTAL_TRACKS_SIZE}"
     debug "LOCAL_AVAILABLE_DISK_SIZE ${LOCAL_AVAILABLE_DISK_SIZE}"
-    debug "ionice -c ${IONICENESS} nice -n ${NICENESS} mkvmerge -o ${MERGE_OUTPUT} --title \"${MERGE_TITLE}\" \"${MERGE_VIDEO}\" \"${MERGE_AUDIO_FULL}\" \"${MERGE_SUBTITLES_FULL}\" \"${MERGE_CHAPTERS}\" \"${MERGE_COVER}\" \"${MERGE_XMLTAGS}\""
+    debug "ionice -c ${IONICENESS} nice -n ${NICENESS} mkvmerge -o ${MERGE_OUTPUT} --title \"${MERGE_TITLE}\" ${MERGE_VERBOSE} ${MERGE_VIDEO} ${MERGE_AUDIO_FULL} ${MERGE_SUBTITLES_FULL} ${MERGE_CHAPTERS} ${MERGE_COVER} ${MERGE_XMLTAGS}"
 
     if [[ "${TOTAL_TRACKS_SIZE}" -gt "${LOCAL_AVAILABLE_DISK_SIZE}" ]]; then
       MESSAGE="$(pwd)"
@@ -1172,12 +1172,8 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
           mkvmerge \
           -o "${MERGE_OUTPUT}" \
           --title "${MERGE_TITLE}" \
-          "${MERGE_VIDEO}" \
-          "${MERGE_AUDIO_FULL}" \
-          "${MERGE_SUBTITLES_FULL}" \
-          "${MERGE_CHAPTERS}" \
-          "${MERGE_COVER}" \
-          "${MERGE_XMLTAGS}" 1>/dev/null 2>/dev/null ) \
+          ${MERGE_VIDEO} ${MERGE_AUDIO_FULL} ${MERGE_SUBTITLES_FULL} ${MERGE_CHAPTERS} ${MERGE_COVER} ${MERGE_XMLTAGS} \
+	  >/dev/null 2>/dev/null ) \
         | zenity --progress --pulsate \
           --title="${ZEN_TITLE} - ${MESSAGE_FINALMERGE}" \
           --text="Creating ${MERGE_OUTPUT}" \
@@ -1186,16 +1182,9 @@ time for TITLE_NUMBER in ${TITLE_LIST}; do
     else
       ionice -c "${IONICENESS}" \
         nice -n "${NICENESS}" \
-        mkvmerge \
-        "${MERGE_VERBOSE}" \
-        -o "${MERGE_OUTPUT}" \
+        mkvmerge -o "${MERGE_OUTPUT}" \
         --title "${MERGE_TITLE}" \
-        "${MERGE_VIDEO}" \
-        "${MERGE_AUDIO_FULL}" \
-        "${MERGE_SUBTITLES_FULL}" \
-        "${MERGE_CHAPTERS}" \
-        "${MERGE_COVER}" \
-        "${MERGE_XMLTAGS}"
+        ${MERGE_VERBOSE} ${MERGE_VIDEO} ${MERGE_AUDIO_FULL} ${MERGE_SUBTITLES_FULL} ${MERGE_CHAPTERS} ${MERGE_COVER} ${MERGE_XMLTAGS} || exit 1
     fi
 
 
